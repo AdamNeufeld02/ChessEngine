@@ -1,0 +1,15 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'c:/Users/adamn/Desktop/ChessEngine'
+g++ main.cpp -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -c -g -Ofast -Wall -Wextra -pedantic -o main.o
+g++ Pieces.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Pieces.o
+g++ ChessGUI.cpp -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -c -g -Ofast -Wall -Wextra -pedantic -o ChessGUI.o
+g++ GameState.cpp -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -c -g -Ofast -Wall -Wextra -pedantic -o GameState.o
+g++ MoveGenerator.cpp -c -g -Ofast -Wall -Wextra -pedantic -o MoveGenerator.o
+g++ ChessBoard.cpp -c -g -Ofast -Wall -Wextra -pedantic -o ChessBoard.o
+g++ main.o Pieces.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ChessEngine
+g++ BitBoard.cpp -c -g -Ofast -Wall -Wextra -pedantic -o BitBoard.o
+g++ PieceList.cpp -c -g -Ofast -Wall -Wextra -pedantic -o PieceList.o
+g++ Test.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Test.o
+g++ BitBoard.o PieceList.o Test.o Pieces.o MoveGenerator.o ChessBoard.o -o ChessTest
+make: Leaving directory 'c:/Users/adamn/Desktop/ChessEngine'
+ 

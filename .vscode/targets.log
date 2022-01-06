@@ -1,0 +1,507 @@
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.3
+# Built for Windows32
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+ 
+
+# Make data base, printed on Thu Jan 06 14:20:37 2022
+
+# Variables
+
+# environment
+SYSTEMDRIVE = C:
+# environment
+LC_ALL = C
+# environment
+USERPROFILE = C:\Users\adamn
+# environment
+LOCALAPPDATA = C:\Users\adamn\AppData\Local
+# environment
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-3f99bf61-a5c8-44c2-9602-e74b1bb1dc06-sock
+# environment
+VSCODE_CWD = C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code
+# environment
+CHOCOLATEYINSTALL = C:\ProgramData\chocolatey
+# environment
+SYSTEMROOT = C:\Windows
+# environment
+PROCESSOR_LEVEL = 25
+# environment
+PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+# default
+MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
+# automatic
+@D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_48616_COQNGSVTEKGUQCRL
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+.VARIABLES := 
+# automatic
+%D = $(patsubst %/,%,$(patsubst %\,%,$(dir $%)))
+# automatic
+^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
+# environment
+VSCODE_LOG_STACK = false
+# automatic
+%F = $(notdir $%)
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\adamn\AppData\Roaming\Code\CachedData\899d46d82c4c95423fb7e10e68eba52050e30ba3
+# environment
+LANG = C
+# default
+.LOADED := 
+# environment
+TMP = C:\Users\adamn\AppData\Local\Temp
+# default
+.INCLUDE_DIRS = .
+# environment
+PROCESSOR_ARCHITEW6432 = AMD64
+# makefile
+MAKEFLAGS = pqrR
+# environment
+ONEDRIVE = C:\Users\adamn\OneDrive
+# makefile
+CURDIR := c:/Users/adamn/Desktop/ChessEngine
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# automatic
+*D = $(patsubst %/,%,$(patsubst %\,%,$(dir $*)))
+# environment
+PROGRAMFILES = C:\Program Files (x86)
+# environment
+MFLAGS = -pqrR
+# default
+.SHELLFLAGS := -c
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# automatic
++D = $(patsubst %/,%,$(patsubst %\,%,$(dir $+)))
+# makefile (from 'makefile', line 1)
+MAKEFILE_LIST := makefile
+# automatic
+@F = $(notdir $@)
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# environment
+VSCODE_PID = 48616
+# automatic
+?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
+# automatic
+*F = $(notdir $*)
+# makefile (from 'makefile', line 16)
+LIBRARY_PATHS = -LC:\Users\adamn\SDL2\lib
+# automatic
+<D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
+# makefile (from 'makefile', line 5)
+OBJS_EXE = main.o Pieces.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+ONEDRIVECONSUMER = C:\Users\adamn\OneDrive
+# default
+MAKE_HOST := Windows32
+# environment
+PROGRAMDATA = C:\ProgramData
+# default
+SHELL := sh.exe
+# environment
+HOMEPATH = \Users\adamn
+# default
+MAKECMDGOALS := all
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# environment
+COMSPEC = C:\Windows\system32\cmd.exe
+# environment
+WINDIR = C:\Windows
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+PATH = C:\Program Files (x86)\Razer Chroma SDK\bin;C:\Program Files\Razer Chroma SDK\bin;C:\Program Files (x86)\Razer\ChromaBroadcast\bin;C:\Program Files\Razer\ChromaBroadcast\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\NetSarang\Xlpd 6\;C:\Program Files (x86)\NetSarang\Xshell 6\;C:\Program Files (x86)\NetSarang\Xmanager 6\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files (x86)\NetSarang\Xmanager 7\;C:\Program Files (x86)\NetSarang\Xshell 7\;C:\Program Files (x86)\NetSarang\Xftp 7\;C:\Program Files (x86)\NetSarang\Xlpd 7\;C:\msys64\mingw64\bin;C:\Program Files\dotnet\;C:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\adamn\.dotnet\tools;C:\ProgramData\chocolatey\bin;C:\Users\adamn\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\adamn\.dotnet\tools
+# environment
+COMPUTERNAME = LAPTOP-7FSGAFD8
+# default
+MAKEFILES := 
+# automatic
+^F = $(notdir $^)
+# environment
+PROMPT = $P$G
+# environment
+CHOCOLATEYLASTPATHUPDATE = 132845055620503667
+# environment
+LOGONSERVER = \\LAPTOP-7FSGAFD8
+# environment
+VSCODE_LOG_NATIVE = false
+# environment
+USERNAME = adamn
+# environment
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
+# automatic
+?F = $(notdir $?)
+# environment
+PROGRAMW6432 = C:\Program Files
+# makefile (from 'makefile', line 27)
+OBJ_NAME = ChessEngine
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# automatic
++F = $(notdir $+)
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+USERDOMAIN = LAPTOP-7FSGAFD8
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+OS = Windows_NT
+# makefile (from 'makefile', line 1)
+EXE = ChessEngine
+# makefile (from 'makefile', line 6)
+OBJS_EXET = BitBoard.o PieceList.o Test.o Pieces.o MoveGenerator.o ChessBoard.o
+# makefile
+.DEFAULT_GOAL := all
+# default
+MAKE_VERSION := 4.3
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# environment
+USERDOMAIN_ROAMINGPROFILE = LAPTOP-7FSGAFD8
+# environment
+NUMBER_OF_PROCESSORS = 16
+# environment
+PUBLIC = C:\Users\Public
+# makefile (from 'makefile', line 11)
+CXX_FLAGS = -c -g -Ofast -Wall -Wextra -pedantic
+# environment
+APPDAT 
+A = C:\Users\adamn\AppData\Roaming
+# environment
+HOMEDRIVE = C:
+# environment
+PROCESSOR_ARCHITECTURE = x86
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/services/extensions/node/extensionHostProcess
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# makefile (from 'makefile', line 2)
+EXET = ChessTest
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+TEMP = C:\Users\adamn\AppData\Local\Temp
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\d4a9e6f9a87c3367f01bb615cd195f42-1.63.2-main-sock
+# default
+.RECIPEPREFIX := 
+# automatic
+<F = $(notdir $<)
+# default
+SUFFIXES := 
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# environment
+SESSIONNAME = Console
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync load
+# environment
+PROCESSOR_REVISION = 5000
+# makefile (from 'makefile', line 9)
+CC = g++
+# makefile (from 'makefile', line 24)
+LINKER_FLAGS = -lmingw32 -lSDL2main 
+ -lSDL2 -lSDL2_image
+# makefile (from 'makefile', line 13)
+INCLUDE_PATHS = -IC:\Users\adamn\SDL2\include\SDL2
+# environment
+PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
+# variable set hash-table stats:
+# Load=105/1024=10%, Rehash=0, Collisions=9/145=6%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1641448128): 41 files, no impossibilities.
+
+# 41 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+GameState.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-05 23:32:20
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+ChessBoard.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-05 13:48:12
+#  File has been updated.
+#  Successfully updated.
+
+ChessTest: BitBoard.o PieceList.o Test.o Pieces.o MoveGenerator.o ChessBoard.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 36):
+	$(CC) $(OBJS_EXET) -o $(EXET)
+
+Pieces.o: Pieces.cpp Pieces.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-01-04 21:41:25
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 48):
+	$(CC) Pieces.cpp $(CXX_FLAGS) -o $@
+
+ChessGUI.o: ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-01-05 23:36:12
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 45):
+	$(CC) ChessGUI.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
+
+# Not a target:
+ChessGUI.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-04 16:18:45
+#  File has been updated.
+#  Successfully updated.
+
+MoveGenerator.o: MoveGenerator.cpp MoveGenerator.h ChessBoard.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-01-05 23:48:48
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 42):
+	$(CC) MoveGenerator.cpp $(CXX_FLAGS) -o $@
+
+# Not a target:
+BitBoard.cpp:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+PieceList.cpp:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+ChessBoard.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-05 23:36:09
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+BitBoard.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+GameState.h:
+#  Implicit rule search has been done.
+#  Last modified 2021-12-30 21:54:19
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+MoveGenerator.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-05 23:48:46
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+MoveGenerator.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-05 22:11:42
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+Pieces.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-02 23:00:14
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+PieceList.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+PieceList.o: PieceList.cpp PieceList.h
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 39):
+	$(CC) PieceList.cpp $(CXX_FLAGS) -o $@
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all: ChessEngine ChessTest
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/9=0%
+
+ChessBoard.o: ChessBoard.cpp ChessBoard.h Types.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-01-05 23:36:14
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 63):
+	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@
+
+# Not a target:
+Test.cpp:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+main.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2021-12-23 13:08:11
+#  File has been updated.
+#  Successfully updated.
+
+main.o: main.cpp GameState.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-01-04 21:41:25
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 57):
+	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
+
+ChessEngine: main.o Pieces.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+#  Implicit rule search ha 
+s not been done.
+#  Implicit/static pattern stem: ''
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := ChessEngine
+# automatic
+# * := 
+# automatic
+# < := main.o
+# automatic
+# + := main.o Pieces.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+# automatic
+# % := 
+# automatic
+# ^ := main.o Pieces.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+# automatic
+# ? := main.o Pieces.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+# automatic
+# | := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=5/17=29%
+#  recipe to execute (from 'makefile', line 33):
+	$(CC) $(OBJS_EXE) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE)
+
+GameState.o: GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-01-05 23:36:13
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 54):
+	$(CC) GameState.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
+
+# Not a target:
+Pieces.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2021-12-23 11:51:29
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-05 23:45:30
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+ChessGUI.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-03 22:45:43
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+Types.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-05 22:16:45
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+Test.o: Test.cpp BitBoard.h PieceList.h MoveGenerator.h ChessBoard.h
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 60):
+	$(CC) Test.cpp $(CXX_FLAGS) -o $@
+
+BitBoard.o: BitBoard.cpp BitBoard.h Pieces.h PieceList.h
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 51):
+	$(CC) BitBoard.cpp $(CXX_FLAGS) -o $@
+
+# files hash-table stats:
+# Load=32/1024=3%, Rehash=0, Collisions=1/99=1%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 46 / storage = 512 B / avg = 11 B
+# current buf: size = 8174 B / used = 512 B / count = 46 / avg = 11 B
+
+# strcache performance: lookups = 117 / hit rate = 60%
+# hash-table stats:
+# Load=46/8192=1%, Rehash=0, Collisions=0/117=0%
+# Finished Make data base on Thu Jan 06 14:20:37 2022
+
+ 
