@@ -146,7 +146,7 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     } else {
         pawns = chessBoard.piecesByType[BLACKPAWN];
         singlePush = (pawns >> 8) & ~chessBoard.allPieces;
-        doublePush = ((singlePush & 0xff0000000000) << 8) & ~chessBoard.allPieces;
+        doublePush = ((singlePush & 0xff0000000000) >> 8) & ~chessBoard.allPieces;
         enemies = chessBoard.piecesByColour[WHITE];
         pawnColourAttacks = pawnAttacks[BLACK];
         forward = -8;

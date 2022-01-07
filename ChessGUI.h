@@ -21,7 +21,7 @@
 class ChessGUI {
     public:
     ChessGUI();
-    void drawBoard(ChessBoard* board, int selectedIndex);
+    void drawBoard(ChessBoard* board, int selectedIndex, int* movMat);
     void quitChessGUI();
     int screenCoordToBoardIndex(int x, int y);
 

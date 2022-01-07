@@ -29,7 +29,7 @@ ChessGUI::ChessGUI() {
     }
 }
 
-void ChessGUI::drawBoard(ChessBoard* chessBoard, int selectedIndex) {
+void ChessGUI::drawBoard(ChessBoard* chessBoard, int selectedIndex, int* movMat) {
     Piece selectedPiece;
     if (selectedIndex >= 0) {
         selectedPiece = chessBoard->pieceOn(selectedIndex);
@@ -57,7 +57,7 @@ void ChessGUI::drawBoard(ChessBoard* chessBoard, int selectedIndex) {
             SDL_RenderDrawRect(renderer, &rect);
             SDL_RenderFillRect(renderer, &rect);
 
-            if ((file + (8 * rank)) == selectedIndex) {
+            if ((file + (8 * rank)) == selectedIndex | (movMat[file + (8 * rank)])) {
                 SDL_SetRenderDrawColor(renderer, CHERRYR, CHERRYG, CHERRYB, 255);
                 SDL_RenderDrawRect(renderer, &rect);
                 SDL_RenderFillRect(renderer, &rect);
