@@ -120,13 +120,14 @@ void ChessBoard::fenToBoard(std::string fenString) {
             curr = fenString[stringIndex];
             continue;
         }
-        char* endPtr;
-        num = strtol(&curr, &endPtr, 10);
+        char* endPtr = &curr;
+        strtol(&curr, &endPtr, 10);
         if (endPtr != &curr) {
-            if (num > 1) {
+            num = curr - 48;
+            if (num >= 1) {
                 boardIndex += num;
             }
-        } else {
+        } else { 
             switch(curr) {
                 case(*"P"): putPiece(WHITEPAWN, boardIndex);
                     break;
@@ -218,11 +219,11 @@ void ChessBoard::fenToBoard(std::string fenString) {
 // Initializes all bitboards to empty and all fields
 void ChessBoard::initBoard() {
     for (int i = 0; i < PIECENB; i++) {
-        piecesByType[i] = 0;
+        piecesByType[i] = (bitBoard)0;
     }
-    piecesByColour[WHITE] = 0;
-    piecesByColour[BLACK] = 0;
-    allPieces = 0;
+    piecesByColour[WHITE] = (bitBoard)0;
+    piecesByColour[BLACK] = (bitBoard)0;
+    allPieces = (bitBoard)0;
 
     whiteToMove = false;
     whiteQueenSideCastle = false;

@@ -7,10 +7,12 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # There is NO WARRANTY, to the extent permitted by law.
  
 
-# Make data base, printed on Thu Jan 06 20:45:11 2022
+# Make data base, printed on Fri Jan 07 12:46:19 2022
 
 # Variables
 
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
 # environment
 SYSTEMDRIVE = C:
 # environment
@@ -20,7 +22,7 @@ USERPROFILE = C:\Users\adamn
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-98cfe229-60b1-439a-a3df-f6bbaffc4571-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-9bb751b6-8b7f-4e47-b78f-39bf96022feb-sock
 # environment
 VSCODE_CWD = C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code
 # environment
@@ -36,7 +38,9 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_60900_VPYJYLPBCIGWXZLB
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_34580_WHOBMTXANAUCGKQF
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -90,7 +94,7 @@ MAKEFILE_LIST := makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 60900
+VSCODE_PID = 34580
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
@@ -137,6 +141,7 @@ MAKEFILES :=
 PROMPT = $P$G
 # environment
 CHOCOLATEYLASTPATHUPDATE = 132845055620503667
+ 
 # environment
 LOGONSERVER = \\LAPTOP-7FSGAFD8
 # environment
@@ -214,7 +219,8 @@ SESSIONNAME = Console
 # environment
 PROCESSOR_REVISION = 5000
 # makefile (from 'makefile', line 9)
-CC = g++
+CC 
+ = g++
 # makefile (from 'makefile', line 24)
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
 # makefile (from 'makefile', line 13)
@@ -222,7 +228,7 @@ INCLUDE_PATHS = -IC:\Users\adamn\SDL2\include\SDL2
 # environment
 PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # variable set hash-table stats:
-# Load=105/1024=10%, Rehash=0, Collisions=9/145=6%
+# Load=107/1024=10%, Rehash=0, Collisions=10/147=7%
 
 # Pattern-specific Variable Values
 
@@ -230,7 +236,7 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Directories
 
-# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1641511027): 33 files, no impossibilities.
+# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1641525731): 33 files, no impossibilities.
 
 # 33 files, no impossibilities in 1 directories.
 
@@ -243,7 +249,7 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # Not a target:
 GameState.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-06 16:53:52
+#  Last modified 2022-01-06 21:22:05
 #  File has been updated.
 #  Successfully updated.
 
@@ -263,22 +269,23 @@ ChessTest: Test.o MoveGenerator.o ChessBoard.o
 
 ChessGUI.o: ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-06 15:04:00
+#  Last modified 2022-01-06 21:22:09
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 42):
 	$(CC) ChessGUI.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
-# Not a target:
+# Not a 
+ target:
 ChessGUI.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-04 16:18:45
+#  Last modified 2022-01-06 20:58:20
 #  File has been updated.
 #  Successfully updated.
 
 MoveGenerator.o: MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-06 16:45:08
+#  Last modified 2022-01-06 21:22:11
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 39):
@@ -294,14 +301,14 @@ ChessBoard.cpp:
 # Not a target:
 GameState.h:
 #  Implicit rule search has been done.
-#  Last modified 2021-12-30 21:54:19
+#  Last modified 2022-01-06 21:20:58
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 MoveGenerator.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-06 16:45:02
+#  Last modified 2022-01-06 21:05:32
 #  File has been updated.
 #  Successfully updated.
 
@@ -329,10 +336,9 @@ all: ChessEngine ChessTest
 
 ChessBoard.o: ChessBoard.cpp ChessBoard.h Types.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-06 15:04:01
+#  Last modified 2022-01-06 21:22:11
 #  File has been updated.
-#  Successfully updated 
-.
+#  Successfully updated.
 #  recipe to execute (from 'makefile', line 54):
 	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@
 
@@ -351,7 +357,7 @@ main.cpp:
 
 main.o: main.cpp GameState.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-06 16:57:03
+#  Last modified 2022-01-06 21:22:08
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 48):
@@ -386,7 +392,7 @@ ChessEngine: main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
 
 GameState.o: GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-06 16:57:03
+#  Last modified 2022-01-06 21:22:10
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -402,14 +408,14 @@ makefile:
 # Not a target:
 ChessGUI.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-03 22:45:43
+#  Last modified 2022-01-06 20:57:30
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 Types.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-06 15:03:55
+#  Last modified 2022-01-06 21:19:59
 #  File has been updated.
 #  Successfully updated.
 
@@ -435,11 +441,12 @@ Test.o: Test.cpp MoveGenerator.h ChessBoard.h
 # No general ('VPATH' variable) search path.
 
 # strcache buffers: 1 (0) / strings = 38 / storage = 415 B / avg = 10 B
-# current buf: size = 8174 B / used = 415 B / count = 38 / avg = 10 B
+# current buf: size = 8174 B / used = 415 B 
+ / count = 38 / avg = 10 B
 
 # strcache performance: lookups = 90 / hit rate = 57%
 # hash-table stats:
 # Load=38/8192=0%, Rehash=0, Collisions=0/90=0%
-# Finished Make data base on Thu Jan 06 20:45:11 2022
+# Finished Make data base on Fri Jan 07 12:46:19 2022
 
  

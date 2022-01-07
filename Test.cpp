@@ -13,7 +13,7 @@ TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
     REQUIRE(cb.whiteKingSideCastle);
     REQUIRE(cb.blackQueenSideCastle);
     REQUIRE(cb.blackKingSideCastle);
-    REQUIRE(cb.countBits(cb.allPieces) == 32);
+    REQUIRE(cb.countBits(cb.allPieces) == 32); 
 }
 
 TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {

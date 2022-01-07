@@ -180,6 +180,9 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
         moves->promFlags = DOUBLEPUSH;
         moves++;
     }
+    //gen enPassent
+    
+
     return moves;
 }
 

@@ -8,12 +8,10 @@
 #include "Types.h"
 
 typedef uint64_t bitBoard;
-
+ 
 class ChessBoard {
 
     public:
-    // Default constructor (TODO)
-    ChessBoard();
     // fenString constructor
     ChessBoard(std::string fenString);
     // return piece code at specific index
