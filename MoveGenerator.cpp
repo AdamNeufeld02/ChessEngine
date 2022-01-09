@@ -10,6 +10,7 @@ MoveGenerator::MoveGenerator() {
 }
 
 Move* MoveGenerator::generateMoves(ChessBoard* chessBoard, Move* moves) {
+    initEnemyAttacks(*chessBoard);
     moves = generateKingMoves(*chessBoard, moves);
     moves = generateSlidingMoves(*chessBoard, moves);
     moves = generateKnightMoves(*chessBoard, moves);
@@ -134,22 +135,39 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
 
 Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard* pawnColourAttacks;
-    bitBoard pawns, enemies, attacks, singlePush, doublePush;
+    bitBoard pawns, enemies, attacks, singlePush, doublePush, epAttacks, promotions;
     int from, to, forward;
+    int epSquare = chessBoard.enPassentSquare;
     if (chessBoard.whiteToMove) {
         pawns = chessBoard.piecesByType[WHITEPAWN];
+        promotions = pawns & 0xff000000000000;
+        pawns ^= promotions;
         singlePush = (pawns << 8) & ~chessBoard.allPieces;
         doublePush = ((singlePush & 0xff0000) << 8) & ~chessBoard.allPieces;
         enemies = chessBoard.piecesByColour[BLACK];
+        if (epSquare >= 0) {
+            epAttacks = pawnAttacks[BLACK][epSquare] & pawns;
+        } else {
+            epAttacks = (bitBoard)0;
+        }
+        // The attack array to reference
         pawnColourAttacks = pawnAttacks[WHITE];
         forward = 8;
     } else {
         pawns = chessBoard.piecesByType[BLACKPAWN];
+        promotions = pawns & 0xff00;
+        pawns ^= promotions;
         singlePush = (pawns >> 8) & ~chessBoard.allPieces;
         doublePush = ((singlePush & 0xff0000000000) >> 8) & ~chessBoard.allPieces;
         enemies = chessBoard.piecesByColour[WHITE];
+        // The attack array to reference
         pawnColourAttacks = pawnAttacks[BLACK];
         forward = -8;
+        if (epSquare >= 0) {
+            epAttacks = pawnAttacks[WHITE][epSquare] & pawns;
+        } else {
+            epAttacks = (bitBoard)0;
+        }
     }
     // gen Pawn Attacks
     while (pawns) {
@@ -181,9 +199,34 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
         moves++;
     }
     //gen enPassent
-    
+    while (epAttacks) {
+        from = getLSBIndex(epAttacks);
+        epAttacks ^= (bitBoard) 1 << from;
+        moves->captToFrom = (epSquare << 6) + from;
+        moves->promFlags = ENPASSENT;
+        moves++;
+    }
+    //gen Promotions
+    if (promotions) {
+        from = getLSBIndex(promotions);
+        promotions ^= (bitBoard)1 << from;
 
+    }
     return moves;
+}
+
+template<Colour c>
+bitBoard MoveGenerator::pushUp(bitBoard board) {
+    if (c == WHITE) {
+        return board << 8;
+    } else {
+        return board >> 8;
+    }
+}
+
+void MoveGenerator::initEnemyAttacks(ChessBoard& chessBoard) {
+    attackedByEnemy = (bitBoard)0;
+
 }
 
 void MoveGenerator::initRookOccMask() {

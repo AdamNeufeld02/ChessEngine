@@ -24,12 +24,12 @@ enum FLAGS {
 };
 
 // A struct representing an encoded move
-// flagsToFrom:
+// captToFrom:
 // bits (0-5) From
 // bits (6-11) to
-// bits (12-15) flags
-// promCat
-// bits (0-3) Captured piece code
+// bits (12-15) Captured piece code
+// promflags
+// bits (0-3) flags
 // bits(4- 7) Promoted Piece Code
 struct Move {
     short captToFrom;

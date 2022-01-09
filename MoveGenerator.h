@@ -10,6 +10,14 @@
 // List of possible optimizations:
 //  - reduce number of arrays by using struct MagicSquare (reduces memory lookups)
 
+// TODO:
+//  - Castling
+//  - Promotion
+//  - Check routine
+//  - Absolute pins
+//  - Double check
+
+// MagicSquare struct (TODO)
 struct MagicSquare {
     bitBoard* attacks;
     bitBoard occMask;
@@ -38,9 +46,6 @@ class MoveGenerator {
     Move* generateMoves(ChessBoard* chessBoard, Move* moves);
     // Function that was used to generate magics for rooks and bishops
     bitBoard generateMagicNumber(int square, int rook);
-
-    // sets the bits in a given attack mask corresponding to the index provided
-    bitBoard setOccupancy(int index, int bitsInMask, bitBoard attackMask);
 
     // Pre-generated magic numbers for rook attacks
     static constexpr bitBoard rookMagics[64] = {
@@ -91,21 +96,31 @@ class MoveGenerator {
     
     bitBoard rookOccMask[64];
     bitBoard bishopOccMask[64];
+    bitBoard attackedByEnemy;
     int bitsInRookMask[64];
     int bitsInBishopMask[64];
 
+    // generates moves for sliding pieces
     Move* generateSlidingMoves(ChessBoard& chessBoard, Move* moves);
+    // generates moves for pawns including enpassent and double pushes
     Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves);
+    // generates all knight moves
     Move* generateKnightMoves(ChessBoard& ChessBoard, Move* moves);
+    //generates all king moves
     Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
+    // pushes a board forward based on the colour given (white is leftshift black is rightshift)
+    template<Colour c>
+    bitBoard pushUp(bitBoard board);
+    // Calculates all enemey attacks (unsure if should use a single is attacked function which calculates attacks for a single square)
+    void initEnemyAttacks(ChessBoard& chessBoard);
     // precomputes attack sets and stores them for fast lookup during runtime
     void precomputeAttackSets();
-    void generatePromotionMoves();
     // computes relevant rook attack occupancy masks for each square
     void initRookOccMask();
     // computes relevant Bishop attack occupancy masks for each square
     void initBishopOccMask();
-    
+    // sets the bits in a given attack mask corresponding to the index provided
+    bitBoard setOccupancy(int index, int bitsInMask, bitBoard attackMask);
     // genarates an attack occupancy mask for the given square for either a rook or bishop
     bitBoard genOccMask(int square, int rook);
     
