@@ -17,11 +17,18 @@
 #define CHERRYR 210
 #define CHERRYG 4
 #define CHERRYB 45
+#define WOODR 186
+#define WOODG 140
+#define WOODB 99
 
 class ChessGUI {
     public:
     ChessGUI();
+    // Draws a board with a selected square and its highlighted moves
+    // To draw a board with no selection and move highlighting pass -1 as selected index and
+    // and int array of 64
     void drawBoard(ChessBoard* board, int selectedIndex, int* movMat);
+    void drawPromSelection(Colour colour);
     void quitChessGUI();
     int screenCoordToBoardIndex(int x, int y);
 

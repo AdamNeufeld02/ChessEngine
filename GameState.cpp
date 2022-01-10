@@ -52,17 +52,58 @@ void GameState::gameLoop() {
                 if (index >= 0 && selectedIndex >= 0 && index != selectedIndex) {
                     endIndex = index;
                     move = findMove(moves, end, from, endIndex);
+                    //If move is valid move
                     if (move.captToFrom) {
+                        //If move has promotion type ask user for promotion piece
+                        if (getProm(move)) {
+                            Colour colour = chessBoard->whiteToMove ? WHITE : BLACK;
+                            Piece promPiece = getPromotionFromUser(colour);
+                            move.promFlags = promPiece << 4;
+                        }
                         chessBoard->makeMove(move);
                         end = moveGenerator->generateMoves(chessBoard, moves);
+                        if (end == moves) {
+                            gameState = GAME_OVER;
+                        }
                     }
-                } //TODO: filter illegal move
+                }
                 selectedIndex = -1;
                 resetMoveMatrix(movMat);
             }
             gui->drawBoard(chessBoard, selectedIndex, movMat);
         }
     }
+}
+
+Piece GameState::getPromotionFromUser(Colour colour) {
+    Piece promPiece = EMPTY;
+    int x, y;
+    int index;
+    SDL_Event ev;
+    gui->drawPromSelection(colour); 
+    while (promPiece == EMPTY) {
+        while(SDL_PollEvent(&ev) != 0) {
+            if (ev.type == SDL_QUIT) {
+                gameState = QUIT;
+                return EMPTY;
+            } else if (ev.type == SDL_MOUSEBUTTONDOWN) {
+                SDL_GetMouseState(&x, &y);
+                index = gui->screenCoordToBoardIndex(x, y);
+                if (index == 27) {
+                    return Piece(ROOK + (colour << 3));
+                } else if (index == 28) {
+                    return Piece(QUEEN + (colour << 3));
+                } else if (index == 35) {
+                    return Piece(KNIGHT + (colour << 3));
+                } else if (index = 36) {
+                    return Piece(BISHOP + (colour << 3));
+                }
+            } if (ev.type == SDL_MOUSEMOTION) {
+                gui->drawPromSelection(colour); 
+            }
+        }
+    }
+    return promPiece;
 }
 
 Move GameState::findMove(Move* begin, Move* end, int from, int to) {
@@ -93,5 +134,5 @@ void GameState::makeMoveMatrix(Move* begin, Move* end, int index, int* movMat) {
 }
 
 void GameState::gameOver() {
-
+    gameState = QUIT;
 }

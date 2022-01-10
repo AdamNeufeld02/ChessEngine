@@ -109,8 +109,7 @@ class MoveGenerator {
     //generates all king moves
     Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
     // pushes a board forward based on the colour given (white is leftshift black is rightshift)
-    template<Colour c>
-    bitBoard pushUp(bitBoard board);
+    bitBoard pushUp(bitBoard board, Colour c);
     // Calculates all enemey attacks (unsure if should use a single is attacked function which calculates attacks for a single square)
     void initEnemyAttacks(ChessBoard& chessBoard);
     // precomputes attack sets and stores them for fast lookup during runtime

@@ -82,6 +82,49 @@ void ChessGUI::drawBoard(ChessBoard* chessBoard, int selectedIndex, int* movMat)
     SDL_RenderPresent(renderer);
 }
 
+void ChessGUI::drawPromSelection(Colour colour) {
+    SDL_GetWindowSize(window, &width, &height);
+    int boardSideLength = std::min(width, height);
+    int squareDimension = boardSideLength/8;
+    int colourConst = colour << 3;
+    SDL_Rect rect;
+    rect.x = 3 * squareDimension;
+    rect.y = 3 * squareDimension;
+    rect.w = 2 * squareDimension;
+    rect.h = 2 * squareDimension;
+    SDL_Rect selectedRect;
+    // Draw the background
+    SDL_SetRenderDrawColor(renderer, WOODR, WOODG, WOODB, 255);
+    SDL_RenderDrawRect(renderer, &rect);
+    SDL_RenderFillRect(renderer, &rect);
+
+    int x, y, index;
+    SDL_GetMouseState(&x, &y);
+    index = screenCoordToBoardIndex(x, y);
+    if (index == 27 || index == 28 || index == 35 || index == 36) {
+        x = index % 8;
+        y = index / 8;
+        selectedRect.x = x * squareDimension;
+        selectedRect.y = (7 - y) * squareDimension;
+        selectedRect.w = squareDimension;
+        selectedRect.h = squareDimension;
+        
+        SDL_SetRenderDrawColor(renderer, CHERRYR, CHERRYG, CHERRYB, 255);
+        SDL_RenderDrawRect(renderer, &selectedRect);
+    }
+    
+    
+    
+    for (int i = KNIGHT; i < KING; i++) {
+        rect.x = (3 + (i - 2) % 2) * squareDimension;
+        rect.y = (3 + (i - 2) / 2) * squareDimension;
+        rect.w = squareDimension;
+        rect.h = squareDimension;
+        drawPiece(rect, Piece(i + colourConst));
+    }
+    SDL_RenderPresent(renderer);
+}
+
 void ChessGUI::drawPiece(SDL_Rect rect, Piece piece) {
     if (piece) {
         SDL_Texture* texture = pieceTextures[piece];

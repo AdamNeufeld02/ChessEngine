@@ -29,6 +29,8 @@ class GameState {
     // If multiple Moves returns first one
     // Returns empty move if no move found
     Move findMove(Move* begin, Move* end, int from, int to);
+    
+    Piece getPromotionFromUser(Colour colour);
     ChessBoard* chessBoard;
     ChessGUI* gui;
     MoveGenerator* moveGenerator;

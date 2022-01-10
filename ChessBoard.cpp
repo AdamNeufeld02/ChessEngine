@@ -11,7 +11,15 @@ void ChessBoard::makeMove(Move move) {
     Piece capt = getCapt(move);
     int from = getFrom(move);
     int to = getTo(move);
-    if (flag == NOFLAG) {
+    // handle Promotion
+    if (getProm(move)) {
+        if(capt) {
+            removePiece(to);
+        }
+        removePiece(from);
+        putPiece(getProm(move), to);
+        enPassentSquare = -1;
+    } else if (flag == NOFLAG) {
         if (capt) {
             removePiece(to);
         }
@@ -27,15 +35,6 @@ void ChessBoard::makeMove(Move move) {
             } else {
                 enPassentSquare = from - 8;
             }
-        }
-        // handle Promotion
-        if (getProm(move)) {
-            if(capt) {
-                removePiece(to);
-            }
-            removePiece(from);
-            putPiece(getProm(move), to);
-            enPassentSquare = -1;
         }
         // handle king side castle
         if (flag & KINGCASTLE) {

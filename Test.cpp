@@ -24,12 +24,6 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     Move* endmoves;
     endmoves = mg->generateMoves(&cb, moves);
     int length = endmoves - moves;
-    for (int i = 0; i < length; i++) {
-        std::cout << getFrom(moves[i]) << std::endl;
-        std::cout << getTo(moves[i]) << std::endl;
-        std::cout << getFlag(moves[i]) << std::endl;
-        std::cout << std::endl;
-    }
-
+    REQUIRE(length == 20);
     delete mg;
 }

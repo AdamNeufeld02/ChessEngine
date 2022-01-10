@@ -138,6 +138,7 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard pawns, enemies, attacks, singlePush, doublePush, epAttacks, promotions;
     int from, to, forward;
     int epSquare = chessBoard.enPassentSquare;
+    Colour colour;
     if (chessBoard.whiteToMove) {
         pawns = chessBoard.piecesByType[WHITEPAWN];
         promotions = pawns & 0xff000000000000;
@@ -145,6 +146,7 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
         singlePush = (pawns << 8) & ~chessBoard.allPieces;
         doublePush = ((singlePush & 0xff0000) << 8) & ~chessBoard.allPieces;
         enemies = chessBoard.piecesByColour[BLACK];
+        colour = WHITE;
         if (epSquare >= 0) {
             epAttacks = pawnAttacks[BLACK][epSquare] & pawns;
         } else {
@@ -160,6 +162,7 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
         singlePush = (pawns >> 8) & ~chessBoard.allPieces;
         doublePush = ((singlePush & 0xff0000000000) >> 8) & ~chessBoard.allPieces;
         enemies = chessBoard.piecesByColour[WHITE];
+        colour = BLACK;
         // The attack array to reference
         pawnColourAttacks = pawnAttacks[BLACK];
         forward = -8;
@@ -208,15 +211,36 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     }
     //gen Promotions
     if (promotions) {
+        bitBoard pushedProms = pushUp(promotions, colour) & ~chessBoard.piecesByColour[colour];
         from = getLSBIndex(promotions);
         promotions ^= (bitBoard)1 << from;
+        attacks = pawnColourAttacks[from] & enemies;
+        while (attacks) {
+            to = getLSBIndex(attacks);
+            attacks ^= (bitBoard)1 << to;
+            int captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
+            for (int i = KNIGHT; i < KING; i++) {
+                moves->captToFrom = captToFrom;
+                moves->promFlags = (i + (colour << 3)) << 4;
+                moves++;
+            }
+        }
+        while (pushedProms) {
+            to = getLSBIndex(pushedProms);
+            pushedProms ^= (bitBoard)1 << to;
+            int captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
+            for (int i = KNIGHT; i < KING; i++) {
+                moves->captToFrom = captToFrom;
+                moves->promFlags = (i + (colour << 3)) << 4;
+                moves++;
+            }
+        }
 
     }
     return moves;
 }
 
-template<Colour c>
-bitBoard MoveGenerator::pushUp(bitBoard board) {
+bitBoard MoveGenerator::pushUp(bitBoard board, Colour c) {
     if (c == WHITE) {
         return board << 8;
     } else {
