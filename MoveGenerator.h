@@ -26,6 +26,7 @@ struct MagicSquare {
     int shift;
 };
 
+// Used for looking up the LSB of a bitboard in constant time
 const bitBoard deBruijn64 = 0x03f79d71b4cb0a89;
 const int index64[64] = {
     0, 47,  1, 56, 48, 27,  2, 60,
@@ -45,7 +46,8 @@ class MoveGenerator {
     // Places all moves in the move list provided
     // Returns a pointer to the end of the list of generated moves
     Move* generateMoves(ChessBoard* chessBoard, Move* moves);
-    // Function that was used to generate magics for rooks and bishops
+    // Function that was used to generate magics for rooks and bishops.
+    // Heavily inspired by the routine found on https://www.chessprogramming.org/Looking_for_Magics
     bitBoard generateMagicNumber(int square, int rook);
 
     // Pre-generated magic numbers for rook attacks
@@ -105,7 +107,7 @@ class MoveGenerator {
 
     // generates moves for sliding pieces
     Move* generateSlidingMoves(ChessBoard& chessBoard, Move* moves);
-    // generates moves for pawns including enpassent and double pushes
+    // generates moves for pawns including enpassent, promotions and double pushes
     Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves);
     // generates all knight moves
     Move* generateKnightMoves(ChessBoard& ChessBoard, Move* moves);

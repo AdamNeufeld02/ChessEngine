@@ -117,6 +117,7 @@ Move GameState::findMove(Move* begin, Move* end, int from, int to) {
             return move;
         }
     }
+    // Return empty move
     return makeMove<NOFLAG>(0, 0, EMPTY, EMPTY);
 }
 

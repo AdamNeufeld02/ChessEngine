@@ -41,12 +41,7 @@ class ChessBoard {
     bool canCastle(CastlingRights cr) const;
     
     // Fields 
-    //int enPassentSquare;
     bool whiteToMove;
-    // bool whiteQueenSideCastle;
-    // bool whiteKingSideCastle;
-    // bool blackQueenSideCastle;
-    // bool blackKingSideCastle;
     StateInfo* st;
     Piece board[64];   
     bitBoard piecesByType[PIECENB];

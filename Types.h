@@ -23,6 +23,7 @@ enum FLAGS {
     QUEENCASTLE=  0b00001000
 };
 
+// Taken from https://github.com/official-stockfish/Stockfish/blob/master/src/position.h
 enum CastlingRights {
     NO_CASTLING,
     WHITE_OO,

@@ -20,6 +20,7 @@ Move* MoveGenerator::generateMoves(ChessBoard* chessBoard, Move* moves) {
 Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard notAllies, rooks, bishops, queens, maskedOcc, attacks;
     int from, to;
+    // init colour specific bitboards
     if (chessBoard.whiteToMove) {
         notAllies = ~chessBoard.piecesByColour[WHITE];
         rooks = chessBoard.piecesByType[WHITEROOK];
@@ -32,6 +33,7 @@ Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
         bishops = chessBoard.piecesByType[BLACKBISHOP];
     }
 
+    // generate rook attacks via magic bitboard lookups
     while (rooks) {
         from = getLSBIndex(rooks);
         rooks ^= (bitBoard) 1 << from;
@@ -47,6 +49,7 @@ Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
         }
     }
 
+    // generate bishop attacks via magic bitboard lookups
     while (bishops) {
         from = getLSBIndex(bishops);
         bishops ^= (bitBoard)1 << from;
@@ -62,6 +65,7 @@ Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
         }
     }
 
+    // generate queen attacks via magic bitboard lookups
     while (queens) {
         from = getLSBIndex(queens);
         queens ^= (bitBoard) 1 << from;
@@ -84,6 +88,7 @@ Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
 Move* MoveGenerator::generateKnightMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard notAllies, knights, attacks;
     int from, to;
+    // init colour specific fields
     if (chessBoard.whiteToMove) {
         notAllies = ~chessBoard.piecesByColour[WHITE];
         knights = chessBoard.piecesByType[WHITEKNIGHT];
@@ -91,6 +96,8 @@ Move* MoveGenerator::generateKnightMoves(ChessBoard& chessBoard, Move* moves) {
         notAllies = ~chessBoard.piecesByColour[BLACK];
         knights = chessBoard.piecesByType[BLACKKNIGHT];
     }
+
+    // lookup precomputed knight moves
     while(knights) {
         from = getLSBIndex(knights);
         knights ^= (bitBoard) 1 << from;
@@ -109,6 +116,7 @@ Move* MoveGenerator::generateKnightMoves(ChessBoard& chessBoard, Move* moves) {
 Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard notAllies, king, attacks;
     int from, to;
+    // init colour specific bitboards
     if (chessBoard.whiteToMove) {
         notAllies = ~chessBoard.piecesByColour[WHITE];
         king = chessBoard.piecesByType[WHITEKING];
@@ -117,6 +125,7 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
         king = chessBoard.piecesByType[BLACKKING];
     }
 
+    // lookup precomputed king moves
     while(king) {
         from = getLSBIndex(king);
         king ^= (bitBoard)1 << from;
@@ -128,6 +137,8 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
             moves->promFlags = 0;
             moves++;
         }
+
+        // Generate Castles
     }
     return moves;
 }
@@ -138,6 +149,8 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     int from, to, forward;
     int epSquare = chessBoard.epSquare();
     Colour colour;
+
+    // init colour specific bitboards
     if (chessBoard.whiteToMove) {
         pawns = chessBoard.piecesByType[WHITEPAWN];
         promotions = pawns & 0xff000000000000;
@@ -171,7 +184,7 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
             epAttacks = (bitBoard)0;
         }
     }
-    // gen Pawn Attacks
+    // gen Pawn Attacks through pre computed attack bitboards
     while (pawns) {
         from = getLSBIndex(pawns);
         pawns ^= (bitBoard) 1 << from;
@@ -210,9 +223,11 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     }
     //gen Promotions
     if (promotions) {
+        // promotions from pawn pushes
         bitBoard pushedProms = pushUp(promotions, colour) & ~chessBoard.piecesByColour[colour];
         from = getLSBIndex(promotions);
         promotions ^= (bitBoard)1 << from;
+        // promotions from captures
         attacks = pawnColourAttacks[from] & enemies;
         while (attacks) {
             to = getLSBIndex(attacks);
