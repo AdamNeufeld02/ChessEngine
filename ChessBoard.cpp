@@ -45,7 +45,7 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
             if (whiteToMove) {
                 si.castlingRights ^= WHITE_CASTLING;
             } else {
-                si.castlingRights ^= WHITE_CASTLING;
+                si.castlingRights ^= BLACK_CASTLING;
             }
             si.epSquare = -1;
         }
@@ -56,7 +56,7 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
             if (whiteToMove) {
                 si.castlingRights ^= WHITE_CASTLING;
             } else {
-                si.castlingRights ^= WHITE_CASTLING;
+                si.castlingRights ^= BLACK_CASTLING;
             }
             si.epSquare = -1;
         }
@@ -176,7 +176,7 @@ void ChessBoard::fenToBoard(std::string fenString) {
             } else if (curr == *"k") {
                 st->castlingRights |= BLACK_OO;
             } else if (curr == *"q") {
-                st->castlingRights |= BLACK_OO;
+                st->castlingRights |= BLACK_OOO;
             }
             stringIndex++;
             curr = fenString[stringIndex];
