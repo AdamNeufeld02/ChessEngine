@@ -6,6 +6,8 @@
 #include "MoveGenerator.h"
 #include "SDL.h"
 #include <iostream>
+#include <deque>
+#include <memory>
 
 class GameState {
     public:
@@ -29,7 +31,7 @@ class GameState {
     // If multiple Moves returns first one
     // Returns empty move if no move found
     Move findMove(Move* begin, Move* end, int from, int to);
-    
+    std::unique_ptr<std::deque<StateInfo>> states;
     Piece getPromotionFromUser(Colour colour);
     ChessBoard* chessBoard;
     ChessGUI* gui;

@@ -8,17 +8,25 @@
 #include "Types.h"
 
 typedef uint64_t bitBoard;
+
+// Inspired by stockFish's stateInfo struct.
+// Used to restore the position of a board on undoMove
+struct StateInfo {
+    char castlingRights;
+    char epSquare;
+    StateInfo* previous;
+};
  
 class ChessBoard {
 
     public:
     // fenString constructor
-    ChessBoard(std::string fenString);
+    ChessBoard(std::string fenString, StateInfo& si);
     // return piece code at specific index
     Piece pieceOn(int sq);
     // Performs a move on the board. Does not check if it is a legal chess move.
     // Updates the enpassent, castle, and whiteToMove fields based on the move played
-    void makeMove(Move move);
+    void makeMove(Move move, StateInfo& si);
     // sets the bit on the bitboard to 0
     static void popBit(bitBoard& bb, int index);
     // sets bit on bitboard to one
@@ -27,17 +35,20 @@ class ChessBoard {
     static void printBoard(bitBoard bb);
     // counts set bits on board
     static int countBits(bitBoard bb);
+
+    char epSquare() const;
+
+    bool canCastle(CastlingRights cr) const;
     
-
-    int enPassentSquare;
+    // Fields 
+    //int enPassentSquare;
     bool whiteToMove;
-    bool whiteQueenSideCastle;
-    bool whiteKingSideCastle;
-    bool blackQueenSideCastle;
-    bool blackKingSideCastle;
-
-    Piece board[64];    
-    //TODO: finish refactoring of chessboard
+    // bool whiteQueenSideCastle;
+    // bool whiteKingSideCastle;
+    // bool blackQueenSideCastle;
+    // bool blackKingSideCastle;
+    StateInfo* st;
+    Piece board[64];   
     bitBoard piecesByType[PIECENB];
     bitBoard piecesByColour[2];
     // The Occupancy of all pieces
@@ -56,13 +67,21 @@ class ChessBoard {
 
 
     void fenToBoard(std::string fenString);
-    void initBoard();
+    void initBoard(StateInfo& si);
     // Assumes to is an empty square
     void movePiece(int from, int to);
     void removePiece(int sq);
     void putPiece(Piece pc, int sq);
     
 };
+
+inline char ChessBoard::epSquare() const {
+    return st->epSquare;
+}
+
+inline bool ChessBoard::canCastle(CastlingRights cr) const {
+    return st->castlingRights & cr;
+}
 
 inline void ChessBoard::putPiece(Piece pc, int sq) {
     bitBoard place = (bitBoard)1 << sq;

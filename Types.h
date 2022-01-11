@@ -23,6 +23,22 @@ enum FLAGS {
     QUEENCASTLE=  0b00001000
 };
 
+enum CastlingRights {
+    NO_CASTLING,
+    WHITE_OO,
+    WHITE_OOO = WHITE_OO << 1,
+    BLACK_OO  = WHITE_OO << 2,
+    BLACK_OOO = WHITE_OO << 3,
+
+    KING_SIDE      = WHITE_OO  | BLACK_OO,
+    QUEEN_SIDE     = WHITE_OOO | BLACK_OOO,
+    WHITE_CASTLING = WHITE_OO  | WHITE_OOO,
+    BLACK_CASTLING = BLACK_OO  | BLACK_OOO,
+    ANY_CASTLING   = WHITE_CASTLING | BLACK_CASTLING,
+
+    CASTLING_RIGHT_NB = 16
+};
+
 // A struct representing an encoded move
 // captToFrom:
 // bits (0-5) From

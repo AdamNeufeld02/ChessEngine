@@ -1,16 +1,18 @@
 #include "ChessBoard.h"
 
 //Builds a chess Board from a given fenstring
-ChessBoard::ChessBoard(std::string fenString) {
-    initBoard();
+ChessBoard::ChessBoard(std::string fenString, StateInfo& si) {
+    initBoard(si);
     fenToBoard(fenString);
 }
 
-void ChessBoard::makeMove(Move move) {
+void ChessBoard::makeMove(Move move, StateInfo& si) {
     FLAGS flag = getFlag(move);
     Piece capt = getCapt(move);
     int from = getFrom(move);
     int to = getTo(move);
+
+    memcpy(&si, st, offsetof(StateInfo, previous));
     // handle Promotion
     if (getProm(move)) {
         if(capt) {
@@ -18,22 +20,22 @@ void ChessBoard::makeMove(Move move) {
         }
         removePiece(from);
         putPiece(getProm(move), to);
-        enPassentSquare = -1;
+        si.epSquare = -1;
     } else if (flag == NOFLAG) {
         if (capt) {
             removePiece(to);
         }
         movePiece(from, to);
-        enPassentSquare = -1;
+        si.epSquare = -1;
         // TODO update castling rights
     } else {
         // handle double push
         if (flag & DOUBLEPUSH) {
             movePiece(from, to);
             if (whiteToMove) {
-                enPassentSquare = from + 8;
+                si.epSquare = from + 8;
             } else {
-                enPassentSquare = from - 8;
+                si.epSquare = from - 8;
             }
         }
         // handle king side castle
@@ -41,26 +43,22 @@ void ChessBoard::makeMove(Move move) {
             movePiece(from, to);
             movePiece(to + 1, from + 1);
             if (whiteToMove) {
-                whiteKingSideCastle = false;
-                whiteQueenSideCastle = false;
+                si.castlingRights ^= WHITE_CASTLING;
             } else {
-                blackKingSideCastle = false;
-                blackQueenSideCastle = false;
+                si.castlingRights ^= WHITE_CASTLING;
             }
-            enPassentSquare = -1;
+            si.epSquare = -1;
         }
         // handle queen side castle
         if (flag & QUEENCASTLE) {
             movePiece(from, to);
             movePiece(to - 1, from - 1);
             if (whiteToMove) {
-                whiteKingSideCastle = false;
-                whiteQueenSideCastle = false;
+                si.castlingRights ^= WHITE_CASTLING;
             } else {
-                whiteKingSideCastle = false;
-                whiteQueenSideCastle = false;
+                si.castlingRights ^= WHITE_CASTLING;
             }
-            enPassentSquare = -1;
+            si.epSquare = -1;
         }
         // handle en passent
         if (flag & ENPASSENT) {
@@ -70,9 +68,11 @@ void ChessBoard::makeMove(Move move) {
                 removePiece(to + 8);
             }
             movePiece(from, to);
-            enPassentSquare = -1;
+            si.epSquare = -1;
         }
     }
+    si.previous = st;
+    st = &si;
     whiteToMove = !whiteToMove;
 }
 
@@ -170,13 +170,13 @@ void ChessBoard::fenToBoard(std::string fenString) {
     if (curr != *"-") {
         while (curr != *" ") {
             if (curr == *"K") {
-                whiteKingSideCastle = true;
+                st->castlingRights |= WHITE_OO;
             } else if (curr == *"Q") {
-                whiteQueenSideCastle = true;
+                st->castlingRights |= WHITE_OOO;
             } else if (curr == *"k") {
-                blackKingSideCastle = true;
+                st->castlingRights |= BLACK_OO;
             } else if (curr == *"q") {
-                blackQueenSideCastle = true;
+                st->castlingRights |= BLACK_OO;
             }
             stringIndex++;
             curr = fenString[stringIndex];
@@ -189,34 +189,34 @@ void ChessBoard::fenToBoard(std::string fenString) {
     // parse En Passent square
     if (curr != *"-") {
         if (curr == *"a") {
-            enPassentSquare = 0;
+            st->epSquare = 0;
         } else if (curr == *"b") {
-            enPassentSquare = 1;
+            st->epSquare = 1;
         } else if (curr == *"c") {
-            enPassentSquare = 2;
+            st->epSquare = 2;
         } else if (curr == *"d") {
-            enPassentSquare = 3;
+            st->epSquare = 3;
         } else if (curr == *"e") {
-            enPassentSquare = 4;
+            st->epSquare = 4;
         } else if (curr == *"f") {
-            enPassentSquare = 5;
+            st->epSquare = 5;
         } else if (curr == *"g") {
-            enPassentSquare = 6;
+            st->epSquare = 6;
         } else if (curr == *"h") {
-            enPassentSquare = 7;
+            st->epSquare = 7;
         }
         stringIndex++;
         curr = fenString[stringIndex];
         num = strtol(&curr, NULL, 10);
-        enPassentSquare += (8 - num) * 8;
+        st->epSquare += (8 - num) * 8;
     } else {
-        enPassentSquare = -1;
+        st->epSquare = -1;
     }
     
 }
 
 // Initializes all bitboards to empty and all fields
-void ChessBoard::initBoard() {
+void ChessBoard::initBoard(StateInfo& si) {
     for (int i = 0; i < PIECENB; i++) {
         piecesByType[i] = (bitBoard)0;
     }
@@ -224,11 +224,12 @@ void ChessBoard::initBoard() {
     piecesByColour[BLACK] = (bitBoard)0;
     allPieces = (bitBoard)0;
 
+    st = &si;
+
+    st->castlingRights = NO_CASTLING;
+    st->epSquare = -1;
+    st->previous = NULL;
+
     whiteToMove = false;
-    whiteQueenSideCastle = false;
-    whiteKingSideCastle = false;
-    blackKingSideCastle = false;
-    blackQueenSideCastle = false;
-    enPassentSquare = -1;
 }
 

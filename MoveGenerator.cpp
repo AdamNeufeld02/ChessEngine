@@ -10,7 +10,6 @@ MoveGenerator::MoveGenerator() {
 }
 
 Move* MoveGenerator::generateMoves(ChessBoard* chessBoard, Move* moves) {
-    initEnemyAttacks(*chessBoard);
     moves = generateKingMoves(*chessBoard, moves);
     moves = generateSlidingMoves(*chessBoard, moves);
     moves = generateKnightMoves(*chessBoard, moves);
@@ -137,7 +136,7 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard* pawnColourAttacks;
     bitBoard pawns, enemies, attacks, singlePush, doublePush, epAttacks, promotions;
     int from, to, forward;
-    int epSquare = chessBoard.enPassentSquare;
+    int epSquare = chessBoard.epSquare();
     Colour colour;
     if (chessBoard.whiteToMove) {
         pawns = chessBoard.piecesByType[WHITEPAWN];
@@ -246,11 +245,6 @@ bitBoard MoveGenerator::pushUp(bitBoard board, Colour c) {
     } else {
         return board >> 8;
     }
-}
-
-void MoveGenerator::initEnemyAttacks(ChessBoard& chessBoard) {
-    attackedByEnemy = (bitBoard)0;
-
 }
 
 void MoveGenerator::initRookOccMask() {
@@ -509,12 +503,12 @@ bitBoard MoveGenerator::computePawnAttack(int square, int white) {
     }
     nfile = file + 1;
     // check if diagonals are legal and set bit in attack board
-    if (file < 8) {
+    if (nfile < 8) {
         ChessBoard::setBit(attacks, (nrank * 8) + nfile);
     }
     nfile = file - 1;
     // check if diagonals are legal and set bit in attack board
-    if (file >= 0) {
+    if (nfile >= 0) {
         ChessBoard::setBit(attacks, (nrank * 8) + nfile);
     }
     return attacks;

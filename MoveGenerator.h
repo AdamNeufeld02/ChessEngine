@@ -9,13 +9,14 @@
 
 // List of possible optimizations:
 //  - reduce number of arrays by using struct MagicSquare (reduces memory lookups)
+//  - known bottleneck is writing to the movelist actual move generation is extremly fast
 
 // TODO:
 //  - Castling
-//  - Promotion
 //  - Check routine
 //  - Absolute pins
 //  - Double check
+//  - Clean up
 
 // MagicSquare struct (TODO)
 struct MagicSquare {
@@ -87,6 +88,7 @@ class MoveGenerator {
     };
 
     private:
+    // AttackTables computed on startup
     // pawnAttacks[color][square] 0 = white 1 = black
     bitBoard pawnAttacks[2][64];
     bitBoard knightAttacks[64];
@@ -94,9 +96,10 @@ class MoveGenerator {
     bitBoard rookAttacks[64][4096];
     bitBoard bishopAttacks[64][512];
     
+    // Occupancy data used in magic bitboards
+    // Computed on startup
     bitBoard rookOccMask[64];
     bitBoard bishopOccMask[64];
-    bitBoard attackedByEnemy;
     int bitsInRookMask[64];
     int bitsInBishopMask[64];
 
@@ -110,8 +113,7 @@ class MoveGenerator {
     Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
     // pushes a board forward based on the colour given (white is leftshift black is rightshift)
     bitBoard pushUp(bitBoard board, Colour c);
-    // Calculates all enemey attacks (unsure if should use a single is attacked function which calculates attacks for a single square)
-    void initEnemyAttacks(ChessBoard& chessBoard);
+    
     // precomputes attack sets and stores them for fast lookup during runtime
     void precomputeAttackSets();
     // computes relevant rook attack occupancy masks for each square

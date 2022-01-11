@@ -3,7 +3,9 @@
 const static std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 
 GameState::GameState() {
-    chessBoard = new ChessBoard(startingFen);
+    states = std::unique_ptr<std::deque<StateInfo>>(new std::deque<StateInfo>(1));
+    states->emplace_back();
+    chessBoard = new ChessBoard(startingFen, states->back());
     gui = new ChessGUI(); 
     gameState = PLAYING_GAME;
     moveGenerator = new MoveGenerator();
@@ -60,7 +62,8 @@ void GameState::gameLoop() {
                             Piece promPiece = getPromotionFromUser(colour);
                             move.promFlags = promPiece << 4;
                         }
-                        chessBoard->makeMove(move);
+                        states->emplace_back();
+                        chessBoard->makeMove(move, states->back());
                         end = moveGenerator->generateMoves(chessBoard, moves);
                         if (end == moves) {
                             gameState = GAME_OVER;

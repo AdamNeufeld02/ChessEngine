@@ -6,19 +6,17 @@
 
 TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    ChessBoard cb = ChessBoard(startingFen);
+    StateInfo state;
+    ChessBoard cb = ChessBoard(startingFen, state);
     cb.printBoard(cb.allPieces);
     REQUIRE(cb.whiteToMove);
-    REQUIRE(cb.whiteQueenSideCastle);
-    REQUIRE(cb.whiteKingSideCastle);
-    REQUIRE(cb.blackQueenSideCastle);
-    REQUIRE(cb.blackKingSideCastle);
     REQUIRE(cb.countBits(cb.allPieces) == 32); 
 }
 
 TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    ChessBoard cb = ChessBoard(startingFen);
+    StateInfo state;
+    ChessBoard cb = ChessBoard(startingFen, state);
     MoveGenerator* mg = new MoveGenerator();
     Move moves[MAXMOVES]; 
     Move* endmoves;
