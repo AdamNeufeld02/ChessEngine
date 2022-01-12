@@ -52,7 +52,7 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
         // handle queen side castle
         if (flag & QUEENCASTLE) {
             movePiece(from, to);
-            movePiece(to - 1, from - 1);
+            movePiece(to - 2, from - 1);
             if (whiteToMove) {
                 si.castlingRights ^= WHITE_CASTLING;
             } else {

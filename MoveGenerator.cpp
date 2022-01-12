@@ -6,6 +6,7 @@ constexpr bitBoard MoveGenerator::rookMagics[64];
 MoveGenerator::MoveGenerator() {
     initRookOccMask();
     initBishopOccMask();
+    initCastleMasks();
     precomputeAttackSets();
 }
 
@@ -115,14 +116,24 @@ Move* MoveGenerator::generateKnightMoves(ChessBoard& chessBoard, Move* moves) {
 
 Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard notAllies, king, attacks;
-    int from, to;
+    int from, to, kcastleTo, qcastleTo;
+    CastlingRights kingCastle;
+    CastlingRights queenCastle;
     // init colour specific bitboards
     if (chessBoard.whiteToMove) {
         notAllies = ~chessBoard.piecesByColour[WHITE];
         king = chessBoard.piecesByType[WHITEKING];
+        kingCastle = WHITE_OO;
+        queenCastle = WHITE_OOO;
+        kcastleTo = 6;
+        qcastleTo = 2;
     } else {
         notAllies = ~chessBoard.piecesByColour[BLACK];
         king = chessBoard.piecesByType[BLACKKING];
+        kingCastle = BLACK_OO;
+        queenCastle = BLACK_OOO;
+        kcastleTo = 62;
+        qcastleTo = 58;
     }
 
     // lookup precomputed king moves
@@ -139,6 +150,17 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
         }
 
         // Generate Castles
+        if (chessBoard.canCastle(kingCastle) && (castleMasks[kingCastle] & chessBoard.allPieces) == 0) {
+            moves->captToFrom = (kcastleTo << 6) + from;
+            moves->promFlags = KINGCASTLE;
+            moves++;
+        }
+
+        if (chessBoard.canCastle(queenCastle) && (castleMasks[queenCastle] & chessBoard.allPieces) == 0) {
+            moves->captToFrom = (qcastleTo << 6) + from;
+            moves->promFlags = QUEENCASTLE;
+            moves++;
+        }
     }
     return moves;
 }
@@ -310,6 +332,13 @@ bitBoard MoveGenerator::setOccupancy(int index, int bitsInMask, bitBoard attackM
     }
 
     return occ;
+}
+
+void MoveGenerator::initCastleMasks() {
+    castleMasks[WHITE_OO] = (bitBoard)0x60;
+    castleMasks[WHITE_OOO] = (bitBoard)0xe;
+    castleMasks[BLACK_OO] = castleMasks[WHITE_OO] << 56;
+    castleMasks[BLACK_OOO] = castleMasks[WHITE_OOO] << 56;
 }
 
 // Precompute attack tables and initialize magic bitboards

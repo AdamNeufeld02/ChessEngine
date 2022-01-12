@@ -12,7 +12,6 @@
 //  - known bottleneck is writing to the movelist actual move generation is extremly fast
 
 // TODO:
-//  - Castling
 //  - Check routine
 //  - Absolute pins
 //  - Double check
@@ -97,6 +96,9 @@ class MoveGenerator {
     bitBoard kingAttacks[64];
     bitBoard rookAttacks[64][4096];
     bitBoard bishopAttacks[64][512];
+
+    // Castles masks used in generating castle moves
+    bitBoard castleMasks[9];
     
     // Occupancy data used in magic bitboards
     // Computed on startup
@@ -116,6 +118,8 @@ class MoveGenerator {
     // pushes a board forward based on the colour given (white is leftshift black is rightshift)
     bitBoard pushUp(bitBoard board, Colour c);
     
+    // Initializes the castle mask array used in the generation of castle moves
+    void initCastleMasks();
     // precomputes attack sets and stores them for fast lookup during runtime
     void precomputeAttackSets();
     // computes relevant rook attack occupancy masks for each square

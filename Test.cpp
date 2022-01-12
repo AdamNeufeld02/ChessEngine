@@ -24,4 +24,7 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     int length = endmoves - moves;
     REQUIRE(length == 20);
     delete mg;
+    bitBoard testBoard = 0x60;
+    testBoard = testBoard << 56;
+    cb.printBoard(testBoard);
 }

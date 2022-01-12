@@ -5,8 +5,9 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
+ 
 
-# Make data base, printed on Mon Jan 10 21:49:09 2022
+# Make data base, printed on Tue Jan 11 19:58:55 2022
 
 # Variables
 
@@ -19,7 +20,7 @@ USERPROFILE = C:\Users\adamn
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-08c76850-4ff6-4276-8b30-bc02be292beb-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-2853202f-3b23-47cd-895a-1368b906d953-sock
 # environment
 VSCODE_CWD = C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code
 # environment
@@ -35,7 +36,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_25300_ISKZVWJUQBFOYVTB
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_20416_VQXHHVPJSWKEETZU
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -63,8 +64,7 @@ PROCESSOR_ARCHITEW6432 = AMD64
 # makefile
 MAKEFLAGS = pqrR
 # environment
-ONEDRIVE = C:\Users\adamn\On 
-eDrive
+ONEDRIVE = C:\Users\adamn\OneDrive
 # makefile
 CURDIR := c:/Users/adamn/Desktop/ChessEngine
 # environment
@@ -90,7 +90,7 @@ MAKEFILE_LIST := makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 25300
+VSCODE_PID = 20416
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
@@ -230,7 +230,7 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Directories
 
-# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1641794473): 34 files, no impossibilities.
+# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1641882919): 34 files, no impossibilities.
 
 # 34 files, no impossibilities in 1 directories.
 
@@ -249,7 +249,7 @@ GameState.cpp:
 # Not a target:
 ChessBoard.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-10 11:59:24
+#  Last modified 2022-01-10 22:42:28
 #  File has been updated.
 #  Successfully updated.
 
@@ -257,13 +257,14 @@ ChessTest: Test.o MoveGenerator.o ChessBoard.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 36):
+#  recipe to execute (from 'makefile', line 
+ 36):
 	$(CC) $(OBJS_EXET) -o $(EXET)
 
 ChessGUI.o: ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
 #  Implicit rule search has not been done.
 #  Implicit/static pattern stem: ''
-#  Last modified 2022-01-09 21:36:05
+#  Last modified 2022-01-10 22:34:52
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # automatic
@@ -310,7 +311,7 @@ ChessBoard.cpp:
 # Not a target:
 GameState.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-09 21:29:43
+#  Last modified 2022-01-10 22:24:45
 #  File has been updated.
 #  Successfully updated.
 
@@ -363,7 +364,7 @@ main.cpp:
 
 main.o: main.cpp GameState.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-09 21:36:04
+#  Last modified 2022-01-10 22:24:49
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 48):
@@ -403,7 +404,7 @@ ChessGUI.h:
 # Not a target:
 Types.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-10 13:12:17
+#  Last modified 2022-01-10 22:50:17
 #  File has been updated.
 #  Successfully updated.
 
@@ -420,8 +421,7 @@ Test.o: Test.cpp MoveGenerator.h ChessBoard.h
 #  recipe to execute (from 'makefile', line 51):
 	$(CC) Test.cpp $(CXX_FLAGS) -o $@
 
-# file 
-s hash-table stats:
+# files hash-table stats:
 # Load=23/1024=2%, Rehash=0, Collisions=0/74=0%
 # VPATH Search Paths
 
@@ -435,6 +435,6 @@ s hash-table stats:
 # strcache performance: lookups = 91 / hit rate = 57%
 # hash-table stats:
 # Load=39/8192=0%, Rehash=0, Collisions=0/91=0%
-# Finished Make data base on Mon Jan 10 21:49:09 2022
+# Finished Make data base on Tue Jan 11 19:58:55 2022
 
  
