@@ -3,6 +3,7 @@ make: Entering directory 'c:/Users/adamn/Desktop/ChessEngine'
 g++ main.cpp -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -c -g -Ofast -Wall -Wextra -pedantic -o main.o
  
 g++ ChessGUI.cpp -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -c -g -Ofast -Wall -Wextra -pedantic -o ChessGUI.o
+ 
 g++ GameState.cpp -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -c -g -Ofast -Wall -Wextra -pedantic -o GameState.o
 g++ MoveGenerator.cpp -c -g -Ofast -Wall -Wextra -pedantic -o MoveGenerator.o
  

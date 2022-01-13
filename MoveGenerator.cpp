@@ -1,11 +1,9 @@
 #include "MoveGenerator.h"
 
-constexpr bitBoard MoveGenerator::bishopMagics[64];
-constexpr bitBoard MoveGenerator::rookMagics[64];
+constexpr bitBoard MoveGenerator::bishopMagicNums[64];
+constexpr bitBoard MoveGenerator::rookMagicNums[64];
 
 MoveGenerator::MoveGenerator() {
-    initRookOccMask();
-    initBishopOccMask();
     initCastleMasks();
     precomputeAttackSets();
 }
@@ -16,6 +14,16 @@ Move* MoveGenerator::generateMoves(ChessBoard* chessBoard, Move* moves) {
     moves = generateKnightMoves(*chessBoard, moves);
     moves = generatePawnMoves(*chessBoard, moves);
     return moves;
+}
+
+template<GenType t, Colour c>
+Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
+
+}
+
+template<PieceType pt>
+Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets) {
+    
 }
 
 Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
@@ -36,14 +44,13 @@ Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
 
     // generate rook attacks via magic bitboard lookups
     while (rooks) {
-        from = getLSBIndex(rooks);
-        rooks ^= (bitBoard) 1 << from;
-        maskedOcc = rookOccMask[from] & chessBoard.allPieces;
-        attacks = rookAttacks[from][maskedOcc * rookMagics[from] >> (64 - bitsInRookMask[from])];
+        from = popLSB(rooks);
+        MagicSquare& m = rookMagics[from];
+        maskedOcc = m.occMask & chessBoard.allPieces;
+        attacks = m.attacks[maskedOcc * m.magic >> m.shift];
         attacks &= notAllies;
         while (attacks) {
-            to = getLSBIndex(attacks);
-            attacks ^= (bitBoard)1 << to;
+            to = popLSB(attacks);
             moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             moves->promFlags = 0;
             moves++;
@@ -52,14 +59,13 @@ Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
 
     // generate bishop attacks via magic bitboard lookups
     while (bishops) {
-        from = getLSBIndex(bishops);
-        bishops ^= (bitBoard)1 << from;
-        maskedOcc = bishopOccMask[from] & chessBoard.allPieces;
-        attacks = bishopAttacks[from][maskedOcc * bishopMagics[from] >> (64 - bitsInBishopMask[from])];
+        from = popLSB(bishops);
+        MagicSquare& m = bishopMagics[from];
+        maskedOcc = m.occMask & chessBoard.allPieces;
+        attacks = m.attacks[maskedOcc * m.magic >> m.shift];
         attacks &= notAllies;
         while (attacks) {
-            to = getLSBIndex(attacks);
-            attacks ^= (bitBoard)1 << to;
+            to = popLSB(attacks);
             moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             moves->promFlags = 0;
             moves++;
@@ -68,16 +74,17 @@ Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
 
     // generate queen attacks via magic bitboard lookups
     while (queens) {
-        from = getLSBIndex(queens);
-        queens ^= (bitBoard) 1 << from;
-        maskedOcc = rookOccMask[from] & chessBoard.allPieces;
-        attacks = rookAttacks[from][maskedOcc * rookMagics[from] >> (64 - bitsInRookMask[from])];
-        maskedOcc = bishopOccMask[from] & chessBoard.allPieces;
-        attacks |= bishopAttacks[from][maskedOcc * bishopMagics[from] >> (64 - bitsInBishopMask[from])];
+        from = popLSB(queens);
+        MagicSquare& mr = rookMagics[from];
+        maskedOcc = mr.occMask & chessBoard.allPieces;
+        attacks = mr.attacks[maskedOcc * mr.magic >> mr.shift];
+
+        MagicSquare& mb = bishopMagics[from];
+        maskedOcc = mb.occMask & chessBoard.allPieces;
+        attacks |= mb.attacks[maskedOcc * mb.magic >> mb.shift];
         attacks &= notAllies;
         while (attacks) {
-            to = getLSBIndex(attacks);
-            attacks ^= (bitBoard)1 << to;
+            to = popLSB(attacks);
             moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             moves->promFlags = 0;
             moves++;
@@ -100,12 +107,10 @@ Move* MoveGenerator::generateKnightMoves(ChessBoard& chessBoard, Move* moves) {
 
     // lookup precomputed knight moves
     while(knights) {
-        from = getLSBIndex(knights);
-        knights ^= (bitBoard) 1 << from;
+        from = popLSB(knights);
         attacks = knightAttacks[from] & notAllies;
         while (attacks) {
-            to = getLSBIndex(attacks);
-            attacks ^= (bitBoard)1 << to;
+            to = popLSB(attacks);
             moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             moves->promFlags = 0;
             moves++;
@@ -116,7 +121,7 @@ Move* MoveGenerator::generateKnightMoves(ChessBoard& chessBoard, Move* moves) {
 
 Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard notAllies, king, attacks;
-    int from, to, kcastleTo, qcastleTo;
+    int from, to;
     CastlingRights kingCastle;
     CastlingRights queenCastle;
     // init colour specific bitboards
@@ -125,39 +130,33 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
         king = chessBoard.piecesByType[WHITEKING];
         kingCastle = WHITE_OO;
         queenCastle = WHITE_OOO;
-        kcastleTo = 6;
-        qcastleTo = 2;
     } else {
         notAllies = ~chessBoard.piecesByColour[BLACK];
         king = chessBoard.piecesByType[BLACKKING];
         kingCastle = BLACK_OO;
         queenCastle = BLACK_OOO;
-        kcastleTo = 62;
-        qcastleTo = 58;
     }
 
     // lookup precomputed king moves
     while(king) {
-        from = getLSBIndex(king);
-        king ^= (bitBoard)1 << from;
+        from = popLSB(king);
         attacks = kingAttacks[from] & notAllies;
         while (attacks) {
-            to = getLSBIndex(attacks);
-            attacks ^= (bitBoard) 1 << to;
+            to = popLSB(attacks);
             moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             moves->promFlags = 0;
             moves++;
         }
 
         // Generate Castles
-        if (chessBoard.canCastle(kingCastle) && (castleMasks[kingCastle] & chessBoard.allPieces) == 0) {
-            moves->captToFrom = (kcastleTo << 6) + from;
+        if ((castleMasks[kingCastle] & chessBoard.allPieces) == 0 && chessBoard.canCastle(kingCastle)) {
+            moves->captToFrom = ((from + 2) << 6) + from;
             moves->promFlags = KINGCASTLE;
             moves++;
         }
 
-        if (chessBoard.canCastle(queenCastle) && (castleMasks[queenCastle] & chessBoard.allPieces) == 0) {
-            moves->captToFrom = (qcastleTo << 6) + from;
+        if ((castleMasks[queenCastle] & chessBoard.allPieces) == 0 && chessBoard.canCastle(queenCastle)) {
+            moves->captToFrom = ((from - 2) << 6) + from;
             moves->promFlags = QUEENCASTLE;
             moves++;
         }
@@ -208,12 +207,10 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     }
     // gen Pawn Attacks through pre computed attack bitboards
     while (pawns) {
-        from = getLSBIndex(pawns);
-        pawns ^= (bitBoard) 1 << from;
+        from = popLSB(pawns);
         attacks = pawnColourAttacks[from] & enemies;
         while (attacks) {
-            to = getLSBIndex(attacks);
-            attacks ^= (bitBoard) 1 << to;
+            to = popLSB(attacks);
             moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             moves->promFlags = 0;
             moves++;
@@ -221,24 +218,21 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     }
     //gen Pawn Pushes
     while (singlePush) {
-        to = getLSBIndex(singlePush);
-        singlePush ^= (bitBoard) 1 << to;
+        to = popLSB(singlePush);
         moves->captToFrom = (to << 6) + to - forward;
         moves->promFlags = 0;
         moves++;
     }
     //gen Double Pawn Pushes
     while (doublePush) {
-        to = getLSBIndex(doublePush);
-        doublePush ^= (bitBoard) 1 << to;
+        to = popLSB(doublePush);
         moves->captToFrom = (to << 6) + to -  (2 * forward);
         moves->promFlags = DOUBLEPUSH;
         moves++;
     }
     //gen enPassent
     while (epAttacks) {
-        from = getLSBIndex(epAttacks);
-        epAttacks ^= (bitBoard) 1 << from;
+        from = popLSB(epAttacks);
         moves->captToFrom = (epSquare << 6) + from;
         moves->promFlags = ENPASSENT;
         moves++;
@@ -246,14 +240,12 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     //gen Promotions
     if (promotions) {
         // promotions from pawn pushes
-        bitBoard pushedProms = pushUp(promotions, colour) & ~chessBoard.piecesByColour[colour];
-        from = getLSBIndex(promotions);
-        promotions ^= (bitBoard)1 << from;
+        bitBoard pushedProms = pushUp(promotions, colour) & ~chessBoard.allPieces;
+        from = popLSB(promotions);
         // promotions from captures
         attacks = pawnColourAttacks[from] & enemies;
         while (attacks) {
-            to = getLSBIndex(attacks);
-            attacks ^= (bitBoard)1 << to;
+            to = popLSB(attacks);
             int captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             for (int i = KNIGHT; i < KING; i++) {
                 moves->captToFrom = captToFrom;
@@ -262,8 +254,7 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
             }
         }
         while (pushedProms) {
-            to = getLSBIndex(pushedProms);
-            pushedProms ^= (bitBoard)1 << to;
+            to = popLSB(pushedProms);
             int captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             for (int i = KNIGHT; i < KING; i++) {
                 moves->captToFrom = captToFrom;
@@ -281,20 +272,6 @@ bitBoard MoveGenerator::pushUp(bitBoard board, Colour c) {
         return board << 8;
     } else {
         return board >> 8;
-    }
-}
-
-void MoveGenerator::initRookOccMask() {
-    for (int i = 0; i < 64; i++) {
-        rookOccMask[i] = genOccMask(i, 1);
-        bitsInRookMask[i] = ChessBoard::countBits(rookOccMask[i]);
-    }
-}
-
-void MoveGenerator::initBishopOccMask() {
-    for (int i = 0; i < 64; i++) {
-        bishopOccMask[i] = genOccMask(i, 0);
-        bitsInBishopMask[i] = ChessBoard::countBits(bishopOccMask[i]);
     }
 }
 
@@ -343,25 +320,50 @@ void MoveGenerator::initCastleMasks() {
 
 // Precompute attack tables and initialize magic bitboards
 void MoveGenerator::precomputeAttackSets() {
-    bitBoard occ, attack, magicIndex;
     for (int i = 0; i < 64; i++) {
         pawnAttacks[0][i] = computePawnAttack(i, 1);
         pawnAttacks[1][i] = computePawnAttack(i, 0);
         knightAttacks[i] = computeKnightAttack(i);
         kingAttacks[i] = computeKingAttack(i);
-        for (int k = 0; k < (1 << bitsInRookMask[i]); k++) {
-            occ = setOccupancy(k, bitsInRookMask[i], rookOccMask[i]);
-            attack = computeRookAttack(i, occ);
-            magicIndex = occ * rookMagics[i] >> (64 - bitsInRookMask[i]);
-            rookAttacks[i][magicIndex] = attack;
-        }
-        for (int k = 0; k < (1 << bitsInBishopMask[i]); k++) {
-            occ = setOccupancy(k, bitsInBishopMask[i], bishopOccMask[i]);
-            attack = computeBishopAttack(i, occ);
-            magicIndex = occ * bishopMagics[i] >> (64 - bitsInBishopMask[i]);
-            bishopAttacks[i][magicIndex] = attack;
+    }
+    initRookMagics();
+    initBishopMagics();
+}
+
+void MoveGenerator::initRookMagics() {
+    bitBoard occ;
+    int size, bits;
+    for (int i = 0; i < 64; i++) {
+        MagicSquare& m = rookMagics[i];
+        m.occMask = genOccMask(i, 1);
+        bits = countBits(m.occMask);
+        m.attacks = i == 0 ? rookAttacks : rookMagics[i - 1].attacks + size;
+        m.shift = 64 - bits;
+        m.magic = rookMagicNums[i];
+        size = 1 << bits;
+        for (int k = 0; k < size; k++) {
+            occ = setOccupancy(k, bits, m.occMask);
+            m.attacks[occ * m.magic >> m.shift] = computeRookAttack(i, occ);
         }
     }
+}
+
+void MoveGenerator::initBishopMagics() {
+    bitBoard occ;
+    int size, bits;
+    for (int i = 0; i < 64; i++) {
+        MagicSquare& m = bishopMagics[i];
+        m.occMask = genOccMask(i, 0);
+        bits = countBits(m.occMask);
+        m.attacks = i == 0? bishopAttacks : bishopMagics[i - 1].attacks + size;
+        m.shift = 64 - bits;
+        m.magic = bishopMagicNums[i];
+        size = 1 << bits;
+        for (int k = 0; k < size; k++) {
+            occ = setOccupancy(k, bits, m.occMask);
+            m.attacks[occ * m.magic >> m.shift] = computeBishopAttack(i, occ);
+        }
+    } 
 }
 
 // computes the rook attack for a given occupancy. Goes through all valid rook directions (north east etc.) until a set bit
@@ -582,9 +584,9 @@ bitBoard MoveGenerator::generateMagicNumber(int square, int rook) {
     bitBoard attackMask, attacks[4096], occupancies[4096], used[4096], magic;
     int bits, magicIndex, fail;
     // init attackmask
-    attackMask = rook? rookOccMask[square] : bishopOccMask[square];
+    attackMask = rook? genOccMask(square, 1) : genOccMask(square, 0);
     // count relevant bits
-    bits = ChessBoard::countBits(attackMask);
+    bits = countBits(attackMask);
     // Calculate all occupancies and their corresponding attacks
     for (int i = 0; i < (1 << bits); i++) {
         occupancies[i] = setOccupancy(i, bits, attackMask);
@@ -593,7 +595,7 @@ bitBoard MoveGenerator::generateMagicNumber(int square, int rook) {
     for (int k = 0; k < 100000000; k++) {
         magic = getMagicNumberCandidate();
         // Discard irrelavant magic numbers
-        if (ChessBoard::countBits((attackMask * magic) & 0xFF00000000000000ULL) < 6) continue;
+        if (countBits((attackMask * magic) & 0xFF00000000000000ULL) < 6) continue;
         for (int i = 0; i < 4096; i++) {
             used[i] = 0ULL;
         }

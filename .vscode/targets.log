@@ -5,9 +5,8 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
- 
 
-# Make data base, printed on Tue Jan 11 19:58:55 2022
+# Make data base, printed on Wed Jan 12 21:28:30 2022
 
 # Variables
 
@@ -20,7 +19,7 @@ USERPROFILE = C:\Users\adamn
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-2853202f-3b23-47cd-895a-1368b906d953-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-ad47821b-4810-4074-8428-d3e769575a03-sock
 # environment
 VSCODE_CWD = C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code
 # environment
@@ -36,7 +35,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_20416_VQXHHVPJSWKEETZU
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_9872_UYFVHNWKPSUZOSVV
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -90,7 +89,7 @@ MAKEFILE_LIST := makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 20416
+VSCODE_PID = 9872
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
@@ -126,7 +125,7 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = C:\Program Files (x86)\Razer Chroma SDK\bin;C:\Program Files\Razer Chroma SDK\bin;C:\Program Files (x86)\Razer\ChromaBroadcast\bin;C:\Program Files\Razer\ChromaBroadcast\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\NetSarang\Xlpd 6\;C:\Program Files (x86)\NetSarang\Xshell 6\;C:\Program Files (x86)\NetSarang\Xmanager 6\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files (x86)\NetSarang\Xmanager 7\;C:\Program Files (x86)\NetSarang\Xshell 7\;C:\Program Files (x86)\NetSarang\Xftp 7\;C:\Program Files (x86)\NetSarang\Xlpd 7\;C:\msys64\mingw64\bin;C:\Program Files\dotnet\;C:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\adamn\.dotnet\tools;C:\ProgramData\chocolatey\bin;C:\Users\adamn\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\adamn\.dotnet\tools
+PATH = C:\Program Files (x86)\Razer Chroma SDK\bin;C:\Program Files\Razer Chroma SDK\bin;C:\Program Files (x86)\Razer\ChromaBroadcast\bin;C:\Program Files\Razer\ChromaBroadcast\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\NetSarang\Xlpd 6\;C:\Program Files (x86)\NetSarang\Xshell 6\;C:\Program Files (x86)\NetSarang\Xmanager 6\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files (x86)\NetSarang\Xmanager 7\;C:\Program Files (x86)\NetSarang\Xshell 7\;C:\Program Files (x86)\NetSarang\Xftp 7\;C:\Program Files (x86)\NetSarang\Xlpd 7\;C:\msys64\mingw64\bin;C:\Program Files\dotnet\;C:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\adamn\.dotnet\tools;C:\ProgramData\chocolatey\bin;C:\Program Files\AMD\AMDuProf\bin;C:\Users\adamn\AppData\Local\Microsoft\WindowsApps;C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\adamn\.dotnet\tools
 # environment
 COMPUTERNAME = LAPTOP-7FSGAFD8
 # default
@@ -186,6 +185,8 @@ APPDATA = C:\Users\adamn\AppData\Roaming
 # environment
 HOMEDRIVE = C:
 # environment
+AMDPROFILERPATH = C:\Program Files\AMD\AMDuProf\bin
+# environment
 PROCESSOR_ARCHITECTURE = x86
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/services/extensions/node/extensionHostProcess
@@ -222,7 +223,7 @@ INCLUDE_PATHS = -IC:\Users\adamn\SDL2\include\SDL2
 # environment
 PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # variable set hash-table stats:
-# Load=105/1024=10%, Rehash=0, Collisions=9/144=6%
+# Load=106/1024=10%, Rehash=0, Collisions=9/146=6%
 
 # Pattern-specific Variable Values
 
@@ -230,7 +231,7 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Directories
 
-# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1641882919): 34 files, no impossibilities.
+# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1642036547): 34 files, no impossibilities.
 
 # 34 files, no impossibilities in 1 directories.
 
@@ -242,9 +243,10 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Not a target:
 GameState.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-10 22:44:49
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 ChessBoard.h:
@@ -257,34 +259,14 @@ ChessTest: Test.o MoveGenerator.o ChessBoard.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 
- 36):
+#  recipe to execute (from 'makefile', line 36):
 	$(CC) $(OBJS_EXET) -o $(EXET)
 
 ChessGUI.o: ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
 #  Implicit rule search has not been done.
-#  Implicit/static pattern stem: ''
-#  Last modified 2022-01-10 22:34:52
+#  Last modified 2022-01-11 20:52:55
 #  File has been updated.
-#  Needs to be updated (-q is set).
-# automatic
-# @ := ChessGUI.o
-# automatic
-# * := 
-# automatic
-# < := ChessGUI.cpp
-# automatic
-# + := ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
-# automatic
-# % := 
-# automatic
-# ^ := ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
-# automatic
-# ? := Types.h ChessBoard.h
-# automatic
-# | := 
-# variable set hash-table stats:
-# Load=8/32=25%, Rehash=0, Collisions=6/17=35%
+#  Successfully updated.
 #  recipe to execute (from 'makefile', line 42):
 	$(CC) ChessGUI.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
@@ -297,16 +279,18 @@ ChessGUI.cpp:
 
 MoveGenerator.o: MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Last modified 2022-01-12 17:15:47
+#  File has been updated.
+#  Successfully updated.
 #  recipe to execute (from 'makefile', line 39):
 	$(CC) MoveGenerator.cpp $(CXX_FLAGS) -o $@
 
 # Not a target:
 ChessBoard.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-11 21:29:36
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 GameState.h:
@@ -317,15 +301,17 @@ GameState.h:
 
 # Not a target:
 MoveGenerator.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-12 17:15:43
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 MoveGenerator.h:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-12 16:42:54
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 .DEFAULT:
@@ -340,12 +326,13 @@ all: ChessEngine ChessTest
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/8=0%
+# Load=0/32=0%, Rehash=0, Collisions=0/9=0%
 
 ChessBoard.o: ChessBoard.cpp ChessBoard.h Types.h
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Last modified 2022-01-11 21:29:38
+#  File has been updated.
+#  Successfully updated.
 #  recipe to execute (from 'makefile', line 54):
 	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@
 
@@ -372,18 +359,36 @@ main.o: main.cpp GameState.h
 
 ChessEngine: main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
 #  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
+# automatic
+# @ := ChessEngine
+# automatic
+# * := 
+# automatic
+# < := main.o
+# automatic
+# + := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+# automatic
+# % := 
+# automatic
+# ^ := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+# automatic
+# ? := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
+# automatic
+# | := 
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/8=0%
+# Load=8/32=25%, Rehash=0, Collisions=5/17=29%
 #  recipe to execute (from 'makefile', line 33):
 	$(CC) $(OBJS_EXE) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE)
 
 GameState.o: GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Last modified 2022-01-12 16:42:57
+#  File has been updated.
+#  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
 	$(CC) GameState.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
@@ -435,6 +440,6 @@ Test.o: Test.cpp MoveGenerator.h ChessBoard.h
 # strcache performance: lookups = 91 / hit rate = 57%
 # hash-table stats:
 # Load=39/8192=0%, Rehash=0, Collisions=0/91=0%
-# Finished Make data base on Tue Jan 11 19:58:55 2022
+# Finished Make data base on Wed Jan 12 21:28:30 2022
 
  

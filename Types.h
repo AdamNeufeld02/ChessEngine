@@ -40,6 +40,10 @@ enum CastlingRights {
     CASTLING_RIGHT_NB = 16
 };
 
+enum GenType {
+    Legal, PseudoLegal, Evasions, Captures
+};
+
 // A struct representing an encoded move
 // captToFrom:
 // bits (0-5) From

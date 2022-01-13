@@ -98,7 +98,7 @@ Piece GameState::getPromotionFromUser(Colour colour) {
                     return Piece(QUEEN + (colour << 3));
                 } else if (index == 35) {
                     return Piece(KNIGHT + (colour << 3));
-                } else if (index = 36) {
+                } else if (index == 36) {
                     return Piece(BISHOP + (colour << 3));
                 }
             } if (ev.type == SDL_MOUSEMOTION) {

@@ -7,35 +7,18 @@
 // A chess move generator utilizing magic bitboards
 // For more info on magic bitboards visit: https://www.chessprogramming.org/Magic_Bitboards
 
-// List of possible optimizations:
-//  - reduce number of arrays by using struct MagicSquare (reduces memory lookups)
-//  - known bottleneck is writing to the movelist actual move generation is extremly fast
-
 // TODO:
 //  - Check routine
 //  - Absolute pins
 //  - Double check
 //  - Clean up
 
-// MagicSquare struct (TODO)
+// MagicSquare struct
 struct MagicSquare {
     bitBoard* attacks;
     bitBoard occMask;
     bitBoard magic;
     int shift;
-};
-
-// Used for looking up the LSB of a bitboard in constant time
-const bitBoard deBruijn64 = 0x03f79d71b4cb0a89;
-const int index64[64] = {
-    0, 47,  1, 56, 48, 27,  2, 60,
-    57, 49, 41, 37, 28, 16,  3, 61,
-    54, 58, 35, 52, 50, 42, 21, 44,
-    38, 32, 29, 23, 17, 11,  4, 62,
-    46, 55, 26, 59, 40, 36, 15, 53,
-    34, 51, 20, 43, 31, 22, 10, 45,
-    25, 39, 14, 33, 19, 30,  9, 24,
-    13, 18,  8, 12,  7,  6,  5, 63
 };
 
 class MoveGenerator {
@@ -50,7 +33,7 @@ class MoveGenerator {
     bitBoard generateMagicNumber(int square, int rook);
 
     // Pre-generated magic numbers for rook attacks
-    static constexpr bitBoard rookMagics[64] = {
+    static constexpr bitBoard rookMagicNums[64] = {
         11565248328107303040ULL, 12123725398701785089ULL, 900733188335206529ULL, 72066458867205152ULL,
         144117387368072224ULL, 216203568472981512ULL, 9547631759814820096ULL, 2341881152152807680ULL,
         140740040605696ULL, 2316046545841029184ULL, 72198468973629440ULL, 81205565149155328ULL,
@@ -69,7 +52,7 @@ class MoveGenerator {
         563158798583922ULL, 5066618438763522ULL, 144221860300195844ULL, 281752018887682ULL
     };
     // Pre-generated magic numbers for bishop attacks
-    static constexpr bitBoard bishopMagics[64] = {
+    static constexpr bitBoard bishopMagicNums[64] = {
         18018831494946945ULL, 1134767471886336ULL, 2308095375972630592ULL, 27308574661148680ULL,
         9404081239914275072ULL, 4683886618770800641ULL, 216245358743802048ULL, 9571253153235970ULL,
         27092002521253381ULL, 1742811846410792ULL, 8830470070272ULL, 9235202921558442240ULL,
@@ -94,19 +77,19 @@ class MoveGenerator {
     bitBoard pawnAttacks[2][64];
     bitBoard knightAttacks[64];
     bitBoard kingAttacks[64];
-    bitBoard rookAttacks[64][4096];
-    bitBoard bishopAttacks[64][512];
+    bitBoard rookAttacks[102400];
+    bitBoard bishopAttacks[5248];
+
+    MagicSquare rookMagics[64];
+    MagicSquare bishopMagics[64];
 
     // Castles masks used in generating castle moves
     bitBoard castleMasks[9];
-    
-    // Occupancy data used in magic bitboards
-    // Computed on startup
-    bitBoard rookOccMask[64];
-    bitBoard bishopOccMask[64];
-    int bitsInRookMask[64];
-    int bitsInBishopMask[64];
 
+    template<GenType t, Colour c>
+    Move* generateMoves(ChessBoard& chessBoard, Move* moves);
+    template<PieceType pt>
+    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets);
     // generates moves for sliding pieces
     Move* generateSlidingMoves(ChessBoard& chessBoard, Move* moves);
     // generates moves for pawns including enpassent, promotions and double pushes
@@ -117,15 +100,19 @@ class MoveGenerator {
     Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
     // pushes a board forward based on the colour given (white is leftshift black is rightshift)
     bitBoard pushUp(bitBoard board, Colour c);
-    
+    // Used to gen any attack bitboard except pawns
+    template<PieceType pt>
+    bitBoard genAttacksBB(int square, bitBoard occ);
+    // Used to gen non-pawn and non-sliding piece attack bitboards
+    template<PieceType pt>
+    bitBoard genAttacksBB(int square);
+
+    void initRookMagics();
+    void initBishopMagics();
     // Initializes the castle mask array used in the generation of castle moves
     void initCastleMasks();
     // precomputes attack sets and stores them for fast lookup during runtime
     void precomputeAttackSets();
-    // computes relevant rook attack occupancy masks for each square
-    void initRookOccMask();
-    // computes relevant Bishop attack occupancy masks for each square
-    void initBishopOccMask();
     // sets the bits in a given attack mask corresponding to the index provided
     bitBoard setOccupancy(int index, int bitsInMask, bitBoard attackMask);
     // genarates an attack occupancy mask for the given square for either a rook or bishop
@@ -145,7 +132,9 @@ class MoveGenerator {
     // returns the index of the least significant bit
     int getLSBIndex(bitBoard bb);
     
-    
+    int popLSB(bitBoard& bb);
+
+    int countBits(bitBoard bb);
     
     unsigned int XORShift32Rand();
     // generates 64 bit number with low number of set bits (ideal candidate)
@@ -155,7 +144,50 @@ class MoveGenerator {
 };
 
 inline int MoveGenerator::getLSBIndex(bitBoard bb) {
-    return index64[((bb ^ (bb-1)) * deBruijn64) >> 58];
+    return __builtin_ctzll(bb);
+}
+
+inline int MoveGenerator::popLSB(bitBoard& bb) {
+    int sq = getLSBIndex(bb);
+    bb &= bb-1;
+    return sq;
+}
+
+inline int MoveGenerator::countBits(bitBoard bb) {
+    return __builtin_popcountll(bb);
+}
+
+template<PieceType pt>
+inline bitBoard MoveGenerator::genAttacksBB(int square, bitBoard occ) {
+    MagicSquare ms;
+    switch (pt)
+    {
+    case KNIGHT:
+        return knightAttacks[square];
+    case BISHOP:
+        ms = bishopMagics[square];
+        return ms.attacks[occ * ms.magic << ms.shift];
+    case ROOK:
+        ms = rookMagics[square];
+        return ms.attacks[occ * ms.magic << ms.shift];
+
+    case QUEEN:
+        return genAttacksBB<BISHOP>(square, occ) | genAttacksBB<ROOK>(square, occ);
+
+    case KING:
+        return kingAttacks[square];
+    }
+}
+
+template<PieceType pt>
+inline bitBoard MoveGenerator::genAttacksBB(int square) {
+    switch (pt)
+    {
+    case KNIGHT:
+        return knightAttacks[square];
+    case KING:
+        return kingAttacks[square];
+    }
 }
 
 #endif

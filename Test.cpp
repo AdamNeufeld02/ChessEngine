@@ -3,6 +3,7 @@
 #include "MoveGenerator.h"
 #include "ChessBoard.h"
 #include <bitset>
+#include <chrono>
 
 TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -20,11 +21,15 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     MoveGenerator* mg = new MoveGenerator();
     Move moves[MAXMOVES]; 
     Move* endmoves;
-    endmoves = mg->generateMoves(&cb, moves);
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < 100000000; i++) {
+        endmoves = mg->generateMoves(&cb, moves);
+    }
+    auto stop = std::chrono::high_resolution_clock::now();
+
+    auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << ms_int.count() << std::endl;
     int length = endmoves - moves;
     REQUIRE(length == 20);
     delete mg;
-    bitBoard testBoard = 0x60;
-    testBoard = testBoard << 56;
-    cb.printBoard(testBoard);
 }
