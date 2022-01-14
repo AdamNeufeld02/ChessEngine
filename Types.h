@@ -18,9 +18,7 @@ enum Piece {
 };
 
 enum FLAGS {
-    NOFLAG, ENPASSENT, DOUBLEPUSH, 
-    KINGCASTLE =  0b00000100, 
-    QUEENCASTLE=  0b00001000
+    NOFLAG, ENPASSENT, PROMOTION, CASTLE
 };
 
 // Taken from https://github.com/official-stockfish/Stockfish/blob/master/src/position.h
@@ -44,48 +42,49 @@ enum GenType {
     Legal, PseudoLegal, Evasions, Captures
 };
 
-// A struct representing an encoded move
-// captToFrom:
+// representing an encoded move
 // bits (0-5) From
 // bits (6-11) to
-// bits (12-15) Captured piece code
-// promflags
-// bits (0-3) flags
-// bits(4- 7) Promoted Piece Code
-struct Move {
-    short captToFrom;
-    char promFlags;
+// bits (12- 13) promoted Piece code - 2 (KNIGHT = 0, BISHOP = 1, etc)
+// bits(14- 15) flags
+enum Move : short {
+    NOMOVE
 };
 
+constexpr Move makeMove(int from, int to, PieceType prom) {
+    return Move((PROMOTION << 14) + ((prom - 2) << 12) + (to << 6) + from);
+}
+
 template<FLAGS f>
-Move makeMove(int from, int to, Piece capt, Piece prom) {
-    Move move;
-    move.captToFrom = ((capt << 12) + (to << 6) + from);
-    move.promFlags = ((prom << 4) + f);
-    return move;
+constexpr Move makeMove(int from, int to) {
+    return Move((f << 14) + (to << 6) + from);
+}
+
+constexpr Move makeMove(int from, int to) {
+    return Move((to << 6) + from);
 }
 
 constexpr int getFrom(Move move) {
-    return move.captToFrom & 0x3f;
+    return move & 0x3f;
 }
 
 constexpr int getTo(Move move) {
-    return (move.captToFrom >> 6) & 0x3f; 
+    return (move >> 6) & 0x3f; 
 }
 
 constexpr FLAGS getFlag(Move move) {
-    return FLAGS(move.promFlags & 0xf);
+    return FLAGS((move >> 14) & 0x3);
 }
 
-constexpr Piece getCapt(Move move) {
-    return Piece((move.captToFrom >> 12) & 0xf);
-}
-
-constexpr Piece getProm(Move move) {
-    return Piece((move.promFlags >> 4) & 0xf);
+constexpr PieceType getProm(Move move) {
+    return PieceType(((move >> 12) & 0x3) + 2);
 }
 
 constexpr int MAXMOVES = 256;
+
+constexpr Piece makePiece(Colour c, PieceType pt) {
+    return Piece((c << 3) + pt);
+}
 
 inline Colour colourOf(Piece pc) {
     return Colour(pc >> 3);

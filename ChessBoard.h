@@ -14,6 +14,8 @@ typedef uint64_t bitBoard;
 struct StateInfo {
     char castlingRights;
     char epSquare;
+
+    Piece captured;
     StateInfo* previous;
 };
  
@@ -25,7 +27,6 @@ class ChessBoard {
     // return piece code at specific index
     Piece pieceOn(int sq);
     // Performs a move on the board. Does not check if it is a legal chess move.
-    // Updates the enpassent, castle, and whiteToMove fields based on the move played
     void makeMove(Move move, StateInfo& si);
     // sets the bit on the bitboard to 0
     static void popBit(bitBoard& bb, int index);
@@ -39,6 +40,10 @@ class ChessBoard {
     char epSquare() const;
 
     bool canCastle(CastlingRights cr) const;
+
+    bitBoard pieces(Colour c, PieceType pt);
+    bitBoard pieces(Colour c);
+    bitBoard pieces();
     
     // Fields 
     bool whiteToMove;
@@ -69,6 +74,18 @@ class ChessBoard {
     void putPiece(Piece pc, int sq);
     
 };
+
+inline bitBoard ChessBoard::pieces(Colour c, PieceType pt) {
+    return piecesByType[(c << 3) + pt];
+}
+
+inline bitBoard ChessBoard::pieces(Colour c) {
+    return piecesByColour[c];
+}
+
+inline bitBoard ChessBoard::pieces() {
+    return allPieces;
+}
 
 inline char ChessBoard::epSquare() const {
     return st->epSquare;

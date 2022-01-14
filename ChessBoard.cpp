@@ -8,69 +8,46 @@ ChessBoard::ChessBoard(std::string fenString, StateInfo& si) {
 
 void ChessBoard::makeMove(Move move, StateInfo& si) {
     FLAGS flag = getFlag(move);
-    Piece capt = getCapt(move);
     int from = getFrom(move);
     int to = getTo(move);
+    
+    Colour us = whiteToMove? WHITE : BLACK;
+    Colour them = whiteToMove? BLACK : WHITE;
+    Piece moved = pieceOn(from);
+    Piece capt = flag == ENPASSENT? makePiece(them, PAWN) : pieceOn(to);
 
-    memcpy(&si, st, offsetof(StateInfo, previous));
-    // handle Promotion
-    if (getProm(move)) {
-        if(capt) {
-            removePiece(to);
+    memcpy(&si, st, offsetof(StateInfo, captured));
+    si.captured = capt;
+    if (capt) {
+        int capsq = to;
+        if (flag == ENPASSENT) {
+            capsq = whiteToMove ? to - 8 : to + 8;
         }
+        removePiece(capsq);
+    }
+    if (flag == PROMOTION) {
         removePiece(from);
-        putPiece(getProm(move), to);
-        si.epSquare = -1;
-    } else if (flag == NOFLAG) {
-        if (capt) {
-            removePiece(to);
+        putPiece(makePiece(us, getProm(move)), from);
+    }
+    if (flag == CASTLE) {
+        if (to > from) {
+            movePiece(to + 1, to - 1);
+        } else {
+            movePiece(to - 2, to + 1);
         }
-        movePiece(from, to);
-        si.epSquare = -1;
-        // TODO update castling rights
-    } else {
-        // handle double push
-        if (flag & DOUBLEPUSH) {
-            movePiece(from, to);
-            if (whiteToMove) {
-                si.epSquare = from + 8;
-            } else {
-                si.epSquare = from - 8;
-            }
-        }
-        // handle king side castle
-        if (flag & KINGCASTLE) {
-            movePiece(from, to);
-            movePiece(to + 1, from + 1);
-            if (whiteToMove) {
+        if (whiteToMove) {
                 si.castlingRights ^= WHITE_CASTLING;
             } else {
                 si.castlingRights ^= BLACK_CASTLING;
-            }
-            si.epSquare = -1;
-        }
-        // handle queen side castle
-        if (flag & QUEENCASTLE) {
-            movePiece(from, to);
-            movePiece(to - 2, from - 1);
-            if (whiteToMove) {
-                si.castlingRights ^= WHITE_CASTLING;
-            } else {
-                si.castlingRights ^= BLACK_CASTLING;
-            }
-            si.epSquare = -1;
-        }
-        // handle en passent
-        if (flag & ENPASSENT) {
-            if (whiteToMove) {
-                removePiece(to - 8);
-            } else {
-                removePiece(to + 8);
-            }
-            movePiece(from, to);
-            si.epSquare = -1;
         }
     }
+    si.epSquare = -1;
+    if (typeOf(moved) == PAWN) {
+        if ((to ^ from) == 16) {
+            si.epSquare = whiteToMove ? from + 8 : from - 8;
+        }
+    }
+    movePiece(from, to);
     si.previous = st;
     st = &si;
     whiteToMove = !whiteToMove;

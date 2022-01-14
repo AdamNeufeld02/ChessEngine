@@ -9,156 +9,70 @@ MoveGenerator::MoveGenerator() {
 }
 
 Move* MoveGenerator::generateMoves(ChessBoard* chessBoard, Move* moves) {
-    moves = generateKingMoves(*chessBoard, moves);
-    moves = generateSlidingMoves(*chessBoard, moves);
-    moves = generateKnightMoves(*chessBoard, moves);
-    moves = generatePawnMoves(*chessBoard, moves);
-    return moves;
+    if (chessBoard->whiteToMove) {
+        return generateMoves<Legal, WHITE>(*chessBoard, moves);
+    }
+    return generateMoves<Legal, BLACK>(*chessBoard, moves);
 }
 
 template<GenType t, Colour c>
 Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
-
+    bitBoard targets = ~chessBoard.pieces(c);
+    moves = generateMoves<ROOK>(chessBoard, moves, chessBoard.pieces(c, ROOK), targets);
+    moves = generateMoves<BISHOP>(chessBoard, moves, chessBoard.pieces(c, BISHOP), targets);
+    moves = generateMoves<QUEEN>(chessBoard, moves, chessBoard.pieces(c, QUEEN), targets);
+    moves = generateMoves<KNIGHT>(chessBoard, moves, chessBoard.pieces(c, KNIGHT), targets);
+    moves = generateKingMoves(chessBoard, moves, chessBoard.pieces(c, KING), targets);
+    moves = generatePawnMoves(chessBoard, moves);
+    return moves;
 }
 
 template<PieceType pt>
-Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets) {
-    
-}
-
-Move* MoveGenerator::generateSlidingMoves(ChessBoard& chessBoard, Move* moves) {
-    bitBoard notAllies, rooks, bishops, queens, maskedOcc, attacks;
+Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard pieces, bitBoard targets) {
     int from, to;
-    // init colour specific bitboards
-    if (chessBoard.whiteToMove) {
-        notAllies = ~chessBoard.piecesByColour[WHITE];
-        rooks = chessBoard.piecesByType[WHITEROOK];
-        queens = chessBoard.piecesByType[WHITEQUEEN];
-        bishops = chessBoard.piecesByType[WHITEBISHOP];
-    } else {
-        notAllies = ~chessBoard.piecesByColour[BLACK];
-        rooks = chessBoard.piecesByType[BLACKROOK];
-        queens = chessBoard.piecesByType[BLACKQUEEN];
-        bishops = chessBoard.piecesByType[BLACKBISHOP];
-    }
-
-    // generate rook attacks via magic bitboard lookups
-    while (rooks) {
-        from = popLSB(rooks);
-        MagicSquare& m = rookMagics[from];
-        maskedOcc = m.occMask & chessBoard.allPieces;
-        attacks = m.attacks[maskedOcc * m.magic >> m.shift];
-        attacks &= notAllies;
+    bitBoard attacks;
+    bitBoard occ = chessBoard.pieces();
+    while (pieces) {
+        from = popLSB(pieces);
+        attacks = genAttacksBB<pt>(from, occ) & targets;
         while (attacks) {
             to = popLSB(attacks);
-            moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
-            moves->promFlags = 0;
-            moves++;
-        }
-    }
-
-    // generate bishop attacks via magic bitboard lookups
-    while (bishops) {
-        from = popLSB(bishops);
-        MagicSquare& m = bishopMagics[from];
-        maskedOcc = m.occMask & chessBoard.allPieces;
-        attacks = m.attacks[maskedOcc * m.magic >> m.shift];
-        attacks &= notAllies;
-        while (attacks) {
-            to = popLSB(attacks);
-            moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
-            moves->promFlags = 0;
-            moves++;
-        }
-    }
-
-    // generate queen attacks via magic bitboard lookups
-    while (queens) {
-        from = popLSB(queens);
-        MagicSquare& mr = rookMagics[from];
-        maskedOcc = mr.occMask & chessBoard.allPieces;
-        attacks = mr.attacks[maskedOcc * mr.magic >> mr.shift];
-
-        MagicSquare& mb = bishopMagics[from];
-        maskedOcc = mb.occMask & chessBoard.allPieces;
-        attacks |= mb.attacks[maskedOcc * mb.magic >> mb.shift];
-        attacks &= notAllies;
-        while (attacks) {
-            to = popLSB(attacks);
-            moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
-            moves->promFlags = 0;
-            moves++;
+            *moves++ = makeMove(from, to);
         }
     }
     return moves;
 }
 
-Move* MoveGenerator::generateKnightMoves(ChessBoard& chessBoard, Move* moves) {
-    bitBoard notAllies, knights, attacks;
-    int from, to;
-    // init colour specific fields
-    if (chessBoard.whiteToMove) {
-        notAllies = ~chessBoard.piecesByColour[WHITE];
-        knights = chessBoard.piecesByType[WHITEKNIGHT];
-    } else {
-        notAllies = ~chessBoard.piecesByColour[BLACK];
-        knights = chessBoard.piecesByType[BLACKKNIGHT];
-    }
-
-    // lookup precomputed knight moves
-    while(knights) {
-        from = popLSB(knights);
-        attacks = knightAttacks[from] & notAllies;
-        while (attacks) {
-            to = popLSB(attacks);
-            moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
-            moves->promFlags = 0;
-            moves++;
-        }
-    }
-    return moves;
-}
-
-Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
-    bitBoard notAllies, king, attacks;
+Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves, bitBoard pieces, bitBoard targets) {
+    bitBoard attacks;
     int from, to;
     CastlingRights kingCastle;
     CastlingRights queenCastle;
-    // init colour specific bitboards
+    // init colour specific castling rights
     if (chessBoard.whiteToMove) {
-        notAllies = ~chessBoard.piecesByColour[WHITE];
-        king = chessBoard.piecesByType[WHITEKING];
         kingCastle = WHITE_OO;
         queenCastle = WHITE_OOO;
     } else {
-        notAllies = ~chessBoard.piecesByColour[BLACK];
-        king = chessBoard.piecesByType[BLACKKING];
         kingCastle = BLACK_OO;
         queenCastle = BLACK_OOO;
     }
 
     // lookup precomputed king moves
-    while(king) {
-        from = popLSB(king);
-        attacks = kingAttacks[from] & notAllies;
+    while(pieces) {
+        from = popLSB(pieces);
+        attacks = genAttacksBB<KING>(from) & targets;
         while (attacks) {
             to = popLSB(attacks);
-            moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
-            moves->promFlags = 0;
-            moves++;
+            *moves++ = makeMove(from, to);
         }
 
         // Generate Castles
         if ((castleMasks[kingCastle] & chessBoard.allPieces) == 0 && chessBoard.canCastle(kingCastle)) {
-            moves->captToFrom = ((from + 2) << 6) + from;
-            moves->promFlags = KINGCASTLE;
-            moves++;
+            *moves++ = makeMove<CASTLE>(from, from + 2);
         }
 
         if ((castleMasks[queenCastle] & chessBoard.allPieces) == 0 && chessBoard.canCastle(queenCastle)) {
-            moves->captToFrom = ((from - 2) << 6) + from;
-            moves->promFlags = QUEENCASTLE;
-            moves++;
+            *moves++ = makeMove<CASTLE>(from, from - 2);
         }
     }
     return moves;
@@ -211,31 +125,23 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
         attacks = pawnColourAttacks[from] & enemies;
         while (attacks) {
             to = popLSB(attacks);
-            moves->captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
-            moves->promFlags = 0;
-            moves++;
+            *moves++ = makeMove(from, to);
         }
     }
     //gen Pawn Pushes
     while (singlePush) {
         to = popLSB(singlePush);
-        moves->captToFrom = (to << 6) + to - forward;
-        moves->promFlags = 0;
-        moves++;
+        *moves++ = makeMove(to - forward, to);
     }
     //gen Double Pawn Pushes
     while (doublePush) {
         to = popLSB(doublePush);
-        moves->captToFrom = (to << 6) + to -  (2 * forward);
-        moves->promFlags = DOUBLEPUSH;
-        moves++;
+        *moves++ = makeMove(to - 2 * (forward), to);
     }
     //gen enPassent
     while (epAttacks) {
         from = popLSB(epAttacks);
-        moves->captToFrom = (epSquare << 6) + from;
-        moves->promFlags = ENPASSENT;
-        moves++;
+        *moves++ = makeMove<ENPASSENT>(from, epSquare);
     }
     //gen Promotions
     if (promotions) {
@@ -246,20 +152,14 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
         attacks = pawnColourAttacks[from] & enemies;
         while (attacks) {
             to = popLSB(attacks);
-            int captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             for (int i = KNIGHT; i < KING; i++) {
-                moves->captToFrom = captToFrom;
-                moves->promFlags = (i + (colour << 3)) << 4;
-                moves++;
+                *moves++ = makeMove(from, to, PieceType(i));
             }
         }
         while (pushedProms) {
             to = popLSB(pushedProms);
-            int captToFrom = (chessBoard.pieceOn(to) << 12) + (to << 6) + from;
             for (int i = KNIGHT; i < KING; i++) {
-                moves->captToFrom = captToFrom;
-                moves->promFlags = (i + (colour << 3)) << 4;
-                moves++;
+                *moves++ = makeMove(to - forward, to, PieceType(i));
             }
         }
 
@@ -301,8 +201,7 @@ bitBoard MoveGenerator::setOccupancy(int index, int bitsInMask, bitBoard attackM
     bitBoard occ = 0;
 
     for (int count = 0; count < bitsInMask; count++) {
-        int bit = getLSBIndex(attackMask);
-        ChessBoard::popBit(attackMask, bit);
+        int bit = popLSB(attackMask);
         if (index & (1 << count)) {
             ChessBoard::setBit(occ, bit);
         }

@@ -89,15 +89,11 @@ class MoveGenerator {
     template<GenType t, Colour c>
     Move* generateMoves(ChessBoard& chessBoard, Move* moves);
     template<PieceType pt>
-    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets);
-    // generates moves for sliding pieces
-    Move* generateSlidingMoves(ChessBoard& chessBoard, Move* moves);
+    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard pieces, bitBoard targets);
     // generates moves for pawns including enpassent, promotions and double pushes
     Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves);
-    // generates all knight moves
-    Move* generateKnightMoves(ChessBoard& ChessBoard, Move* moves);
     //generates all king moves
-    Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
+    Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves, bitBoard pieces, bitBoard targets);
     // pushes a board forward based on the colour given (white is leftshift black is rightshift)
     bitBoard pushUp(bitBoard board, Colour c);
     // Used to gen any attack bitboard except pawns
@@ -166,14 +162,14 @@ inline bitBoard MoveGenerator::genAttacksBB(int square, bitBoard occ) {
         return knightAttacks[square];
     case BISHOP:
         ms = bishopMagics[square];
-        return ms.attacks[occ * ms.magic << ms.shift];
+        occ &= ms.occMask;
+        return ms.attacks[(occ * ms.magic) >> ms.shift];
     case ROOK:
         ms = rookMagics[square];
-        return ms.attacks[occ * ms.magic << ms.shift];
-
+        occ &= ms.occMask;
+        return ms.attacks[(occ * ms.magic) >> ms.shift];
     case QUEEN:
         return genAttacksBB<BISHOP>(square, occ) | genAttacksBB<ROOK>(square, occ);
-
     case KING:
         return kingAttacks[square];
     }
@@ -183,10 +179,11 @@ template<PieceType pt>
 inline bitBoard MoveGenerator::genAttacksBB(int square) {
     switch (pt)
     {
-    case KNIGHT:
-        return knightAttacks[square];
     case KING:
         return kingAttacks[square];
+    case KNIGHT:
+        return knightAttacks[square];
+        
     }
 }
 

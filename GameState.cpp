@@ -55,12 +55,12 @@ void GameState::gameLoop() {
                     endIndex = index;
                     move = findMove(moves, end, from, endIndex);
                     //If move is valid move
-                    if (move.captToFrom) {
+                    if (move) {
                         //If move has promotion type ask user for promotion piece
-                        if (getProm(move)) {
+                        if (getFlag(move) == PROMOTION) {
                             Colour colour = chessBoard->whiteToMove ? WHITE : BLACK;
                             Piece promPiece = getPromotionFromUser(colour);
-                            move.promFlags = promPiece << 4;
+                            move = makeMove(getFrom(move), getTo(move), typeOf(promPiece));
                         }
                         states->emplace_back();
                         chessBoard->makeMove(move, states->back());
@@ -118,7 +118,7 @@ Move GameState::findMove(Move* begin, Move* end, int from, int to) {
         }
     }
     // Return empty move
-    return makeMove<NOFLAG>(0, 0, EMPTY, EMPTY);
+    return NOMOVE;
 }
 
 void GameState::resetMoveMatrix(int* movMat) {
