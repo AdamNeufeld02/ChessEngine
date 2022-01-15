@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include "Types.h"
 
-typedef uint64_t bitBoard;
+
 
 // Inspired by stockFish's stateInfo struct.
 // Used to restore the position of a board on undoMove
@@ -26,6 +26,7 @@ class ChessBoard {
     ChessBoard(std::string fenString, StateInfo& si);
     // return piece code at specific index
     Piece pieceOn(int sq);
+    Colour colourToMove();
     // Performs a move on the board. Does not check if it is a legal chess move.
     void makeMove(Move move, StateInfo& si);
     // sets the bit on the bitboard to 0
@@ -44,27 +45,17 @@ class ChessBoard {
     bitBoard pieces(Colour c, PieceType pt);
     bitBoard pieces(Colour c);
     bitBoard pieces();
-    
+
+    private:
+
     // Fields 
-    bool whiteToMove;
+    Colour colToMove;
     StateInfo* st;
     Piece board[64];   
     bitBoard piecesByType[PIECENB];
     bitBoard piecesByColour[2];
     // The Occupancy of all pieces
     bitBoard allPieces;
-
-    private:
-    // Rank and File masks Currently not used
-    const bitBoard rankMasks[8] = {
-        0xff, 0xff00, 0xff0000, 0xff000000,
-	    0xff00000000, 0xff0000000000, 0xff000000000000, 0xff00000000000000
-    };
-    const bitBoard fileMasks[8] = {
-        0x0101010101010101, 0x0202020202020202, 0x0404040404040404, 0x0808080808080808,
-        0x1010101010101010, 0x2020202020202020, 0x4040404040404040, 0x8080808080808080
-    };
-
 
     void fenToBoard(std::string fenString);
     void initBoard(StateInfo& si);
@@ -74,6 +65,10 @@ class ChessBoard {
     void putPiece(Piece pc, int sq);
     
 };
+
+inline Colour ChessBoard::colourToMove() {
+    return colToMove;
+}
 
 inline bitBoard ChessBoard::pieces(Colour c, PieceType pt) {
     return piecesByType[(c << 3) + pt];

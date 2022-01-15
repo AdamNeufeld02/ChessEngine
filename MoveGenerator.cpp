@@ -9,7 +9,7 @@ MoveGenerator::MoveGenerator() {
 }
 
 Move* MoveGenerator::generateMoves(ChessBoard* chessBoard, Move* moves) {
-    if (chessBoard->whiteToMove) {
+    if (chessBoard->colourToMove() == WHITE) {
         return generateMoves<Legal, WHITE>(*chessBoard, moves);
     }
     return generateMoves<Legal, BLACK>(*chessBoard, moves);
@@ -23,7 +23,7 @@ Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
     moves = generateMoves<QUEEN>(chessBoard, moves, chessBoard.pieces(c, QUEEN), targets);
     moves = generateMoves<KNIGHT>(chessBoard, moves, chessBoard.pieces(c, KNIGHT), targets);
     moves = generateKingMoves(chessBoard, moves, chessBoard.pieces(c, KING), targets);
-    moves = generatePawnMoves(chessBoard, moves);
+    moves = generatePawnMoves<t, c>(chessBoard, moves);
     return moves;
 }
 
@@ -49,7 +49,7 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves, bitB
     CastlingRights kingCastle;
     CastlingRights queenCastle;
     // init colour specific castling rights
-    if (chessBoard.whiteToMove) {
+    if (chessBoard.colourToMove() == WHITE) {
         kingCastle = WHITE_OO;
         queenCastle = WHITE_OOO;
     } else {
@@ -67,102 +67,90 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves, bitB
         }
 
         // Generate Castles
-        if ((castleMasks[kingCastle] & chessBoard.allPieces) == 0 && chessBoard.canCastle(kingCastle)) {
+        if ((castleMasks[kingCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(kingCastle)) {
             *moves++ = makeMove<CASTLE>(from, from + 2);
         }
 
-        if ((castleMasks[queenCastle] & chessBoard.allPieces) == 0 && chessBoard.canCastle(queenCastle)) {
+        if ((castleMasks[queenCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(queenCastle)) {
             *moves++ = makeMove<CASTLE>(from, from - 2);
         }
     }
     return moves;
 }
 
+template<GenType t, Colour us>
 Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
-    bitBoard* pawnColourAttacks;
-    bitBoard pawns, enemies, attacks, singlePush, doublePush, epAttacks, promotions;
-    int from, to, forward;
-    int epSquare = chessBoard.epSquare();
-    Colour colour;
+    Colour them = ~us;
+    constexpr Direction upRight = us == WHITE ? NORTHEAST : SOUTHWEST;
+    constexpr Direction upLeft = us == WHITE ? NORTHWEST : SOUTHEAST;
+    constexpr Direction up = us == WHITE? NORTH : SOUTH;
+    bitBoard pawnsNotOn7 = chessBoard.pieces(us, PAWN);
+    bitBoard pawnsOn7 = us == WHITE? pawnsNotOn7 & Rank7BB : pawnsNotOn7 & Rank2BB;
+    pawnsNotOn7 ^= pawnsOn7;
+    bitBoard rank3 = us == WHITE? Rank3BB : Rank6BB;
 
-    // init colour specific bitboards
-    if (chessBoard.whiteToMove) {
-        pawns = chessBoard.piecesByType[WHITEPAWN];
-        promotions = pawns & 0xff000000000000;
-        pawns ^= promotions;
-        singlePush = (pawns << 8) & ~chessBoard.allPieces;
-        doublePush = ((singlePush & 0xff0000) << 8) & ~chessBoard.allPieces;
-        enemies = chessBoard.piecesByColour[BLACK];
-        colour = WHITE;
-        if (epSquare >= 0) {
-            epAttacks = pawnAttacks[BLACK][epSquare] & pawns;
-        } else {
-            epAttacks = (bitBoard)0;
-        }
-        // The attack array to reference
-        pawnColourAttacks = pawnAttacks[WHITE];
-        forward = 8;
-    } else {
-        pawns = chessBoard.piecesByType[BLACKPAWN];
-        promotions = pawns & 0xff00;
-        pawns ^= promotions;
-        singlePush = (pawns >> 8) & ~chessBoard.allPieces;
-        doublePush = ((singlePush & 0xff0000000000) >> 8) & ~chessBoard.allPieces;
-        enemies = chessBoard.piecesByColour[WHITE];
-        colour = BLACK;
-        // The attack array to reference
-        pawnColourAttacks = pawnAttacks[BLACK];
-        forward = -8;
-        if (epSquare >= 0) {
-            epAttacks = pawnAttacks[WHITE][epSquare] & pawns;
-        } else {
-            epAttacks = (bitBoard)0;
-        }
-    }
-    // gen Pawn Attacks through pre computed attack bitboards
-    while (pawns) {
-        from = popLSB(pawns);
-        attacks = pawnColourAttacks[from] & enemies;
-        while (attacks) {
-            to = popLSB(attacks);
-            *moves++ = makeMove(from, to);
-        }
-    }
-    //gen Pawn Pushes
-    while (singlePush) {
-        to = popLSB(singlePush);
-        *moves++ = makeMove(to - forward, to);
-    }
-    //gen Double Pawn Pushes
-    while (doublePush) {
-        to = popLSB(doublePush);
-        *moves++ = makeMove(to - 2 * (forward), to);
-    }
-    //gen enPassent
-    while (epAttacks) {
-        from = popLSB(epAttacks);
-        *moves++ = makeMove<ENPASSENT>(from, epSquare);
-    }
-    //gen Promotions
-    if (promotions) {
-        // promotions from pawn pushes
-        bitBoard pushedProms = pushUp(promotions, colour) & ~chessBoard.allPieces;
-        from = popLSB(promotions);
-        // promotions from captures
-        attacks = pawnColourAttacks[from] & enemies;
-        while (attacks) {
-            to = popLSB(attacks);
-            for (int i = KNIGHT; i < KING; i++) {
-                *moves++ = makeMove(from, to, PieceType(i));
-            }
-        }
-        while (pushedProms) {
-            to = popLSB(pushedProms);
-            for (int i = KNIGHT; i < KING; i++) {
-                *moves++ = makeMove(to - forward, to, PieceType(i));
-            }
+    bitBoard empty = ~chessBoard.pieces();
+    bitBoard enemies = chessBoard.pieces(them);
+    
+    // gen pushes if type is not captures
+    if (t != Captures) {
+        bitBoard b1 = shift<up>(pawnsNotOn7) & empty;
+        bitBoard b2 = shift<up>(b1 & rank3) & empty;
+        while (b1) {
+            int to = popLSB(b1);
+            *moves++ = makeMove(to - up, to);
         }
 
+        while (b2) {
+            int to = popLSB(b2);
+            *moves++ = makeMove(to - up - up, to);
+        }
+    }
+
+    // gen promotions (push promotions even if gentype is captures only)
+    if (pawnsOn7) {
+        bitBoard b1 = shift<upRight>(pawnsOn7) & enemies;
+        bitBoard b2 = shift<upLeft>(pawnsOn7) & enemies;
+        bitBoard b3 = shift<up>(pawnsOn7) & empty;
+        while (b1) {
+            int to = popLSB(b1);
+            for (int i = KNIGHT; i < KING; i++) {
+                *moves++ = makeMove(to - upRight, to, PieceType(i));
+            }
+        }
+        while (b2) {
+            int to = popLSB(b2);
+            for (int i = KNIGHT; i < KING; i++) {
+                *moves++ = makeMove(to - upLeft, to, PieceType(i));
+            }
+        }
+        while (b3) {
+            int to = popLSB(b3);
+            for (int i = KNIGHT; i < KING; i++) {
+                *moves++ = makeMove(to - up, to, PieceType(i));
+            }
+        }
+    }
+
+    bitBoard b1 = shift<upRight>(pawnsNotOn7) & enemies;
+    bitBoard b2 = shift<upLeft>(pawnsNotOn7) & enemies;
+
+    while (b1) {
+        int to = popLSB(b1);
+        *moves++ = makeMove(to - upRight, to);
+    }
+
+    while (b2) {
+        int to = popLSB(b2);
+        *moves++ = makeMove(to - upLeft, to);
+    }
+
+    if (chessBoard.epSquare() > 0) {
+        bitBoard b1 = pawnAttacks[them][(int)chessBoard.epSquare()] & pawnsNotOn7;
+        while (b1) {
+            int from = popLSB(b1);
+            *moves++ = makeMove<ENPASSENT>(from, chessBoard.epSquare());
+        }
     }
     return moves;
 }

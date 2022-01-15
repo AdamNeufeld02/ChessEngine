@@ -9,9 +9,9 @@ TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo state;
     ChessBoard cb = ChessBoard(startingFen, state);
-    cb.printBoard(cb.allPieces);
-    REQUIRE(cb.whiteToMove);
-    REQUIRE(cb.countBits(cb.allPieces) == 32); 
+    cb.printBoard(cb.pieces());
+    REQUIRE(cb.colourToMove() == WHITE);
+    REQUIRE(cb.countBits(cb.pieces()) == 32); 
 }
 
 TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {

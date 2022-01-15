@@ -58,7 +58,7 @@ void GameState::gameLoop() {
                     if (move) {
                         //If move has promotion type ask user for promotion piece
                         if (getFlag(move) == PROMOTION) {
-                            Colour colour = chessBoard->whiteToMove ? WHITE : BLACK;
+                            Colour colour = chessBoard->colourToMove();
                             Piece promPiece = getPromotionFromUser(colour);
                             move = makeMove(getFrom(move), getTo(move), typeOf(promPiece));
                         }

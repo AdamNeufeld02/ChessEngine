@@ -91,6 +91,7 @@ class MoveGenerator {
     template<PieceType pt>
     Move* generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard pieces, bitBoard targets);
     // generates moves for pawns including enpassent, promotions and double pushes
+    template<GenType t, Colour us>
     Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves);
     //generates all king moves
     Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves, bitBoard pieces, bitBoard targets);

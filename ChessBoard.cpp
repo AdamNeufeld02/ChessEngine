@@ -11,8 +11,8 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
     int from = getFrom(move);
     int to = getTo(move);
     
-    Colour us = whiteToMove? WHITE : BLACK;
-    Colour them = whiteToMove? BLACK : WHITE;
+    Colour us = colToMove;
+    Colour them = ~colToMove;
     Piece moved = pieceOn(from);
     Piece capt = flag == ENPASSENT? makePiece(them, PAWN) : pieceOn(to);
 
@@ -21,7 +21,7 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
     if (capt) {
         int capsq = to;
         if (flag == ENPASSENT) {
-            capsq = whiteToMove ? to - 8 : to + 8;
+            capsq = us == WHITE ? to - 8 : to + 8;
         }
         removePiece(capsq);
     }
@@ -35,7 +35,7 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
         } else {
             movePiece(to - 2, to + 1);
         }
-        if (whiteToMove) {
+        if (us == WHITE) {
                 si.castlingRights ^= WHITE_CASTLING;
             } else {
                 si.castlingRights ^= BLACK_CASTLING;
@@ -44,13 +44,13 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
     si.epSquare = -1;
     if (typeOf(moved) == PAWN) {
         if ((to ^ from) == 16) {
-            si.epSquare = whiteToMove ? from + 8 : from - 8;
+            si.epSquare = us == WHITE ? from + 8 : from - 8;
         }
     }
     movePiece(from, to);
     si.previous = st;
     st = &si;
-    whiteToMove = !whiteToMove;
+    colToMove = ~colToMove;
 }
 
 void ChessBoard::popBit(bitBoard& bb, int index) {
@@ -139,7 +139,11 @@ void ChessBoard::fenToBoard(std::string fenString) {
     // Parse next Move
     stringIndex++;
     curr = fenString[stringIndex];
-    whiteToMove = (curr == *"w");
+    if (curr == *"w") {
+        colToMove = WHITE;
+    } else {
+        colToMove = BLACK;
+    }
 
     // Parse Castling Rights
     stringIndex += 2;
@@ -207,6 +211,6 @@ void ChessBoard::initBoard(StateInfo& si) {
     st->epSquare = -1;
     st->previous = NULL;
 
-    whiteToMove = false;
+    colToMove = WHITE;
 }
 
