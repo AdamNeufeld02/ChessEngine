@@ -53,12 +53,15 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
     colToMove = ~colToMove;
 }
 
-void ChessBoard::popBit(bitBoard& bb, int index) {
-    bb = bb ^ ((bitBoard)1 << index);
-}
-
-void ChessBoard::setBit(bitBoard& bb, int index) {
-    bb = bb | ((bitBoard)1 << index);
+template<Colour c>
+bitBoard ChessBoard::getAttackers(int sq) {
+    bitBoard attackers = genAttacksBB<QUEEN>(sq, allPieces) & pieces(c, QUEEN);
+    attackers |= genAttacksBB<ROOK>(sq, allPieces) & pieces(c, ROOK);
+    attackers |= genAttacksBB<BISHOP>(sq, allPieces) & pieces(c, BISHOP);
+    attackers |= genAttacksBB<KNIGHT>(sq) & pieces(c, KNIGHT);
+    attackers |= genAttacksBB<KING>(sq) & pieces(c, KING);
+    attackers |= pawnAttacks[~c][sq] & pieces(c, PAWN);
+    return attackers;
 }
 
 void ChessBoard::printBoard(bitBoard bb) {
@@ -71,17 +74,6 @@ void ChessBoard::printBoard(bitBoard bb) {
         }
         std::cout << std::endl;
     }
-}
-
-int ChessBoard::countBits(bitBoard bb) {
-    int count = 0;
-
-    while (bb) {
-        count++;
-        bb &= bb-1;
-    }
-
-    return count;
 }
 
 void ChessBoard::fenToBoard(std::string fenString) {

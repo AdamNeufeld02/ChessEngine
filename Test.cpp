@@ -2,16 +2,18 @@
 #include "catch.hpp"
 #include "MoveGenerator.h"
 #include "ChessBoard.h"
+#include "BitBoards.h"
 #include <bitset>
 #include <chrono>
 
 TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
+    BitBoards::precomputeAttackSets();
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo state;
     ChessBoard cb = ChessBoard(startingFen, state);
     cb.printBoard(cb.pieces());
     REQUIRE(cb.colourToMove() == WHITE);
-    REQUIRE(cb.countBits(cb.pieces()) == 32); 
+    REQUIRE(countBits(cb.pieces()) == 32); 
 }
 
 TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {

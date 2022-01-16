@@ -1,11 +1,11 @@
 #ifndef CHESSBOARD_H
 #define CHESSBOARD_H
-#include <cstdint>
 #include <string>
 #include <iostream>
 #include <bitset>
 #include <unordered_map>
 #include "Types.h"
+#include "BitBoards.h"
 
 
 
@@ -29,16 +29,13 @@ class ChessBoard {
     Colour colourToMove();
     // Performs a move on the board. Does not check if it is a legal chess move.
     void makeMove(Move move, StateInfo& si);
-    // sets the bit on the bitboard to 0
-    static void popBit(bitBoard& bb, int index);
-    // sets bit on bitboard to one
-    static void setBit(bitBoard& bb, int index);
     // prints a bitboard
     static void printBoard(bitBoard bb);
-    // counts set bits on board
-    static int countBits(bitBoard bb);
-
     char epSquare() const;
+
+    // Returns the bitboard of all attackers of one colour of a certain square
+    template<Colour c>
+    bitBoard getAttackers(int sq);
 
     bool canCastle(CastlingRights cr) const;
 

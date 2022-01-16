@@ -2,8 +2,8 @@ EXE = ChessEngine
 EXET = ChessTest
 
 #OBJS specifies which files to compile as part of the project
-OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o
-OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o
+OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
+OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o
 
 #CC specifies which compiler we're using
 CC = g++
@@ -35,21 +35,24 @@ $(EXE) : $(OBJS_EXE)
 $(EXET) : $(OBJS_EXET)
 	$(CC) $(OBJS_EXET) -o $(EXET)
 
-MoveGenerator.o : MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h
+MoveGenerator.o : MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h BitBoards.h
 	$(CC) MoveGenerator.cpp $(CXX_FLAGS) -o $@
 
-ChessGUI.o : ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
+ChessGUI.o : ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h BitBoards.h
 	$(CC) ChessGUI.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
-GameState.o : GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h
+GameState.o : GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h BitBoards.h
 	$(CC) GameState.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
 main.o : main.cpp GameState.h
 	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
-Test.o : Test.cpp MoveGenerator.h ChessBoard.h
+Test.o : Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h
 	$(CC) Test.cpp $(CXX_FLAGS) -o $@
 
-ChessBoard.o : ChessBoard.cpp ChessBoard.h Types.h
+ChessBoard.o : ChessBoard.cpp ChessBoard.h Types.h BitBoards.h
 	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@
+
+BitBoards.0 : BitBoards.cpp BitBoards.h
+	$(CC) BitBoards.cpp $(CXX_FLAGS) -o $@
 

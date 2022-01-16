@@ -1,27 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-typedef uint64_t bitBoard;
-
-// from https://github.com/official-stockfish/Stockfish/blob/master/src/bitboard.h
-constexpr bitBoard FileABB = 0x0101010101010101ULL;
-constexpr bitBoard FileBBB = FileABB << 1;
-constexpr bitBoard FileCBB = FileABB << 2;
-constexpr bitBoard FileDBB = FileABB << 3;
-constexpr bitBoard FileEBB = FileABB << 4;
-constexpr bitBoard FileFBB = FileABB << 5;
-constexpr bitBoard FileGBB = FileABB << 6;
-constexpr bitBoard FileHBB = FileABB << 7;
-
-constexpr bitBoard Rank1BB = 0xFF;
-constexpr bitBoard Rank2BB = Rank1BB << (8 * 1);
-constexpr bitBoard Rank3BB = Rank1BB << (8 * 2);
-constexpr bitBoard Rank4BB = Rank1BB << (8 * 3);
-constexpr bitBoard Rank5BB = Rank1BB << (8 * 4);
-constexpr bitBoard Rank6BB = Rank1BB << (8 * 5);
-constexpr bitBoard Rank7BB = Rank1BB << (8 * 6);
-constexpr bitBoard Rank8BB = Rank1BB << (8 * 7);
-
 enum Colour {
     WHITE, BLACK
 };
@@ -65,17 +44,6 @@ enum CastlingRights {
 
 enum GenType {
     Legal, PseudoLegal, Evasions, Captures
-};
-
-enum Direction {
-    NORTH = 8,
-    EAST = 1,
-    SOUTH = -NORTH,
-    WEST = -EAST,
-    NORTHEAST = NORTH + EAST,
-    SOUTHEAST = SOUTH + EAST,
-    NORTHWEST = NORTH + WEST,
-    SOUTHWEST = SOUTH + WEST
 };
 
 // representing an encoded move
@@ -129,15 +97,5 @@ inline Colour colourOf(Piece pc) {
 inline PieceType typeOf(Piece pc) {
     return PieceType(pc & 7);
 }
-
-template<Direction dir>
-constexpr bitBoard shift(bitBoard bb) {
-    return dir == NORTH ? bb << 8 : dir == NORTHEAST ? bb << 9
-        :  dir == EAST ? bb << 1 : dir == SOUTHEAST ? bb >> 7
-        :  dir == SOUTH ? bb >> 8 : dir == SOUTHWEST ? bb >> 9
-        :  dir == WEST ? bb >> 1 : dir == NORTHWEST ? bb << 7
-        : 0;
-}
-
 
 #endif
