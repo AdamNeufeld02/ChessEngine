@@ -51,13 +51,21 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
     si.previous = st;
     st = &si;
     colToMove = ~colToMove;
+    st->castlingRights &= castlingRights[from];
+    st->castlingRights &= castlingRights[to];
 }
 
-template<Colour c>
-bitBoard ChessBoard::getAttackers(int sq) {
-    bitBoard attackers = genAttacksBB<QUEEN>(sq, allPieces) & pieces(c, QUEEN);
-    attackers |= genAttacksBB<ROOK>(sq, allPieces) & pieces(c, ROOK);
-    attackers |= genAttacksBB<BISHOP>(sq, allPieces) & pieces(c, BISHOP);
+void ChessBoard::undoMove(Move move) {
+    //TODO
+}
+
+void ChessBoard::updateChecksAndPins() {
+    //TODO
+}
+
+bitBoard ChessBoard::getAttackers(int sq, Colour c) {
+    bitBoard attackers = genAttacksBB<ROOK>(sq, allPieces) & (pieces(c, ROOK) | pieces(c, QUEEN));
+    attackers |= genAttacksBB<BISHOP>(sq, allPieces) & (pieces(c, BISHOP) | pieces(c, QUEEN));
     attackers |= genAttacksBB<KNIGHT>(sq) & pieces(c, KNIGHT);
     attackers |= genAttacksBB<KING>(sq) & pieces(c, KING);
     attackers |= pawnAttacks[~c][sq] & pieces(c, PAWN);

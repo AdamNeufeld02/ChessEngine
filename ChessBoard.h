@@ -16,6 +16,9 @@ struct StateInfo {
     char epSquare;
 
     Piece captured;
+    bitBoard checkersBB;
+    bitBoard pinnersBB;
+    bitBoard pinnedBB;
     StateInfo* previous;
 };
  
@@ -29,13 +32,14 @@ class ChessBoard {
     Colour colourToMove();
     // Performs a move on the board. Does not check if it is a legal chess move.
     void makeMove(Move move, StateInfo& si);
+    // Undos the given move. Must have been the last move played
+    void undoMove(Move move);
     // prints a bitboard
     static void printBoard(bitBoard bb);
     char epSquare() const;
 
     // Returns the bitboard of all attackers of one colour of a certain square
-    template<Colour c>
-    bitBoard getAttackers(int sq);
+    bitBoard getAttackers(int sq, Colour c);
 
     bool canCastle(CastlingRights cr) const;
 
@@ -56,6 +60,8 @@ class ChessBoard {
 
     void fenToBoard(std::string fenString);
     void initBoard(StateInfo& si);
+
+    void updateChecksAndPins();
     // Assumes to is an empty square
     void movePiece(int from, int to);
     void removePiece(int sq);

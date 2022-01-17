@@ -2,6 +2,7 @@
 #define BITBOARDS_H
 #include <cstdint>
 #include "Types.h"
+#include <iostream>
 
 // Contains definitions and operations to do with bitboards including the calculation of bitboard attack sets
 
@@ -36,6 +37,8 @@ namespace BitBoards {
     bitBoard genOccMask(int square, int rook);
     void initRookMagics();
     void initBishopMagics();
+    void initBetweenBB();
+    bitBoard computeBetweenBB(int sq1, int sq2, Direction dir);
     // computes rook attack from a given square and occupancy
     bitBoard computeRookAttack(int square, bitBoard occ);
     // computes Bishop attack from a given square and occupancy
@@ -106,6 +109,7 @@ static constexpr bitBoard bishopMagicNums[64] = {
     1161950831810052608ULL, 2464735771073020416ULL, 54610562058947072ULL, 580611413180448ULL
 };
 
+extern bitBoard betweenBB[64][64];
 extern bitBoard pawnAttacks[2][64];
 extern bitBoard knightAttacks[64];
 extern bitBoard kingAttacks[64];
@@ -143,6 +147,10 @@ inline void setBit(bitBoard& bb, int index) {
     bb = bb | ((bitBoard)1 << index);
 }
 
+inline bitBoard moreThanOne(bitBoard bb) {
+    return bb & (bb - 1);
+}
+
 template<PieceType pt>
 inline bitBoard genAttacksBB(int square, bitBoard occ) {
     MagicSquare ms;
@@ -175,6 +183,10 @@ inline bitBoard genAttacksBB(int square) {
         return knightAttacks[square];
         
     }
+}
+
+inline bitBoard getBetweenBB(int sq1, int sq2) {
+    return betweenBB[sq1][sq2];
 }
 
 #endif

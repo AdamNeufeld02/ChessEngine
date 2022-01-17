@@ -1,5 +1,7 @@
 #include "BitBoards.h"
 
+bitBoard betweenBB[64][64];
+
 bitBoard pawnAttacks[2][64];
 bitBoard knightAttacks[64];
 bitBoard kingAttacks[64];
@@ -20,6 +22,7 @@ void BitBoards::precomputeAttackSets() {
     }
     initRookMagics();
     initBishopMagics();
+    initBetweenBB();
 }
 
 void BitBoards::initRookMagics() {
@@ -56,6 +59,57 @@ void BitBoards::initBishopMagics() {
             m.attacks[occ * m.magic >> m.shift] = computeBishopAttack(i, occ);
         }
     } 
+}
+
+void BitBoards::initBetweenBB() {
+    int file, rank;
+    for (int i = 0; i < 64; i++) {
+        file = i % 8;
+        rank = i / 8;
+        
+        for (int nrank = rank; nrank < 8; nrank++) {
+            betweenBB[i][8*nrank+file] = computeBetweenBB(i, 8*nrank+file, NORTH);
+        }
+
+        for (int nfile = file; nfile < 8; nfile++) {
+            betweenBB[i][8*rank+nfile] = computeBetweenBB(i, 8*rank+nfile, EAST);
+        }
+
+        for (int nrank = rank; nrank >=0 ; nrank--) {
+            betweenBB[i][8*nrank+file] = computeBetweenBB(i, 8*nrank+file, SOUTH);
+        }
+
+        for (int nfile = file; nfile >=0; nfile--) {
+            betweenBB[i][8*rank+nfile] = computeBetweenBB(i, 8*rank+nfile, WEST);
+        }
+
+        for (int nfile = file, nrank = rank; nfile < 8 && nrank < 8; nrank++, nfile++) {
+            betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, NORTHEAST);
+        }
+        
+        for (int nfile = file, nrank = rank; nfile < 8 && nrank >= 0; nrank--, nfile++) {
+            betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, SOUTHEAST);
+        }
+
+        for (int nfile = file, nrank = rank; nfile >= 0 && nrank >= 0; nrank--, nfile--) {
+            betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, SOUTHWEST);
+        }
+
+        for (int nfile = file, nrank = rank; nfile >= 0 && nrank < 8; nrank++, nfile--) {
+            betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, NORTHWEST);
+        }
+
+    }
+}
+
+bitBoard BitBoards::computeBetweenBB(int sq1, int sq2, Direction dir) {
+    bitBoard betweenBB = 0;
+    setBit(betweenBB, sq1);
+    while (sq1 != sq2) {
+        sq1 += dir;
+        setBit(betweenBB, sq1);
+    }
+    return betweenBB;
 }
 
 // computes the rook attack for a given occupancy. Goes through all valid rook directions (north east etc.) until a set bit
