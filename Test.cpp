@@ -25,7 +25,7 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     Move* endmoves;
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < 100000000; i++) {
-        endmoves = mg->generateMoves(&cb, moves);
+        endmoves = mg->generateMoves(cb, moves);
     }
     auto stop = std::chrono::high_resolution_clock::now();
 

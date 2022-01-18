@@ -1,5 +1,7 @@
 #include "BitBoards.h"
 
+// An array of bitboards of squares between two given square
+// The between BB contains the square of the second index but not the first
 bitBoard betweenBB[64][64];
 
 bitBoard pawnAttacks[2][64];
@@ -64,38 +66,45 @@ void BitBoards::initBishopMagics() {
 void BitBoards::initBetweenBB() {
     int file, rank;
     for (int i = 0; i < 64; i++) {
+        for (int k = 0; k < 64; k++) {
+            bitBoard bb = 0;
+            setBit(bb, k);
+            betweenBB[i][k] = bb;
+        }
+    }
+    for (int i = 0; i < 64; i++) {
         file = i % 8;
         rank = i / 8;
         
-        for (int nrank = rank; nrank < 8; nrank++) {
+        for (int nrank = rank + 1; nrank < 8; nrank++) {
             betweenBB[i][8*nrank+file] = computeBetweenBB(i, 8*nrank+file, NORTH);
         }
 
-        for (int nfile = file; nfile < 8; nfile++) {
+        for (int nfile = file + 1; nfile < 8; nfile++) {
             betweenBB[i][8*rank+nfile] = computeBetweenBB(i, 8*rank+nfile, EAST);
         }
 
-        for (int nrank = rank; nrank >=0 ; nrank--) {
+        for (int nrank = rank - 1; nrank >=0 ; nrank--) {
             betweenBB[i][8*nrank+file] = computeBetweenBB(i, 8*nrank+file, SOUTH);
         }
 
-        for (int nfile = file; nfile >=0; nfile--) {
+        for (int nfile = file - 1; nfile >=0; nfile--) {
             betweenBB[i][8*rank+nfile] = computeBetweenBB(i, 8*rank+nfile, WEST);
         }
 
-        for (int nfile = file, nrank = rank; nfile < 8 && nrank < 8; nrank++, nfile++) {
+        for (int nfile = file + 1, nrank = rank + 1; nfile < 8 && nrank < 8; nrank++, nfile++) {
             betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, NORTHEAST);
         }
         
-        for (int nfile = file, nrank = rank; nfile < 8 && nrank >= 0; nrank--, nfile++) {
+        for (int nfile = file + 1, nrank = rank - 1; nfile < 8 && nrank >= 0; nrank--, nfile++) {
             betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, SOUTHEAST);
         }
 
-        for (int nfile = file, nrank = rank; nfile >= 0 && nrank >= 0; nrank--, nfile--) {
+        for (int nfile = file - 1, nrank = rank - 1; nfile >= 0 && nrank >= 0; nrank--, nfile--) {
             betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, SOUTHWEST);
         }
 
-        for (int nfile = file, nrank = rank; nfile >= 0 && nrank < 8; nrank++, nfile--) {
+        for (int nfile = file - 1, nrank = rank + 1; nfile >= 0 && nrank < 8; nrank++, nfile--) {
             betweenBB[i][8*nrank+nfile] = computeBetweenBB(i, 8*nrank+nfile, NORTHWEST);
         }
 
@@ -104,7 +113,6 @@ void BitBoards::initBetweenBB() {
 
 bitBoard BitBoards::computeBetweenBB(int sq1, int sq2, Direction dir) {
     bitBoard betweenBB = 0;
-    setBit(betweenBB, sq1);
     while (sq1 != sq2) {
         sq1 += dir;
         setBit(betweenBB, sq1);

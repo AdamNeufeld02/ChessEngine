@@ -29,7 +29,7 @@ class ChessBoard {
     ChessBoard(std::string fenString, StateInfo& si);
     // return piece code at specific index
     Piece pieceOn(int sq);
-    Colour colourToMove();
+    Colour colourToMove() const;
     // Performs a move on the board. Does not check if it is a legal chess move.
     void makeMove(Move move, StateInfo& si);
     // Undos the given move. Must have been the last move played
@@ -41,11 +41,19 @@ class ChessBoard {
     // Returns the bitboard of all attackers of one colour of a certain square
     bitBoard getAttackers(int sq, Colour c);
 
+    // Caluculates if the given square is attacked for the given occupancy
+    //  returns non zero if attacked
+    int isAttacked(int sq, bitBoard occ);
+
     bool canCastle(CastlingRights cr) const;
 
     bitBoard pieces(Colour c, PieceType pt);
     bitBoard pieces(Colour c);
     bitBoard pieces();
+
+    bitBoard checkers();
+    bitBoard pinners();
+    bitBoard pinned();
 
     private:
 
@@ -61,7 +69,8 @@ class ChessBoard {
     void fenToBoard(std::string fenString);
     void initBoard(StateInfo& si);
 
-    void updateChecksAndPins();
+    void updateChecksAndPins(Colour toMove);
+    bitBoard blockersForSq(int sq, Colour col, bitBoard& pinners);
     // Assumes to is an empty square
     void movePiece(int from, int to);
     void removePiece(int sq);
@@ -69,7 +78,7 @@ class ChessBoard {
     
 };
 
-inline Colour ChessBoard::colourToMove() {
+inline Colour ChessBoard::colourToMove() const {
     return colToMove;
 }
 
@@ -87,6 +96,18 @@ inline bitBoard ChessBoard::pieces() {
 
 inline char ChessBoard::epSquare() const {
     return st->epSquare;
+}
+
+inline bitBoard ChessBoard::checkers() {
+    return st->checkersBB;
+}
+
+inline bitBoard ChessBoard::pinners() {
+    return st->pinnersBB;
+}
+
+inline bitBoard ChessBoard::pinned() {
+    return st->pinnedBB;
 }
 
 inline bool ChessBoard::canCastle(CastlingRights cr) const {

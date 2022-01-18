@@ -51,16 +51,43 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
     si.previous = st;
     st = &si;
     colToMove = ~colToMove;
-    st->castlingRights &= castlingRights[from];
-    st->castlingRights &= castlingRights[to];
+    st->castlingRights &= castlingRights[from] & castlingRights[to];
+    updateChecksAndPins(colToMove);
 }
 
 void ChessBoard::undoMove(Move move) {
     //TODO
 }
 
-void ChessBoard::updateChecksAndPins() {
-    //TODO
+void ChessBoard::updateChecksAndPins(Colour toMove) {
+    st->checkersBB = getAttackers(getLSBIndex(pieces(toMove, KING)), ~toMove);
+    st->pinnedBB = blockersForSq(getLSBIndex(pieces(toMove, KING)), toMove, st->pinnersBB);
+}
+
+bitBoard ChessBoard::blockersForSq(int sq, Colour blockingCol, bitBoard& pinners) {
+    bitBoard blockers = 0;
+    pinners = 0;
+
+    bitBoard snipers = (genAttacksBB<ROOK>(sq) & (pieces(~blockingCol, ROOK) | pieces(~blockingCol, QUEEN))) |
+                       (genAttacksBB<BISHOP>(sq) & (pieces(~blockingCol, BISHOP) | pieces(~blockingCol, QUEEN)));
+
+    bitBoard occupancy = pieces() ^ snipers;
+
+    while (snipers)
+    {
+        int sniperSq = getLSBIndex(snipers);
+        bitBoard between = getBetweenBB(sq, sniperSq);
+        bitBoard pinned = between & occupancy;
+        bitBoard pinner = between & snipers;
+        if (pinned && !moreThanOne(pinned)) {
+            blockers |= pinned;
+            if (pinned & pieces(blockingCol)) {
+                pinners |= pinner;
+            }
+        }
+        snipers ^= pinner;
+    }
+    return blockers;
 }
 
 bitBoard ChessBoard::getAttackers(int sq, Colour c) {
@@ -70,6 +97,23 @@ bitBoard ChessBoard::getAttackers(int sq, Colour c) {
     attackers |= genAttacksBB<KING>(sq) & pieces(c, KING);
     attackers |= pawnAttacks[~c][sq] & pieces(c, PAWN);
     return attackers;
+}
+
+int ChessBoard::isAttacked(int sq, bitBoard occ) {
+    Colour us = colourOf(pieceOn(sq));
+    Colour them = ~us;
+    if (genAttacksBB<ROOK>(sq, occ) & (pieces(them, ROOK) | pieces(them, QUEEN))) {
+        return 1; 
+    } else if (genAttacksBB<BISHOP>(sq, occ) & (pieces(them, BISHOP) | pieces(them, QUEEN))) {
+        return 1;
+    } else if (genAttacksBB<KNIGHT>(sq) & pieces(them, KNIGHT)) {
+        return 1;
+    } else if (genAttacksBB<KING>(sq) & pieces(them, KING)) {
+        return 1;
+    } else if (pawnAttacks[us][sq] & pieces(them, PAWN)) {
+        return 1;
+    }
+    return 0;
 }
 
 void ChessBoard::printBoard(bitBoard bb) {

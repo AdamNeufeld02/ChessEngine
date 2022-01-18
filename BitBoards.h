@@ -109,6 +109,7 @@ static constexpr bitBoard bishopMagicNums[64] = {
     1161950831810052608ULL, 2464735771073020416ULL, 54610562058947072ULL, 580611413180448ULL
 };
 
+// The bitboard of squares between two squares. If squares are not in a straight line the between bitboard is only the second index
 extern bitBoard betweenBB[64][64];
 extern bitBoard pawnAttacks[2][64];
 extern bitBoard knightAttacks[64];
@@ -177,11 +178,16 @@ template<PieceType pt>
 inline bitBoard genAttacksBB(int square) {
     switch (pt)
     {
-    case KING:
-        return kingAttacks[square];
     case KNIGHT:
         return knightAttacks[square];
-        
+    case BISHOP:
+        return bishopMagics[square].attacks[0];
+    case ROOK:
+        return rookMagics[square].attacks[0];
+    case QUEEN:
+        return genAttacksBB<ROOK>(square) | genAttacksBB<BISHOP>(square);
+    case KING:
+        return kingAttacks[square];
     }
 }
 

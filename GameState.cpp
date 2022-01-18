@@ -33,7 +33,7 @@ void GameState::gameLoop() {
     int index, x, y, from;
     Move moves[MAXMOVES];
     int movMat[64];
-    Move* end = moveGenerator->generateMoves(chessBoard, moves);
+    Move* end = moveGenerator->generateMoves(*chessBoard, moves);
     resetMoveMatrix(movMat);
     while (gameState == PLAYING_GAME) {
         while(SDL_PollEvent(&ev) != 0) {
@@ -64,7 +64,7 @@ void GameState::gameLoop() {
                         }
                         states->emplace_back();
                         chessBoard->makeMove(move, states->back());
-                        end = moveGenerator->generateMoves(chessBoard, moves);
+                        end = moveGenerator->generateMoves(*chessBoard, moves);
                         if (end == moves) {
                             gameState = GAME_OVER;
                         }

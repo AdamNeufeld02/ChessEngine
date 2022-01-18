@@ -4,29 +4,39 @@ MoveGenerator::MoveGenerator() {
     initCastleMasks();
 }
 
-Move* MoveGenerator::generateMoves(ChessBoard* chessBoard, Move* moves) {
-    if (chessBoard->colourToMove() == WHITE) {
-        return generateMoves<Legal, WHITE>(*chessBoard, moves);
-    }
-    return generateMoves<Legal, BLACK>(*chessBoard, moves);
+Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
+    return chessBoard.checkers() ? generateAllMoves<Evasions>(chessBoard, moves) : generateAllMoves<Legal>(chessBoard, moves);
 }
 
-template<GenType t, Colour c>
+template<GenType t>
+Move* MoveGenerator::generateAllMoves(ChessBoard& chessBoard, Move* moves) {
+    Colour us = chessBoard.colourToMove();
+    return us == WHITE? generateMoves<t, WHITE>(chessBoard, moves) : generateMoves<t, BLACK>(chessBoard, moves);
+}
+
+template<GenType t, Colour us>
 Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
-    bitBoard targets = ~chessBoard.pieces(c);
-    moves = generateMoves<ROOK>(chessBoard, moves, chessBoard.pieces(c, ROOK), targets);
-    moves = generateMoves<BISHOP>(chessBoard, moves, chessBoard.pieces(c, BISHOP), targets);
-    moves = generateMoves<QUEEN>(chessBoard, moves, chessBoard.pieces(c, QUEEN), targets);
-    moves = generateMoves<KNIGHT>(chessBoard, moves, chessBoard.pieces(c, KNIGHT), targets);
-    moves = generateKingMoves(chessBoard, moves, chessBoard.pieces(c, KING), targets);
-    moves = generatePawnMoves<t, c>(chessBoard, moves);
+    bitBoard targets;
+    int ksq = getLSBIndex(chessBoard.pieces(us, KING));
+    if (t != Evasions || !moreThanOne(chessBoard.checkers())) {
+        targets = t == Legal ? ~chessBoard.pieces(us) : t == Evasions ? getBetweenBB(ksq, getLSBIndex(chessBoard.checkers())) :
+                  t == Captures ? chessBoard.pieces(~ us) : ~chessBoard.pieces();
+        moves = generateMoves<ROOK, us>(chessBoard, moves, targets);
+        moves = generateMoves<BISHOP, us>(chessBoard, moves, targets);
+        moves = generateMoves<QUEEN, us>(chessBoard, moves, targets);
+        moves = generateMoves<KNIGHT, us>(chessBoard, moves, targets);
+        moves = generatePawnMoves<t, us>(chessBoard, moves, targets);
+    }
+    
+    moves = generateKingMoves(chessBoard, moves, chessBoard.pieces(us, KING), targets);
     return moves;
 }
 
-template<PieceType pt>
-Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard pieces, bitBoard targets) {
+template<PieceType pt, Colour us>
+Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets) {
     int from, to;
     bitBoard attacks;
+    bitBoard pieces = chessBoard.pieces(us, pt);
     bitBoard occ = chessBoard.pieces();
     while (pieces) {
         from = popLSB(pieces);
@@ -75,7 +85,7 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves, bitB
 }
 
 template<GenType t, Colour us>
-Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
+Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets) {
     Colour them = ~us;
     constexpr Direction upRight = us == WHITE ? NORTHEAST : SOUTHWEST;
     constexpr Direction upLeft = us == WHITE ? NORTHWEST : SOUTHEAST;
@@ -86,12 +96,16 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard rank3 = us == WHITE? Rank3BB : Rank6BB;
 
     bitBoard empty = ~chessBoard.pieces();
-    bitBoard enemies = chessBoard.pieces(them);
+    bitBoard enemies = t == Evasions? chessBoard.checkers() : chessBoard.pieces(them);
     
     // gen pushes if type is not captures
     if (t != Captures) {
         bitBoard b1 = shift<up>(pawnsNotOn7) & empty;
         bitBoard b2 = shift<up>(b1 & rank3) & empty;
+        if (t == Evasions) {
+            b1 &= targets;
+            b2 &= targets;
+        }
         while (b1) {
             int to = popLSB(b1);
             *moves++ = makeMove(to - up, to);
@@ -108,6 +122,9 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves) {
         bitBoard b1 = shift<upRight>(pawnsOn7) & enemies;
         bitBoard b2 = shift<upLeft>(pawnsOn7) & enemies;
         bitBoard b3 = shift<up>(pawnsOn7) & empty;
+        if (t == Evasions) {
+            b3 &= targets;
+        }
         while (b1) {
             int to = popLSB(b1);
             for (int i = KNIGHT; i < KING; i++) {

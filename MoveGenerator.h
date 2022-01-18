@@ -20,7 +20,7 @@ class MoveGenerator {
     // Generates pseudo legal chess moves for the chessBoard given based on which side is to move
     // Places all moves in the move list provided
     // Returns a pointer to the end of the list of generated moves
-    Move* generateMoves(ChessBoard* chessBoard, Move* moves);
+    Move* generateMoves(ChessBoard& chessBoard, Move* moves);
     // Function that was used to generate magics for rooks and bishops.
     // Heavily inspired by the routine found on https://www.chessprogramming.org/Looking_for_Magics
     bitBoard generateMagicNumber(int square, int rook);
@@ -29,14 +29,15 @@ class MoveGenerator {
 
     // Castles masks used in generating castle moves
     bitBoard castleMasks[9];
-
-    template<GenType t, Colour c>
+    template<GenType t>
+    Move* generateAllMoves(ChessBoard& chessBoard, Move* moves);
+    template<GenType t, Colour us>
     Move* generateMoves(ChessBoard& chessBoard, Move* moves);
-    template<PieceType pt>
-    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard pieces, bitBoard targets);
+    template<PieceType pt, Colour us>
+    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets);
     // generates moves for pawns including enpassent, promotions and double pushes
     template<GenType t, Colour us>
-    Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves);
+    Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets);
     //generates all king moves
     Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves, bitBoard pieces, bitBoard targets);
 
