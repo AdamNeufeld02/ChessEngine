@@ -5,8 +5,9 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
+ 
 
-# Make data base, printed on Mon Jan 17 09:33:08 2022
+# Make data base, printed on Tue Jan 18 13:28:03 2022
 
 # Variables
 
@@ -19,7 +20,7 @@ USERPROFILE = C:\Users\adamn
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-7fe468d7-f17d-4195-a203-4b70830eb072-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-057274d1-f8cd-4628-8298-403b853d4a02-sock
 # environment
 VSCODE_CWD = C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code
 # environment
@@ -35,7 +36,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_14480_XBMAKNZLFELBCHEC
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_10972_IIUOCJJNHKUFUQKC
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -89,7 +90,7 @@ MAKEFILE_LIST := makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 14480
+VSCODE_PID = 10972
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
@@ -101,8 +102,7 @@ LIBRARY_PATHS = -LC:\Users\adamn\SDL2\lib
 # makefile (from 'makefile', line 5)
 OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
 # environment
-VSCODE_NLS_CONFIG = {"loc 
-ale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
 ONEDRIVECONSUMER = C:\Users\adamn\OneDrive
 # default
@@ -224,7 +224,7 @@ INCLUDE_PATHS = -IC:\Users\adamn\SDL2\include\SDL2
 # environment
 PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # variable set hash-table stats:
-# Load=106/1024=10%, Rehash=0, Collisions=9/142=6%
+# Load=106/1024=10%, Rehash=0, Collisions=9/146=6%
 
 # Pattern-specific Variable Values
 
@@ -232,7 +232,7 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Directories
 
-# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1642401621): 37 files, no impossibilities.
+# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1642488013): 37 files, no impossibilities.
 
 # 37 files, no impossibilities in 1 directories.
 
@@ -244,21 +244,22 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Not a target:
 BitBoards.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-17 22:28:11
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 GameState.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-15 23:04:02
+#  Last modified 2022-01-17 20:21:31
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 ChessBoard.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-16 22:37:29
+#  Last modified 2022-01-17 22:38:13
 #  File has been updated.
 #  Successfully updated.
 
@@ -271,7 +272,7 @@ ChessTest: Test.o MoveGenerator.o ChessBoard.o BitBoards.o
 
 ChessGUI.o: ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-16 22:39:26
+#  Last modified 2022-01-17 22:39:17
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 42):
@@ -286,7 +287,7 @@ ChessGUI.cpp:
 
 MoveGenerator.o: MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-16 22:39:27
+#  Last modified 2022-01-17 22:40:13
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 39):
@@ -295,35 +296,35 @@ MoveGenerator.o: MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h BitBoard
 # Not a target:
 ChessBoard.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-16 22:41:31
+#  Last modified 2022-01-17 22:38:04
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 BitBoards.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-16 21:40:24
+#  Last modified 2022-01-17 22:30:24
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 GameState.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-15 20:19:23
+#  Last modified 2022-01-17 20:20:34
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 MoveGenerator.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-15 22:41:10
+#  Last modified 2022-01-17 22:40:10
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 MoveGenerator.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-15 22:41:02
+#  Last modified 2022-01-17 22:10:23
 #  File has been updated.
 #  Successfully updated.
 
@@ -347,32 +348,14 @@ all: ChessEngine ChessTest
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/5=0%
+# Load=0/32=0%, Rehash=0 
+, Collisions=0/9=0%
 
 ChessBoard.o: ChessBoard.cpp ChessBoard.h Types.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Implicit/static pattern stem: ''
-#  Last modified 2022-01-16 22:40:21
+#  Last modified 2022-01-17 22:39:20
 #  File has been updated.
-#  Needs to be updated (-q is set).
-# automatic
-# @ := ChessBoard.o
-# automatic
-# * := 
-# automatic
-# < := ChessBoard.cpp
-# automatic
-# + := ChessBoard.cpp ChessBoard.h Types.h BitBoards.h
-# automatic
-# % := 
-# automatic
-# ^ := ChessBoard.cpp ChessBoard.h Types.h BitBoards.h
-# automatic
-# ? := ChessBoard.cpp
-# automatic
-# | := 
-# variable set hash-table stats:
-# Load=8/32=25%, Rehash=0, Collisions=3/14=21%
+#  Successfully updated.
 #  recipe to execute (from 'makefile', line 54):
 	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@
 
@@ -397,7 +380,7 @@ main.cpp:
 
 main.o: main.cpp GameState.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-15 22:56:52
+#  Last modified 2022-01-17 20:21:36
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 48):
@@ -405,17 +388,34 @@ main.o: main.cpp GameState.h
 
 ChessEngine: main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
 #  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
+# automatic
+# @ := ChessEngine
+# automatic
+# * := 
+# automatic
+# < := main.o
+# automatic
+# + := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
+# automatic
+# % := 
+# automatic
+# ^ := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
+# automatic
+# ? := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
+# automatic
+# | := 
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/5=0%
+# Load=8/32=25%, Rehash=0, Collisions=5/17=29%
 #  recipe to execute (from 'makefile', line 33):
 	$(CC) $(OBJS_EXE) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE)
 
 GameState.o: GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-16 22:39:27
+#  Last modified 2022-01-17 22:39:18
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -455,8 +455,7 @@ Test.o: Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h
 #  recipe to execute (from 'makefile', line 51):
 	$(CC) Test.cpp $(CXX_FLAGS) -o $@
 
-# fil 
-es hash-table stats:
+# files hash-table stats:
 # Load=27/1024=3%, Rehash=0, Collisions=2/87=2%
 # VPATH Search Paths
 
@@ -470,6 +469,6 @@ es hash-table stats:
 # strcache performance: lookups = 105 / hit rate = 59%
 # hash-table stats:
 # Load=43/8192=1%, Rehash=0, Collisions=0/105=0%
-# Finished Make data base on Mon Jan 17 09:33:08 2022
+# Finished Make data base on Tue Jan 18 13:28:03 2022
 
  

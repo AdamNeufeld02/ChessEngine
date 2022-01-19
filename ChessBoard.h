@@ -41,9 +41,8 @@ class ChessBoard {
     // Returns the bitboard of all attackers of one colour of a certain square
     bitBoard getAttackers(int sq, Colour c);
 
-    // Caluculates if the given square is attacked for the given occupancy
-    //  returns non zero if attacked
-    int isAttacked(int sq, bitBoard occ);
+    // returns the bitboard of sliding attacks that the given colour attacks for the given occ
+    bitBoard getSlidingAttacks(bitBoard occ);
 
     bool canCastle(CastlingRights cr) const;
 

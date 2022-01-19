@@ -3,7 +3,7 @@
 // An array of bitboards of squares between two given square
 // The between BB contains the square of the second index but not the first
 bitBoard betweenBB[64][64];
-
+bitBoard squares[64];
 bitBoard pawnAttacks[2][64];
 bitBoard knightAttacks[64];
 bitBoard kingAttacks[64];
@@ -17,6 +17,9 @@ MagicSquare bishopMagics[64];
 // Precompute attack tables and initialize magic bitboards
 void BitBoards::precomputeAttackSets() {
     for (int i = 0; i < 64; i++) {
+        bitBoard bb = 0;
+        setBit(bb, i);
+        squares[i] = bb;
         pawnAttacks[0][i] = computePawnAttack(i, 1);
         pawnAttacks[1][i] = computePawnAttack(i, 0);
         knightAttacks[i] = computeKnightAttack(i);

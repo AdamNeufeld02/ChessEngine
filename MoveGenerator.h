@@ -11,7 +11,6 @@
 // TODO:
 //  - Check routine
 //  - Absolute pins
-//  - Double check
 //  - Clean up
 
 class MoveGenerator {
@@ -39,7 +38,8 @@ class MoveGenerator {
     template<GenType t, Colour us>
     Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets);
     //generates all king moves
-    Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves, bitBoard pieces, bitBoard targets);
+    template<GenType t, Colour us>
+    Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
 
     // Initializes the castle mask array used in the generation of castle moves
     void initCastleMasks();

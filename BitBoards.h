@@ -111,6 +111,7 @@ static constexpr bitBoard bishopMagicNums[64] = {
 
 // The bitboard of squares between two squares. If squares are not in a straight line the between bitboard is only the second index
 extern bitBoard betweenBB[64][64];
+extern bitBoard squares[64];
 extern bitBoard pawnAttacks[2][64];
 extern bitBoard knightAttacks[64];
 extern bitBoard kingAttacks[64];

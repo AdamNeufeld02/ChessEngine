@@ -99,21 +99,22 @@ bitBoard ChessBoard::getAttackers(int sq, Colour c) {
     return attackers;
 }
 
-int ChessBoard::isAttacked(int sq, bitBoard occ) {
-    Colour us = colourOf(pieceOn(sq));
-    Colour them = ~us;
-    if (genAttacksBB<ROOK>(sq, occ) & (pieces(them, ROOK) | pieces(them, QUEEN))) {
-        return 1; 
-    } else if (genAttacksBB<BISHOP>(sq, occ) & (pieces(them, BISHOP) | pieces(them, QUEEN))) {
-        return 1;
-    } else if (genAttacksBB<KNIGHT>(sq) & pieces(them, KNIGHT)) {
-        return 1;
-    } else if (genAttacksBB<KING>(sq) & pieces(them, KING)) {
-        return 1;
-    } else if (pawnAttacks[us][sq] & pieces(them, PAWN)) {
-        return 1;
+bitBoard ChessBoard::getSlidingAttacks(bitBoard occ) {
+    Colour attackingCol = ~colourToMove();
+    bitBoard rooks = pieces(attackingCol, ROOK);
+    bitBoard bishops = pieces(attackingCol, BISHOP);
+    bitBoard queens = pieces(attackingCol, QUEEN);
+    bitBoard slidingAttacks = 0;
+    while (rooks) {
+        slidingAttacks |= genAttacksBB<ROOK>(popLSB(rooks), occ);
     }
-    return 0;
+    while (bishops) {
+        slidingAttacks |= genAttacksBB<BISHOP>(popLSB(bishops), occ);
+    } 
+    while (queens) {
+        slidingAttacks |= genAttacksBB<QUEEN>(popLSB(queens), occ);
+    }
+    return slidingAttacks;
 }
 
 void ChessBoard::printBoard(bitBoard bb) {
