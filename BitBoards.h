@@ -38,6 +38,7 @@ namespace BitBoards {
     void initRookMagics();
     void initBishopMagics();
     void initBetweenBB();
+    void initLineBB();
     bitBoard computeBetweenBB(int sq1, int sq2, Direction dir);
     // computes rook attack from a given square and occupancy
     bitBoard computeRookAttack(int square, bitBoard occ);
@@ -111,14 +112,24 @@ static constexpr bitBoard bishopMagicNums[64] = {
 
 // The bitboard of squares between two squares. If squares are not in a straight line the between bitboard is only the second index
 extern bitBoard betweenBB[64][64];
+// The bitboard of the straight line which passes through both squares.
+extern bitBoard lineBB[64][64];
+// bitboard of each square
 extern bitBoard squares[64];
+// bitboard of pawn attacks seperated by colour
 extern bitBoard pawnAttacks[2][64];
+// bitboard of knight attacks
 extern bitBoard knightAttacks[64];
+// bitboard of king attacks
 extern bitBoard kingAttacks[64];
+// bitboard to store rook attacks. Accessed through rookMagics
 extern bitBoard rookAttacks[102400];
+// bitboard to store bishop attacks. Accessed through bishopMagics
 extern bitBoard bishopAttacks[5248];
 
+// Array of rook magics to lookup rook attacks
 extern MagicSquare rookMagics[64];
+// Array of bishop magics to lookup bishop attacks
 extern MagicSquare bishopMagics[64];
 
 
@@ -194,6 +205,10 @@ inline bitBoard genAttacksBB(int square) {
 
 inline bitBoard getBetweenBB(int sq1, int sq2) {
     return betweenBB[sq1][sq2];
+}
+
+inline bool isAligned(int sq1, int sq2, int sq3) {
+    return lineBB[sq1][sq2] & squares[sq3];
 }
 
 #endif

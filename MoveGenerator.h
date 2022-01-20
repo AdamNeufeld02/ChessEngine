@@ -9,8 +9,7 @@
 // For more info on magic bitboards visit: https://www.chessprogramming.org/Magic_Bitboards
 
 // TODO:
-//  - Check routine
-//  - Absolute pins
+//  - filter illegal castles
 //  - Clean up
 
 class MoveGenerator {

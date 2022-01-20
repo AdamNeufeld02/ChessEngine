@@ -3,6 +3,7 @@
 // An array of bitboards of squares between two given square
 // The between BB contains the square of the second index but not the first
 bitBoard betweenBB[64][64];
+bitBoard lineBB[64][64];
 bitBoard squares[64];
 bitBoard pawnAttacks[2][64];
 bitBoard knightAttacks[64];
@@ -28,6 +29,7 @@ void BitBoards::precomputeAttackSets() {
     initRookMagics();
     initBishopMagics();
     initBetweenBB();
+    initLineBB();
 }
 
 void BitBoards::initRookMagics() {
@@ -64,6 +66,26 @@ void BitBoards::initBishopMagics() {
             m.attacks[occ * m.magic >> m.shift] = computeBishopAttack(i, occ);
         }
     } 
+}
+
+void BitBoards::initLineBB() {
+    // initialize lines to 0
+    for (int sq1 = 0; sq1 < 64; sq1++) {
+        for (int sq2 = 0; sq2 < 64; sq2++) {
+            lineBB[sq1][sq2] = 0;
+        }
+    }
+    for (int sq1 = 0; sq1 < 64; sq1++) {
+        bitBoard straight = genAttacksBB<ROOK>(sq1);
+        bitBoard diagonal = genAttacksBB<BISHOP>(sq1);
+        for (int sq2 = 0; sq2 < 64; sq2++) {
+            if (squares[sq2] & straight) {
+                lineBB[sq1][sq2] = (straight & genAttacksBB<ROOK>(sq2)) | squares[sq1] | squares[sq2];
+            } else if (squares[sq2] & diagonal) {
+                lineBB[sq1][sq2] = (diagonal & genAttacksBB<BISHOP>(sq2) | squares[sq1] | squares[sq2]);
+            }
+        }
+    }
 }
 
 void BitBoards::initBetweenBB() {

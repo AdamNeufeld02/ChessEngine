@@ -5,7 +5,21 @@ MoveGenerator::MoveGenerator() {
 }
 
 Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
-    return chessBoard.checkers() ? generateAllMoves<Evasions>(chessBoard, moves) : generateAllMoves<Legal>(chessBoard, moves);
+    Move* curr = moves;
+    Colour us = chessBoard.colourToMove();
+    int ksq = getLSBIndex(chessBoard.pieces(us, KING));
+    bitBoard pinned = chessBoard.pinned() & chessBoard.pieces(us);
+    moves = chessBoard.checkers() ? generateAllMoves<Evasions>(chessBoard, moves) : generateAllMoves<Legal>(chessBoard, moves);
+    if (pinned) {
+        while (curr != moves) {
+            if ((pinned & squares[getFrom(*curr)]) && !isAligned(getFrom(*curr), getTo(*curr), ksq)) {
+                *curr = *--moves;
+            } else {
+                ++curr;
+            }
+        }
+    }
+    return moves;
 }
 
 template<GenType t>
@@ -81,13 +95,12 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
                 }
             }
         }
-
         // Generate Castles
-        if ((castleMasks[kingCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(kingCastle) && t != Evasions) {
+        if (t == Legal && (castleMasks[kingCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(kingCastle)) {
             *moves++ = makeMove<CASTLE>(from, from + 2);
         }
 
-        if ((castleMasks[queenCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(queenCastle) && t != Evasions) {
+        if (t == Legal && (castleMasks[queenCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(queenCastle)) {
             *moves++ = makeMove<CASTLE>(from, from - 2);
         }
     }
@@ -170,9 +183,14 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves, bitB
 
     if (chessBoard.epSquare() > 0) {
         bitBoard b1 = pawnAttacks[them][(int)chessBoard.epSquare()] & pawnsNotOn7;
+        bitBoard capturedOcc = chessBoard.pieces() ^ squares[chessBoard.epSquare() - up];
         while (b1) {
             int from = popLSB(b1);
-            *moves++ = makeMove<ENPASSENT>(from, chessBoard.epSquare());
+            bitBoard lineAttack = genAttacksBB<ROOK>(from, capturedOcc);
+            // if enpassent exposes king dont do it
+            if (!((lineAttack & (chessBoard.pieces(them, ROOK) | chessBoard.pieces(them, QUEEN))) && (lineAttack & chessBoard.pieces(us, KING)))) {
+                *moves++ = makeMove<ENPASSENT>(from, chessBoard.epSquare());
+            }
         }
     }
     return moves;

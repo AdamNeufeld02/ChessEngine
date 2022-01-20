@@ -35,11 +35,6 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
         } else {
             movePiece(to - 2, to + 1);
         }
-        if (us == WHITE) {
-                si.castlingRights ^= WHITE_CASTLING;
-            } else {
-                si.castlingRights ^= BLACK_CASTLING;
-        }
     }
     si.epSquare = -1;
     if (typeOf(moved) == PAWN) {
@@ -56,7 +51,11 @@ void ChessBoard::makeMove(Move move, StateInfo& si) {
 }
 
 void ChessBoard::undoMove(Move move) {
-    //TODO
+    FLAGS flag = getFlag(move);
+    int from = getFrom(move);
+    int to = getTo(move);
+    movePiece(to, from);
+    // TODO
 }
 
 void ChessBoard::updateChecksAndPins(Colour toMove) {
