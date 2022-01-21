@@ -12,9 +12,7 @@
 //  - filter illegal castles
 //  - Clean up
 
-class MoveGenerator {
-    public:
-    MoveGenerator();
+namespace MoveGenerator {
     // Generates pseudo legal chess moves for the chessBoard given based on which side is to move
     // Places all moves in the move list provided
     // Returns a pointer to the end of the list of generated moves
@@ -23,10 +21,6 @@ class MoveGenerator {
     // Heavily inspired by the routine found on https://www.chessprogramming.org/Looking_for_Magics
     bitBoard generateMagicNumber(int square, int rook);
 
-    private:
-
-    // Castles masks used in generating castle moves
-    bitBoard castleMasks[9];
     template<GenType t>
     Move* generateAllMoves(ChessBoard& chessBoard, Move* moves);
     template<GenType t, Colour us>
@@ -39,15 +33,12 @@ class MoveGenerator {
     //generates all king moves
     template<GenType t, Colour us>
     Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
-
-    // Initializes the castle mask array used in the generation of castle moves
-    void initCastleMasks();
     
     unsigned int XORShift32Rand();
     // generates 64 bit number with low number of set bits (ideal candidate)
     bitBoard getMagicNumberCandidate();
     bitBoard genRand64();
     
-};
+}
 
 #endif

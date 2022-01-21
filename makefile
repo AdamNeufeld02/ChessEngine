@@ -1,9 +1,11 @@
 EXE = ChessEngine
 EXET = ChessTest
+EXEP = Perft
 
 #OBJS specifies which files to compile as part of the project
 OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
 OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o
+OBJS_EXEP = Perft.o MoveGenerator.o ChessBoard.o BitBoards.o
 
 #CC specifies which compiler we're using
 CC = g++
@@ -26,7 +28,7 @@ LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = ChessEngine
 
-all : ChessEngine ChessTest
+all : ChessEngine ChessTest Perft
 
 #This is the target that compiles our executable
 $(EXE) : $(OBJS_EXE)
@@ -34,6 +36,9 @@ $(EXE) : $(OBJS_EXE)
 
 $(EXET) : $(OBJS_EXET)
 	$(CC) $(OBJS_EXET) -o $(EXET)
+
+$(EXEP) : $(OBJS_EXEP)
+	$(CC) $(OBJS_EXEP) -o $(EXEP)
 
 MoveGenerator.o : MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h BitBoards.h
 	$(CC) MoveGenerator.cpp $(CXX_FLAGS) -o $@
@@ -49,6 +54,9 @@ main.o : main.cpp GameState.h
 
 Test.o : Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h
 	$(CC) Test.cpp $(CXX_FLAGS) -o $@
+
+Perft.o : Perft.cpp MoveGenerator.h ChessBoard.h BitBoards.h
+	$(CC) Perft.cpp $(CXX_FLAGS) -o $@
 
 ChessBoard.o : ChessBoard.cpp ChessBoard.h Types.h BitBoards.h
 	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@

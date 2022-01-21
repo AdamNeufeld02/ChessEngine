@@ -5,6 +5,7 @@
 bitBoard betweenBB[64][64];
 bitBoard lineBB[64][64];
 bitBoard squares[64];
+bitBoard castleMasks[9];
 bitBoard pawnAttacks[2][64];
 bitBoard knightAttacks[64];
 bitBoard kingAttacks[64];
@@ -30,6 +31,7 @@ void BitBoards::precomputeAttackSets() {
     initBishopMagics();
     initBetweenBB();
     initLineBB();
+    initCastleMasks();
 }
 
 void BitBoards::initRookMagics() {
@@ -66,6 +68,13 @@ void BitBoards::initBishopMagics() {
             m.attacks[occ * m.magic >> m.shift] = computeBishopAttack(i, occ);
         }
     } 
+}
+
+void BitBoards::initCastleMasks() {
+    castleMasks[WHITE_OO] = (bitBoard)0x60;
+    castleMasks[WHITE_OOO] = (bitBoard)0xe;
+    castleMasks[BLACK_OO] = castleMasks[WHITE_OO] << 56;
+    castleMasks[BLACK_OOO] = castleMasks[WHITE_OOO] << 56;
 }
 
 void BitBoards::initLineBB() {

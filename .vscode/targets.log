@@ -5,9 +5,8 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
- 
 
-# Make data base, printed on Wed Jan 19 20:32:40 2022
+# Make data base, printed on Thu Jan 20 22:33:38 2022
 
 # Variables
 
@@ -20,14 +19,15 @@ USERPROFILE = C:\Users\adamn
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-6b573698-0d56-4c8e-826f-0a594fa693a8-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-a9e7eb32-dc74-46e8-bbcc-244b83c798d9-sock
 # environment
 VSCODE_CWD = C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code
 # environment
 CHOCOLATEYINSTALL = C:\ProgramData\chocolatey
 # environment
 SYSTEMROOT = C:\Windows
-# environment
+# e 
+nvironment
 PROCESSOR_LEVEL = 25
 # environment
 PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
@@ -36,7 +36,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_41492_BAZKQPTFPZXPGTSQ
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_42888_RIPFMPDEGDUSMKUV
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -90,18 +90,18 @@ MAKEFILE_LIST := makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 41492
+VSCODE_PID = 42888
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
 *F = $(notdir $*)
-# makefile (from 'makefile', line 16)
+# makefile (from 'makefile', line 18)
 LIBRARY_PATHS = -LC:\Users\adamn\SDL2\lib
 # automatic
 <D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
 # environment
 VTUNE_PROFILER_2022_DIR = C:\Program Files (x86)\Intel\oneAPI\vtune\2022.1.0
-# makefile (from 'makefile', line 5)
+# makefile (from 'makefile', line 6)
 OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
@@ -137,8 +137,7 @@ COMPUTERNAME = LAPTOP-7FSGAFD8
 MAKEFILES := 
 # automatic
 ^F = $(notdir $^)
-# envir 
-onment
+# environment
 PROMPT = $P$G
 # environment
 CHOCOLATEYLASTPATHUPDATE = 132845055620503667
@@ -154,7 +153,7 @@ COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
 ?F = $(notdir $?)
 # environment
 PROGRAMW6432 = C:\Program Files
-# makefile (from 'makefile', line 27)
+# makefile (from 'makefile', line 29)
 OBJ_NAME = ChessEngine
 # environment
 PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
@@ -166,11 +165,13 @@ ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 USERDOMAIN = LAPTOP-7FSGAFD8
 # 'override' directive
 GNUMAKEFLAGS := 
+# makefile (from 'makefile', line 8)
+OBJS_EXEP = Perft.o MoveGenerator.o ChessBoard.o BitBoards.o
 # environment
 OS = Windows_NT
 # makefile (from 'makefile', line 1)
 EXE = ChessEngine
-# makefile (from 'makefile', line 6)
+# makefile (from 'makefile', line 7)
 OBJS_EXET = Test.o MoveGenerator.o ChessBoard.o BitBoards.o
 # makefile
 .DEFAULT_GOAL := all
@@ -184,7 +185,9 @@ USERDOMAIN_ROAMINGPROFILE = LAPTOP-7FSGAFD8
 NUMBER_OF_PROCESSORS = 16
 # environment
 PUBLIC = C:\Users\Public
-# makefile (from 'makefile', line 11)
+# makefile (from 'makefile', line 3)
+EXEP = Perft
+# makefile (from 'makefile', line 13)
 CXX_FLAGS = -c -g -Ofast -Wall -Wextra -pedantic
 # environment
 APPDATA = C:\Users\adamn\AppData\Roaming
@@ -222,16 +225,16 @@ SESSIONNAME = Console
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync load
 # environment
 PROCESSOR_REVISION = 5000
-# makefile (from 'makefile', line 9)
+# makefile (from 'makefile', line 11)
 CC = g++
-# makefile (from 'makefile', line 24)
+# makefile (from 'makefile', line 26)
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
-# makefile (from 'makefile', line 13)
+# makefile (from 'makefile', line 15)
 INCLUDE_PATHS = -IC:\Users\adamn\SDL2\include\SDL2
 # environment
 PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # variable set hash-table stats:
-# Load=109/1024=11%, Rehash=0, Collisions=14/148=9%
+# Load=111/1024=11%, Rehash=0, Collisions=15/153=10%
 
 # Pattern-specific Variable Values
 
@@ -239,9 +242,9 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Directories
 
-# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1642638947): 37 files, no impossibilities.
+# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1642746807): 40 files, no impossibilities.
 
-# 37 files, no impossibilities in 1 directories.
+# 40 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -251,20 +254,22 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Not a target:
 BitBoards.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-20 22:30:37
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 GameState.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-20 22:30:08
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 ChessBoard.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-18 21:39:17
+#  Last modified 2022-01-20 21:50:23
 #  File has been updated.
 #  Successfully updated.
 
@@ -272,34 +277,22 @@ ChessTest: Test.o MoveGenerator.o ChessBoard.o BitBoards.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 36):
+#  recipe to execute (from 'makefile', line 38):
 	$(CC) $(OBJS_EXET) -o $(EXET)
+
+Perft: Perft.o MoveGenerator.o ChessBoard.o BitBoards.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 41):
+	$(CC) $(OBJS_EXEP) -o $(EXEP)
 
 ChessGUI.o: ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Implicit/static pattern stem: ''
-#  Last modified 2022-01-18 22:38:55
+#  Last modified 2022-01-20 22:30:35
 #  File has been updated.
-#  Needs to be updated (-q is set).
-# automatic
-# @ := ChessGUI.o
-# automatic
-# * := 
-# automatic
-# < := ChessGUI.cpp
-# automatic
-# + := ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h BitBoards.h
-# automatic
-# % := 
-# automatic
-# ^ := ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h BitBoards.h
-# automatic
-# ? := BitBoards.h
-# automatic
-# | := 
-# variable set hash-table stats:
-# Load=8/32=25%, Rehash=0, Collisions=6/17=35%
-#  recipe to execute (from 'makefile', line 42):
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 47):
 	$(CC) ChessGUI.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
 # Not a target:
@@ -309,42 +302,51 @@ ChessGUI.cpp:
 #  File has been updated.
 #  Successfully updated.
 
-MoveGenerator.o: MoveGenerator.cpp MoveGen 
-erator.h ChessBoard.h Types.h BitBoards.h
+MoveGenerator.o: MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'makefile', line 39):
+#  Last modified 2022-01-20 22:33:08
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 44):
 	$(CC) MoveGenerator.cpp $(CXX_FLAGS) -o $@
 
 # Not a target:
 ChessBoard.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-20 21:58:59
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 BitBoards.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-19 19:37:37
+#  Last modified 2022-01-20 22:27:28
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 GameState.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-17 20:20:34
+#  Last modified 2022-01-20 22:29:37
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 MoveGenerator.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-01-20 22:29:00
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 MoveGenerator.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-20 22:30:55
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+Perft.cpp:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -353,7 +355,7 @@ BitBoards.0: BitBoards.cpp BitBoards.h
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 57):
+#  recipe to execute (from 'makefile', line 65):
 	$(CC) BitBoards.cpp $(CXX_FLAGS) -o $@
 
 # Not a target:
@@ -362,20 +364,22 @@ BitBoards.0: BitBoards.cpp BitBoards.h
 #  Modification time never checked.
 #  File has not been updated.
 
-all: ChessEngine ChessTest
+all: ChessEngine ChessTest Perft
 #  Command line target.
 #  Implicit rule search has been done.
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/8=0%
+# Load=0/32=0%, Rehash=0, Collisions=0/9=0%
 
 ChessBoard.o: ChessBoard.cpp ChessBoard.h Types.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'makefile', line 54):
+#  Last modified 2022-01-20 22:30:37
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execut 
+e (from 'makefile', line 62):
 	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@
 
 # Not a target:
@@ -399,33 +403,51 @@ main.cpp:
 
 main.o: main.cpp GameState.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-18 22:38:54
+#  Last modified 2022-01-20 22:30:34
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 48):
+#  recipe to execute (from 'makefile', line 53):
 	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
 ChessEngine: main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
 #  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
+# automatic
+# @ := ChessEngine
+# automatic
+# * := 
+# automatic
+# < := main.o
+# automatic
+# + := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
+# automatic
+# % := 
+# automatic
+# ^ := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
+# automatic
+# ? := main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o
+# automatic
+# | := 
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/8=0%
-#  recipe to execute (from 'makefile', line 33):
+# Load=8/32=25%, Rehash=0, Collisions=5/17=29%
+#  recipe to execute (from 'makefile', line 35):
 	$(CC) $(OBJS_EXE) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE)
 
 GameState.o: GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h BitBoards.h
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'makefile', line 45):
+#  Last modified 2022-01-20 22:33:07
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 50):
 	$(CC) GameState.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-15 22:39:09
+#  Last modified 2022-01-20 22:33:25
 #  File has been updated.
 #  Successfully updated.
 
@@ -435,6 +457,13 @@ ChessGUI.h:
 #  Last modified 2022-01-09 21:05:20
 #  File has been updated.
 #  Successfully updated.
+
+Perft.o: Perft.cpp MoveGenerator.h ChessBoard.h BitBoards.h
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 59):
+	$(CC) Perft.cpp $(CXX_FLAGS) -o $@
 
 # Not a target:
 Types.h:
@@ -453,23 +482,23 @@ Test.o: Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 51):
+#  recipe to execute (from 'makefile', line 56):
 	$(CC) Test.cpp $(CXX_FLAGS) -o $@
 
 # files hash-table stats:
-# Load=27/1024=3%, Rehash=0, Collisions=2/87=2%
+# Load=30/1024=3%, Rehash=0, Collisions=2/101=2%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 43 / storage = 476 B / avg = 11 B
-# current buf: size = 8174 B / used = 476 B / count = 43 / avg = 11 B
+# strcache buffers: 1 (0) / strings = 47 / storage = 510 B / avg = 10 B
+# current buf: size = 8174 B / used = 510 B / count = 47 / avg = 10 B
 
-# strcache performance: lookups = 105 / hit rate = 59%
+# strcache performance: lookups = 121 / hit rate = 61%
 # hash-table stats:
-# Load=43/8192=1%, Rehash=0, Collisions=0/105=0%
-# Finished Make data base on Wed Jan 19 20:32:40 2022
+# Load=47/8192=1%, Rehash=0, Collisions=0/121=0%
+# Finished Make data base on Thu Jan 20 22:33:38 2022
 
  

@@ -6,7 +6,7 @@ ChessBoard::ChessBoard(std::string fenString, StateInfo& si) {
     fenToBoard(fenString);
 }
 
-void ChessBoard::makeMove(Move move, StateInfo& si) {
+void ChessBoard::doMove(Move move, StateInfo& si) {
     FLAGS flag = getFlag(move);
     int from = getFrom(move);
     int to = getTo(move);
@@ -54,8 +54,28 @@ void ChessBoard::undoMove(Move move) {
     FLAGS flag = getFlag(move);
     int from = getFrom(move);
     int to = getTo(move);
+    colToMove = ~colToMove;
+    Piece capt = st->captured;
+    st = st->previous;
     movePiece(to, from);
-    // TODO
+    if (capt) {
+        int captSq = to;
+        if (flag == ENPASSENT) {
+            captSq = colToMove == WHITE ? to - 8 : to + 8;
+        }
+        putPiece(capt, captSq);
+    }
+    if (flag == PROMOTION) {
+        removePiece(from);
+        putPiece(makePiece(colToMove, PAWN), from);
+    }
+    if (flag == CASTLE) {
+        if (to > from) {
+            movePiece(to - 1, to + 1);
+        } else {
+            movePiece(to + 1, to - 2);
+        }
+    }
 }
 
 void ChessBoard::updateChecksAndPins(Colour toMove) {
@@ -237,13 +257,16 @@ void ChessBoard::fenToBoard(std::string fenString) {
     } else {
         st->epSquare = -1;
     }
-    
+    updateChecksAndPins(colToMove);
 }
 
 // Initializes all bitboards to empty and all fields
 void ChessBoard::initBoard(StateInfo& si) {
     for (int i = 0; i < PIECENB; i++) {
         piecesByType[i] = (bitBoard)0;
+    }
+    for (int i = 0; i < 64; i++) {
+        board[i] = EMPTY;
     }
     piecesByColour[WHITE] = (bitBoard)0;
     piecesByColour[BLACK] = (bitBoard)0;
@@ -254,7 +277,10 @@ void ChessBoard::initBoard(StateInfo& si) {
     st->castlingRights = NO_CASTLING;
     st->epSquare = -1;
     st->previous = NULL;
-
+    st->checkersBB = 0;
+    st->pinnedBB = 0;
+    st->pinnersBB = 0;
+    st->captured = EMPTY;
     colToMove = WHITE;
 }
 

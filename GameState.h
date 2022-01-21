@@ -35,7 +35,6 @@ class GameState {
     Piece getPromotionFromUser(Colour colour);
     ChessBoard* chessBoard;
     ChessGUI* gui;
-    MoveGenerator* moveGenerator;
 };
 
 #endif

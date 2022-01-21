@@ -39,6 +39,7 @@ namespace BitBoards {
     void initBishopMagics();
     void initBetweenBB();
     void initLineBB();
+    void initCastleMasks();
     bitBoard computeBetweenBB(int sq1, int sq2, Direction dir);
     // computes rook attack from a given square and occupancy
     bitBoard computeRookAttack(int square, bitBoard occ);
@@ -110,6 +111,8 @@ static constexpr bitBoard bishopMagicNums[64] = {
     1161950831810052608ULL, 2464735771073020416ULL, 54610562058947072ULL, 580611413180448ULL
 };
 
+// Castles masks used in generating castle moves
+extern bitBoard castleMasks[9];
 // The bitboard of squares between two squares. If squares are not in a straight line the between bitboard is only the second index
 extern bitBoard betweenBB[64][64];
 // The bitboard of the straight line which passes through both squares.

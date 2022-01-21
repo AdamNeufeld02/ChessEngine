@@ -20,12 +20,11 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo state;
     ChessBoard cb = ChessBoard(startingFen, state);
-    MoveGenerator* mg = new MoveGenerator();
     Move moves[MAXMOVES]; 
     Move* endmoves;
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < 100000000; i++) {
-        endmoves = mg->generateMoves(cb, moves);
+        endmoves = MoveGenerator::generateMoves(cb, moves);
     }
     auto stop = std::chrono::high_resolution_clock::now();
 
@@ -33,5 +32,4 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     std::cout << ms_int.count() << std::endl;
     int length = endmoves - moves;
     REQUIRE(length == 20);
-    delete mg;
 }

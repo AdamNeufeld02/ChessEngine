@@ -1,9 +1,5 @@
 #include "MoveGenerator.h"
 
-MoveGenerator::MoveGenerator() {
-    initCastleMasks();
-}
-
 Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
     Move* curr = moves;
     Colour us = chessBoard.colourToMove();
@@ -97,11 +93,15 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
         }
         // Generate Castles
         if (t == Legal && (castleMasks[kingCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(kingCastle)) {
-            *moves++ = makeMove<CASTLE>(from, from + 2);
+            if (!chessBoard.getAttackers(from + 1, ~us) && !chessBoard.getAttackers(from + 2, ~us)) {
+                *moves++ = makeMove<CASTLE>(from, from + 2);
+            }
         }
 
         if (t == Legal && (castleMasks[queenCastle] & chessBoard.pieces()) == 0 && chessBoard.canCastle(queenCastle)) {
-            *moves++ = makeMove<CASTLE>(from, from - 2);
+            if (!chessBoard.getAttackers(from - 1, ~us) && !chessBoard.getAttackers(from - 2, ~us)) {
+                 *moves++ = makeMove<CASTLE>(from, from - 2);
+            }
         }
     }
     return moves;
@@ -182,25 +182,21 @@ Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves, bitB
     }
 
     if (chessBoard.epSquare() > 0) {
-        bitBoard b1 = pawnAttacks[them][(int)chessBoard.epSquare()] & pawnsNotOn7;
-        bitBoard capturedOcc = chessBoard.pieces() ^ squares[chessBoard.epSquare() - up];
+        int epSquare = chessBoard.epSquare();
+        bitBoard b1 = pawnAttacks[them][epSquare] & pawnsNotOn7;
+        int ksq = getLSBIndex(chessBoard.pieces(us, KING));
         while (b1) {
             int from = popLSB(b1);
-            bitBoard lineAttack = genAttacksBB<ROOK>(from, capturedOcc);
+            bitBoard capturedOcc = (chessBoard.pieces() ^ squares[epSquare - up] ^ squares[from]) | squares[epSquare];
+            bitBoard lineAttack = genAttacksBB<ROOK>(ksq, capturedOcc) & (chessBoard.pieces(them, ROOK) | chessBoard.pieces(them, QUEEN));
+            bitBoard diagAttack = genAttacksBB<BISHOP>(ksq, capturedOcc) & (chessBoard.pieces(them, BISHOP) | chessBoard.pieces(them, QUEEN));
             // if enpassent exposes king dont do it
-            if (!((lineAttack & (chessBoard.pieces(them, ROOK) | chessBoard.pieces(them, QUEEN))) && (lineAttack & chessBoard.pieces(us, KING)))) {
-                *moves++ = makeMove<ENPASSENT>(from, chessBoard.epSquare());
+            if (!(lineAttack || diagAttack)) {
+                *moves++ = makeMove<ENPASSENT>(from, epSquare);
             }
         }
     }
     return moves;
-}
-
-void MoveGenerator::initCastleMasks() {
-    castleMasks[WHITE_OO] = (bitBoard)0x60;
-    castleMasks[WHITE_OOO] = (bitBoard)0xe;
-    castleMasks[BLACK_OO] = castleMasks[WHITE_OO] << 56;
-    castleMasks[BLACK_OOO] = castleMasks[WHITE_OOO] << 56;
 }
 
 unsigned int MoveGenerator::XORShift32Rand() {

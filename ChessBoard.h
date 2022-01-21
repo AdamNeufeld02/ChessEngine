@@ -31,7 +31,7 @@ class ChessBoard {
     Piece pieceOn(int sq);
     Colour colourToMove() const;
     // Performs a move on the board. Does not check if it is a legal chess move.
-    void makeMove(Move move, StateInfo& si);
+    void doMove(Move move, StateInfo& si);
     // Undos the given move. Must have been the last move played
     void undoMove(Move move);
     // prints a bitboard
@@ -114,7 +114,7 @@ inline bool ChessBoard::canCastle(CastlingRights cr) const {
 }
 
 inline void ChessBoard::putPiece(Piece pc, int sq) {
-    bitBoard place = (bitBoard)1 << sq;
+    bitBoard place = squares[sq];
     board[sq] = pc;
     piecesByType[pc] |= place;
     piecesByColour[colourOf(pc)] |= place;
@@ -122,7 +122,7 @@ inline void ChessBoard::putPiece(Piece pc, int sq) {
 }
 
 inline void ChessBoard::removePiece(int sq) {
-    bitBoard place = (bitBoard)1 << sq;
+    bitBoard place = squares[sq];
     Piece pc = board[sq];
     board[sq] = EMPTY;
     piecesByType[pc] ^= place;
@@ -135,7 +135,7 @@ inline Piece ChessBoard::pieceOn(int sq) {
 }
 
 inline void ChessBoard::movePiece(int from, int to) {
-    bitBoard fromTo = ((bitBoard)1 << from) | ((bitBoard) 1 << to);
+    bitBoard fromTo = (squares[from] | squares[to]);
     Piece pc = board[from];
     allPieces ^= fromTo;
     piecesByType[pc] ^= fromTo;
