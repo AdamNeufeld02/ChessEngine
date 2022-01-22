@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-const static std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+const static std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 GameState::GameState() {
     states = std::unique_ptr<std::deque<StateInfo>>(new std::deque<StateInfo>(1));

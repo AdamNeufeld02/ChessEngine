@@ -97,7 +97,7 @@ bitBoard ChessBoard::blockersForSq(int sq, Colour blockingCol, bitBoard& pinners
         int sniperSq = getLSBIndex(snipers);
         bitBoard between = getBetweenBB(sq, sniperSq);
         bitBoard pinned = between & occupancy;
-        bitBoard pinner = between & snipers;
+        bitBoard pinner = between & squares[sniperSq];
         if (pinned && !moreThanOne(pinned)) {
             blockers |= pinned;
             if (pinned & pieces(blockingCol)) {

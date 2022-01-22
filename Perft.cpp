@@ -22,9 +22,79 @@ int perft(ChessBoard& cb, int depth) {
     }
 }
 
+std::string indexToStr(int index) {
+    int rank = index / 8;
+    int file = index % 8;
+    std::string r;
+    std::string f;
+    switch (rank)
+    {
+    case 0:
+        r = "1";
+        break;
+    case 1:
+        r = "2";
+        break;
+    case 2:
+        r = "3";
+        break;
+    case 3:
+        r = "4";
+        break;
+    case 4:
+        r = "5";
+        break;
+    case 5:
+        r = "6";
+        break;
+    case 6:
+        r = "7";
+        break;
+    case 7:
+        r = "8";
+        break;
+    }
+    switch (file)
+    {
+    case 0:
+        f = "a";
+        break;
+    case 1:
+        f = "b";
+        break;
+    case 2:
+        f = "c";
+        break;
+    case 3:
+        f = "d";
+        break;
+    case 4:
+        f = "e";
+        break;
+    case 5:
+        f = "f";
+        break;
+    case 6:
+        f = "g";
+        break;
+    case 7:
+        f = "h";
+        break;
+    }
+    f.append(r);
+    return f;
+}
+
+std::string moveToStr(Move move) {
+    std::string from = indexToStr(getFrom(move));
+    std::string to = indexToStr(getTo(move));
+    from.append(to);
+    return from;
+}
+
 int main(int arc, char** argv) {
     BitBoards::precomputeAttackSets();
-    std::string startFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    std::string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo si;
     ChessBoard cb = ChessBoard(startFen, si);
     Move moves[MAXMOVES];
@@ -36,16 +106,16 @@ int main(int arc, char** argv) {
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < size; i++) {
         cb.doMove(moves[i], st);
-        curr = perft(cb, 3);
-        std::cout << "From: " << getFrom(moves[i]) << " To: " << getTo(moves[i]) << " Num: " << curr << std::endl;
-        cb.printBoard(cb.pieces());
+        curr = perft(cb, 6);
+        std::cout << moveToStr(moves[i]) << ": " << curr << std::endl;
         cb.undoMove(moves[i]);
         total += curr;
         end--;
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    std::cout << ms_int.count() << std::endl;
-    std::cout << total << std::endl;
+    std::cout << "Total Time(ms): " << ms_int.count() << std::endl;
+    std::cout << "Nodes: " << total << std::endl;
+    std::cout << "NPS: " << (total * 1000) / ms_int.count() << std::endl;
 }
 
