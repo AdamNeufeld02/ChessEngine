@@ -8,6 +8,12 @@
 #include <iostream>
 #include <deque>
 #include <memory>
+#include <stdlib.h>
+
+struct Player {
+    bool isHuman;
+    Colour colour;
+};
 
 class GameState {
     public:
@@ -33,8 +39,13 @@ class GameState {
     Move findMove(Move* begin, Move* end, int from, int to);
     std::unique_ptr<std::deque<StateInfo>> states;
     Piece getPromotionFromUser(Colour colour);
+    Move getMoveFromUser();
+    Move getMoveFromComp();
+    struct Player getPlayerToMove();
     ChessBoard* chessBoard;
     ChessGUI* gui;
+    struct Player player1;
+    struct Player player2;
 };
 
 #endif

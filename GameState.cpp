@@ -8,6 +8,10 @@ GameState::GameState() {
     chessBoard = new ChessBoard(startingFen, states->back());
     gui = new ChessGUI(); 
     gameState = PLAYING_GAME;
+    player1.colour = WHITE;
+    player2.colour = BLACK;
+    player1.isHuman = false;
+    player2.isHuman = false;
 }
 
 void GameState::start() {
@@ -24,56 +28,82 @@ void GameState::start() {
 }
 
 void GameState::gameLoop() {
-    SDL_Event ev;
+    struct Player playerToMove = getPlayerToMove();
     Move move;
-    int selectedIndex = -1;
-    int endIndex = -1;
-    int index, x, y, from;
-    Move moves[MAXMOVES];
-    int movMat[64];
-    Move* end = MoveGenerator::generateMoves(*chessBoard, moves);
-    resetMoveMatrix(movMat);
     while (gameState == PLAYING_GAME) {
+        if(playerToMove.isHuman) {
+            move = getMoveFromUser();
+        } else {
+            move = getMoveFromComp();
+        }
+        states->emplace_back();
+        chessBoard->doMove(move, states->back());
+        playerToMove = getPlayerToMove();
+        //_sleep(100);
+    }
+}
+
+Move GameState::getMoveFromComp() {
+    Move moves[MAXMOVES];
+    Move* end = MoveGenerator::generateMoves(*chessBoard, moves);
+    int moveIndex;
+    int length = end - moves;
+    int movMat[64];
+    resetMoveMatrix(movMat);
+    gui->drawBoard(chessBoard, -1, movMat);
+    if (length == 0) {
+        gameState = GAME_OVER;
+        std::cout << "COMPUTER LOST";
+        return NOMOVE;
+    }
+    if (length > 1) {
+        moveIndex = std::rand() % (length - 1);
+        std::cout << moveIndex << std::endl;
+    } else {
+        moveIndex = 0;
+    }
+    
+    return moves[moveIndex];
+}
+
+Move GameState::getMoveFromUser() {
+    Move move = NOMOVE;
+    Move moves[MAXMOVES];
+    Move* end = MoveGenerator::generateMoves(*chessBoard, moves);
+    SDL_Event ev;
+    Piece promPiece;
+    int x, y;
+    int selectedIndex = -1;
+    int movMat[64];
+    resetMoveMatrix(movMat);
+    gui->drawBoard(chessBoard, selectedIndex, movMat);
+    if (end == moves) {
+        gameState = GAME_OVER;
+        return NOMOVE;
+    }
+    while (move == NOMOVE) {
         while(SDL_PollEvent(&ev) != 0) {
             if (ev.type == SDL_QUIT) {
                 gameState = QUIT;
-                break;
+                return NOMOVE;
             } else if (ev.type == SDL_MOUSEBUTTONDOWN) {
                 SDL_GetMouseState(&x, &y);
-                index = gui->screenCoordToBoardIndex(x, y);
-                makeMoveMatrix(moves, end, index, movMat);
-                if (index >= 0 && chessBoard->pieceOn(index)) {
-                    selectedIndex = index;
-                    from = selectedIndex;
-                }
+                selectedIndex = gui->screenCoordToBoardIndex(x, y);
+                makeMoveMatrix(moves, end, selectedIndex, movMat);
             } else if (ev.type == SDL_MOUSEBUTTONUP) {
                 SDL_GetMouseState(&x, &y);
-                index = gui->screenCoordToBoardIndex(x, y);
-                if (index >= 0 && selectedIndex >= 0 && index != selectedIndex) {
-                    endIndex = index;
-                    move = findMove(moves, end, from, endIndex);
-                    //If move is valid move
-                    if (move) {
-                        //If move has promotion type ask user for promotion piece
-                        if (getFlag(move) == PROMOTION) {
-                            Colour colour = chessBoard->colourToMove();
-                            Piece promPiece = getPromotionFromUser(colour);
-                            move = makeMove(getFrom(move), getTo(move), typeOf(promPiece));
-                        }
-                        states->emplace_back();
-                        chessBoard->doMove(move, states->back());
-                        end = MoveGenerator::generateMoves(*chessBoard, moves);
-                        if (end == moves) {
-                            gameState = GAME_OVER;
-                        }
-                    }
+                move = findMove(moves, end, selectedIndex, gui->screenCoordToBoardIndex(x, y));
+                if (getFlag(move) == PROMOTION) {
+                    promPiece = getPromotionFromUser(chessBoard->colourToMove());
+                    move = makeMove(getFrom(move), getTo(move), typeOf(promPiece));
                 }
-                selectedIndex = -1;
                 resetMoveMatrix(movMat);
+                selectedIndex = -1;
             }
             gui->drawBoard(chessBoard, selectedIndex, movMat);
         }
     }
+    return move;
 }
 
 Piece GameState::getPromotionFromUser(Colour colour) {
@@ -132,6 +162,14 @@ void GameState::makeMoveMatrix(Move* begin, Move* end, int index, int* movMat) {
         if (getFrom(begin[i]) == index) {
             movMat[getTo(begin[i])] += 1;
         }
+    }
+}
+
+struct Player GameState::getPlayerToMove() {
+    if (player1.colour == chessBoard->colourToMove()) {
+        return player1;
+    } else {
+        return player2;
     }
 }
 
