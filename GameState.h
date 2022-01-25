@@ -5,6 +5,7 @@
 #include "ChessGUI.h"
 #include "MoveGenerator.h"
 #include "SDL.h"
+#include "Search.h"
 #include <iostream>
 #include <deque>
 #include <memory>

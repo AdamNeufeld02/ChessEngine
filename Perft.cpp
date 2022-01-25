@@ -106,7 +106,7 @@ int main(int arc, char** argv) {
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < size; i++) {
         cb.doMove(moves[i], st);
-        curr = perft(cb, 6);
+        curr = perft(cb, 2);
         std::cout << moveToStr(moves[i]) << ": " << curr << std::endl;
         cb.undoMove(moves[i]);
         total += curr;

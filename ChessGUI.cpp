@@ -57,7 +57,7 @@ void ChessGUI::drawBoard(ChessBoard* chessBoard, int selectedIndex, int* movMat)
             SDL_RenderDrawRect(renderer, &rect);
             SDL_RenderFillRect(renderer, &rect);
 
-            if ((file + (8 * rank)) == selectedIndex | (movMat[file + (8 * rank)])) {
+            if (((file + (8 * rank)) == selectedIndex) | (movMat[file + (8 * rank)])) {
                 SDL_SetRenderDrawColor(renderer, CHERRYR, CHERRYG, CHERRYB, 255);
                 SDL_RenderDrawRect(renderer, &rect);
                 SDL_RenderFillRect(renderer, &rect);

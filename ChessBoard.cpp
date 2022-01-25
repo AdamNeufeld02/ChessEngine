@@ -281,6 +281,8 @@ void ChessBoard::initBoard(StateInfo& si) {
     st->pinnedBB = 0;
     st->pinnersBB = 0;
     st->captured = EMPTY;
+    material[WHITE] = 0;
+    material[BLACK] = 0;
     colToMove = WHITE;
 }
 

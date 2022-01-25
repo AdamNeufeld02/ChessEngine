@@ -11,7 +11,7 @@ GameState::GameState() {
     player1.colour = WHITE;
     player2.colour = BLACK;
     player1.isHuman = false;
-    player2.isHuman = false;
+    player2.isHuman = true;
 }
 
 void GameState::start() {
@@ -38,6 +38,7 @@ void GameState::gameLoop() {
         }
         states->emplace_back();
         chessBoard->doMove(move, states->back());
+        std::cout << Evaluation::evaluate(*chessBoard) << std::endl;
         playerToMove = getPlayerToMove();
         //_sleep(100);
     }
@@ -56,14 +57,8 @@ Move GameState::getMoveFromComp() {
         std::cout << "COMPUTER LOST";
         return NOMOVE;
     }
-    if (length > 1) {
-        moveIndex = std::rand() % (length - 1);
-        std::cout << moveIndex << std::endl;
-    } else {
-        moveIndex = 0;
-    }
-    
-    return moves[moveIndex];
+    Move move = Search::searchStart(*chessBoard, 6);
+    return move;
 }
 
 Move GameState::getMoveFromUser() {

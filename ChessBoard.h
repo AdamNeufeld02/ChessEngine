@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include "Types.h"
 #include "BitBoards.h"
-
+#include "Evaluation.h"
 
 
 // Inspired by stockFish's stateInfo struct.
@@ -38,6 +38,8 @@ class ChessBoard {
     static void printBoard(bitBoard bb);
     char epSquare() const;
 
+    int getMaterial(Colour col);
+
     // Returns the bitboard of all attackers of one colour of a certain square
     bitBoard getAttackers(int sq, Colour c);
 
@@ -64,6 +66,7 @@ class ChessBoard {
     bitBoard piecesByColour[2];
     // The Occupancy of all pieces
     bitBoard allPieces;
+    int material[2];
 
     void fenToBoard(std::string fenString);
     void initBoard(StateInfo& si);
@@ -76,6 +79,10 @@ class ChessBoard {
     void putPiece(Piece pc, int sq);
     
 };
+
+inline int ChessBoard::getMaterial(Colour col) {
+    return material[col];
+}
 
 inline Colour ChessBoard::colourToMove() const {
     return colToMove;
@@ -115,18 +122,22 @@ inline bool ChessBoard::canCastle(CastlingRights cr) const {
 
 inline void ChessBoard::putPiece(Piece pc, int sq) {
     bitBoard place = squares[sq];
+    Colour col = colourOf(pc);
+    material[col] += mgVals[typeOf(pc)];
     board[sq] = pc;
     piecesByType[pc] |= place;
-    piecesByColour[colourOf(pc)] |= place;
+    piecesByColour[col] |= place;
     allPieces |= place;
 }
 
 inline void ChessBoard::removePiece(int sq) {
     bitBoard place = squares[sq];
     Piece pc = board[sq];
+    Colour col = colourOf(pc);
+    material[col] -= mgVals[typeOf(pc)];
     board[sq] = EMPTY;
     piecesByType[pc] ^= place;
-    piecesByColour[colourOf(pc)] ^= place;
+    piecesByColour[col] ^= place;
     allPieces ^= place;
 }
 

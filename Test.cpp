@@ -3,6 +3,7 @@
 #include "MoveGenerator.h"
 #include "ChessBoard.h"
 #include "BitBoards.h"
+#include "Search.h"
 #include <bitset>
 #include <chrono>
 
@@ -20,16 +21,6 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo state;
     ChessBoard cb = ChessBoard(startingFen, state);
-    Move moves[MAXMOVES]; 
-    Move* endmoves;
-    auto start = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < 100000000; i++) {
-        endmoves = MoveGenerator::generateMoves(cb, moves);
-    }
-    auto stop = std::chrono::high_resolution_clock::now();
-
-    auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    std::cout << ms_int.count() << std::endl;
-    int length = endmoves - moves;
-    REQUIRE(length == 20);
+    Move move = Search::searchStart(cb, 7);
+    REQUIRE(move != NOMOVE);
 }
