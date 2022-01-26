@@ -1,11 +1,11 @@
 #include "MoveGenerator.h"
 
-Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
+Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bool onlyCaptures) {
     Move* curr = moves;
     Colour us = chessBoard.colourToMove();
     int ksq = getLSBIndex(chessBoard.pieces(us, KING));
     bitBoard pinned = chessBoard.pinned() & chessBoard.pieces(us);
-    moves = chessBoard.checkers() ? generateAllMoves<Evasions>(chessBoard, moves) : generateAllMoves<Legal>(chessBoard, moves);
+    moves = chessBoard.checkers() ? generateAllMoves<Evasions>(chessBoard, moves) : onlyCaptures? generateAllMoves<Captures>(chessBoard, moves) : generateAllMoves<Legal>(chessBoard, moves);
     if (pinned) {
         while (curr != moves) {
             if ((pinned & squares[getFrom(*curr)]) && !isAligned(getFrom(*curr), getTo(*curr), ksq)) {
@@ -63,6 +63,7 @@ template<GenType t, Colour us>
 Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
     bitBoard attacks;
     bitBoard pieces = chessBoard.pieces(us, KING);
+    bitBoard targets = t == Captures ? chessBoard.pieces(~us) : ~chessBoard.pieces(us);
     int from, to;
     CastlingRights kingCastle;
     CastlingRights queenCastle;
@@ -78,7 +79,7 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
     // lookup precomputed king moves
     while(pieces) {
         from = popLSB(pieces);
-        attacks = genAttacksBB<KING>(from) & ~chessBoard.pieces(us);
+        attacks = genAttacksBB<KING>(from) & targets;
         if (attacks) {
             attacks &= ~(chessBoard.getSlidingAttacks(chessBoard.pieces() & ~chessBoard.pieces(us, KING)));
             bitBoard enemyknights = chessBoard.pieces(~us, KNIGHT);

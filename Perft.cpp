@@ -5,7 +5,7 @@
 
 int perft(ChessBoard& cb, int depth) {
     Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves);
+    Move* end = MoveGenerator::generateMoves(cb, moves, false);
     int total = 0;
     int size = end - moves;
     StateInfo si;
@@ -98,7 +98,7 @@ int main(int arc, char** argv) {
     StateInfo si;
     ChessBoard cb = ChessBoard(startFen, si);
     Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves);
+    Move* end = MoveGenerator::generateMoves(cb, moves, false);
     int size = end - moves;
     int curr = 0;
     long long total = 0;
@@ -106,7 +106,7 @@ int main(int arc, char** argv) {
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < size; i++) {
         cb.doMove(moves[i], st);
-        curr = perft(cb, 2);
+        curr = perft(cb, 5);
         std::cout << moveToStr(moves[i]) << ": " << curr << std::endl;
         cb.undoMove(moves[i]);
         total += curr;

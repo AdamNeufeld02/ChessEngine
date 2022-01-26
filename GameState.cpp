@@ -38,7 +38,6 @@ void GameState::gameLoop() {
         }
         states->emplace_back();
         chessBoard->doMove(move, states->back());
-        std::cout << Evaluation::evaluate(*chessBoard) << std::endl;
         playerToMove = getPlayerToMove();
         //_sleep(100);
     }
@@ -46,7 +45,7 @@ void GameState::gameLoop() {
 
 Move GameState::getMoveFromComp() {
     Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(*chessBoard, moves);
+    Move* end = MoveGenerator::generateMoves(*chessBoard, moves, false);
     int moveIndex;
     int length = end - moves;
     int movMat[64];
@@ -57,14 +56,14 @@ Move GameState::getMoveFromComp() {
         std::cout << "COMPUTER LOST";
         return NOMOVE;
     }
-    Move move = Search::searchStart(*chessBoard, 6);
+    Move move = Search::searchStart(*chessBoard, 5);
     return move;
 }
 
 Move GameState::getMoveFromUser() {
     Move move = NOMOVE;
     Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(*chessBoard, moves);
+    Move* end = MoveGenerator::generateMoves(*chessBoard, moves, false);
     SDL_Event ev;
     Piece promPiece;
     int x, y;
@@ -73,6 +72,7 @@ Move GameState::getMoveFromUser() {
     resetMoveMatrix(movMat);
     gui->drawBoard(chessBoard, selectedIndex, movMat);
     if (end == moves) {
+        std::cout << "Player Lost";
         gameState = GAME_OVER;
         return NOMOVE;
     }
@@ -169,5 +169,6 @@ struct Player GameState::getPlayerToMove() {
 }
 
 void GameState::gameOver() {
+    while (1);
     gameState = QUIT;
 }

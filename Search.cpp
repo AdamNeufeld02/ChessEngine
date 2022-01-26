@@ -1,42 +1,74 @@
 #include "Search.h"
 
 Move Search::searchStart(ChessBoard& cb, int depth) {
+    nodesSearched = 0;
     Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves);
+    Move* end = MoveGenerator::generateMoves(cb, moves, false);
     int length = end - moves;
-    std::cout << length << std::endl;
     Move bestMove = NOMOVE;
     int score = -infinity;
     StateInfo si;
     for (int i = 0; i < length; i++) {
         cb.doMove(moves[i], si);
-        int tempScore = -search(cb, depth - 1);
+        int tempScore = -search(cb, -infinity, infinity, depth - 1);
         cb.undoMove(moves[i]);
-        std::cout << tempScore << std::endl;
-        if (tempScore > score) {
+        if (tempScore >= score) {
             bestMove = moves[i];
             score = tempScore;
         }
+        nodesSearched++;
     }
+    std::cout << score << std::endl;
+    std::cout << nodesSearched << std::endl;
     return bestMove;
 }
 
-int Search::search(ChessBoard& cb, int depth) {
+int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
     if (depth <= 0) {
-        return Evaluation::evaluate(cb);
+        return quiesce(cb, alpha, beta);
     }
     Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves);
+    Move* end = MoveGenerator::generateMoves(cb, moves, false);
     int length = end - moves;
-    int topScore = -infinity;
     StateInfo si;
     for (int i = 0; i < length; i++) {
         cb.doMove(moves[i], si);
-        int tempScore = -search(cb, depth - 1);
-        if (tempScore > topScore) {
-            topScore = tempScore;
-        }
+        int tempScore = -search(cb, -beta, -alpha, depth - 1);
         cb.undoMove(moves[i]);
+        nodesSearched++;
+        if (tempScore >= beta) {
+            return tempScore;
+        }
+        if (tempScore > alpha) {
+            alpha = tempScore;
+        }
     }
-    return topScore;
+    return alpha;
+}
+
+int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
+    int eval = Evaluation::evaluate(cb);
+    if (eval >= beta) {
+        return beta;
+    }
+    if (eval > alpha) {
+        alpha = eval;
+    }
+    Move moves[MAXMOVES];
+    Move* end = MoveGenerator::generateMoves(cb, moves, true);
+    int length = end - moves;
+    StateInfo si;
+    for (int i = 0; i < length; i++) {
+        cb.doMove(moves[i], si);
+        int tempScore = -quiesce(cb, -beta, -alpha);
+        cb.undoMove(moves[i]);
+        nodesSearched++;
+        if (tempScore >= beta) {
+            return beta;
+        }
+        if (tempScore > alpha) {
+            alpha = tempScore;
+        }
+    }
+    return alpha;
 }

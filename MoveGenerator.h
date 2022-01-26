@@ -16,7 +16,7 @@ namespace MoveGenerator {
     // Generates pseudo legal chess moves for the chessBoard given based on which side is to move
     // Places all moves in the move list provided
     // Returns a pointer to the end of the list of generated moves
-    Move* generateMoves(ChessBoard& chessBoard, Move* moves);
+    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bool onlyCaptures);
     // Function that was used to generate magics for rooks and bishops.
     // Heavily inspired by the routine found on https://www.chessprogramming.org/Looking_for_Magics
     bitBoard generateMagicNumber(int square, int rook);

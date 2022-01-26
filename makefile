@@ -3,8 +3,8 @@ EXET = ChessTest
 EXEP = Perft
 
 #OBJS specifies which files to compile as part of the project
-OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o
-OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o
+OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o
+OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o
 OBJS_EXEP = Perft.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o
 
 #CC specifies which compiler we're using
@@ -67,6 +67,9 @@ BitBoards.o : BitBoards.cpp BitBoards.h
 Evaluation.o : Evaluation.cpp Evaluation.h ChessBoard.h
 	$(CC) Evaluation.cpp $(CXX_FLAGS) -o $@
 
-Search.o : Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h
+Search.o : Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h MovePick.h
 	$(CC) Search.cpp $(CXX_FLAGS) -o $@
+
+MovePick.o : MovePick.cpp MovePick.h Types.h
+	$(CC) MovePick.cpp $(CXX_FLAGS) -o $@ 
 
