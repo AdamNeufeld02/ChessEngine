@@ -124,6 +124,7 @@ inline void ChessBoard::putPiece(Piece pc, int sq) {
     bitBoard place = squares[sq];
     Colour col = colourOf(pc);
     material[col] += mgVals[typeOf(pc)];
+    material[col] += pieceSquareTables[pc][sq];
     board[sq] = pc;
     piecesByType[pc] |= place;
     piecesByColour[col] |= place;
@@ -135,6 +136,7 @@ inline void ChessBoard::removePiece(int sq) {
     Piece pc = board[sq];
     Colour col = colourOf(pc);
     material[col] -= mgVals[typeOf(pc)];
+    material[col] -= pieceSquareTables[pc][sq];
     board[sq] = EMPTY;
     piecesByType[pc] ^= place;
     piecesByColour[col] ^= place;
@@ -148,9 +150,11 @@ inline Piece ChessBoard::pieceOn(int sq) {
 inline void ChessBoard::movePiece(int from, int to) {
     bitBoard fromTo = (squares[from] | squares[to]);
     Piece pc = board[from];
+    Colour col = colourOf(pc);
+    material[col] += pieceSquareTables[pc][to] - pieceSquareTables[pc][from];
     allPieces ^= fromTo;
     piecesByType[pc] ^= fromTo;
-    piecesByColour[colourOf(pc)] ^= fromTo;
+    piecesByColour[col] ^= fromTo;
     board[from] = EMPTY;
     board[to] = pc;
 }

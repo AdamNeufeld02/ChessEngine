@@ -6,7 +6,7 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Tue Jan 25 20:36:33 2022
+# Make data base, printed on Wed Jan 26 21:01:22 2022
 
 # Variables
 
@@ -19,7 +19,7 @@ USERPROFILE = C:\Users\adamn
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-84c3e8bf-9d2e-44f4-a27c-03d98e8f56ae-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-fea8c102-bff8-46e5-a77f-601bae7eaaaf-sock
 # environment
 VSCODE_CWD = C:\Users\adamn\AppData\Local\Programs\Microsoft VS Code
 # environment
@@ -35,14 +35,13 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_48688_IHRBTCICZFAPZQFR
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_9240_DQJZOPFRCAPGUAXU
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
 .VARIABLES := 
 # automatic
-%D = $(patsubst %/,%,$(patsubst %\,% 
-,$(dir $%)))
+%D = $(patsubst %/,%,$(patsubst %\,%,$(dir $%)))
 # automatic
 ^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
 # environment
@@ -90,7 +89,7 @@ MAKEFILE_LIST := makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 48688
+VSCODE_PID = 9240
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
@@ -242,7 +241,7 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Directories
 
-# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1643164588): 49 files, no impossibilities.
+# . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1643223506): 49 files, no impossibilities.
 
 # 49 files, no impossibilities in 1 directories.
 
@@ -263,7 +262,7 @@ BitBoards.o: BitBoards.cpp BitBoards.h
 # Not a target:
 GameState.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-25 19:48:35
+#  Last modified 2022-01-25 20:41:08
 #  File has been updated.
 #  Successfully updated.
 
@@ -277,7 +276,7 @@ ChessBoard.h:
 # Not a target:
 Search.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-25 19:01:17
+#  Last modified 2022-01-26 12:58:10
 #  File has been updated.
 #  Successfully updated.
 
@@ -328,7 +327,7 @@ Evaluation.cpp:
 # Not a target:
 MovePick.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-25 19:16:46
+#  Last modified 2022-01-25 20:37:25
 #  File has been updated.
 #  Successfully updated.
 
@@ -369,7 +368,7 @@ MoveGenerator.h:
 
 MovePick.o: MovePick.cpp MovePick.h Types.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-25 20:36:07
+#  Last modified 2022-01-25 20:37:28
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 74):
@@ -475,10 +474,10 @@ Evaluation.h:
 
 GameState.o: GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h BitBoards.h Evaluation.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-25 20:28:53
+#  Last modified 2022-01-25 21:24:18
 #  File has been updated.
-#  
- Successfully updated.
+#  S 
+uccessfully updated.
 #  recipe to execute (from 'makefile', line 50):
 	$(CC) GameState.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
@@ -492,7 +491,7 @@ Evaluation.o: Evaluation.cpp Evaluation.h ChessBoard.h
 
 Search.o: Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h MovePick.h
 #  Implicit rule search has not been done.
-#  Last modified 2022-01-25 20:35:42
+#  Last modified 2022-01-26 12:58:14
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 71):
@@ -529,7 +528,7 @@ Types.h:
 # Not a target:
 MovePick.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-25 20:35:39
+#  Last modified 2022-01-25 20:37:08
 #  File has been updated.
 #  Successfully updated.
 
@@ -560,6 +559,6 @@ Test.o: Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h Search.h
 # strcache performance: lookups = 159 / hit rate = 65%
 # hash-table stats:
 # Load=55/8192=1%, Rehash=0, Collisions=0/159=0%
-# Finished Make data base on Tue Jan 25 20:36:33 2022
+# Finished Make data base on Wed Jan 26 21:01:22 2022
 
  
