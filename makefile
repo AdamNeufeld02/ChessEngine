@@ -70,6 +70,6 @@ Evaluation.o : Evaluation.cpp Evaluation.h ChessBoard.h
 Search.o : Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h MovePick.h
 	$(CC) Search.cpp $(CXX_FLAGS) -o $@
 
-MovePick.o : MovePick.cpp MovePick.h Types.h
+MovePick.o : MovePick.cpp MovePick.h Types.h ChessBoard.h
 	$(CC) MovePick.cpp $(CXX_FLAGS) -o $@ 
 

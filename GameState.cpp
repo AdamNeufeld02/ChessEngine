@@ -10,8 +10,8 @@ GameState::GameState() {
     gameState = PLAYING_GAME;
     player1.colour = WHITE;
     player2.colour = BLACK;
-    player1.isHuman = false;
-    player2.isHuman = true;
+    player1.isHuman = true;
+    player2.isHuman = false;
 }
 
 void GameState::start() {
@@ -56,7 +56,7 @@ Move GameState::getMoveFromComp() {
         std::cout << "COMPUTER LOST";
         return NOMOVE;
     }
-    Move move = Search::searchStart(*chessBoard, 5);
+    Move move = Search::searchStart(*chessBoard, 4);
     return move;
 }
 

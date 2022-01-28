@@ -26,7 +26,7 @@ class ChessGUI {
     ChessGUI();
     // Draws a board with a selected square and its highlighted moves
     // To draw a board with no selection and move highlighting pass -1 as selected index and
-    // and int array of 64
+    // and int array of 64 zeroes
     void drawBoard(ChessBoard* board, int selectedIndex, int* movMat);
     void drawPromSelection(Colour colour);
     void quitChessGUI();

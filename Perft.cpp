@@ -94,6 +94,7 @@ std::string moveToStr(Move move) {
 
 int main(int arc, char** argv) {
     BitBoards::precomputeAttackSets();
+    Evaluation::init();
     std::string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo si;
     ChessBoard cb = ChessBoard(startFen, si);
@@ -106,7 +107,7 @@ int main(int arc, char** argv) {
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < size; i++) {
         cb.doMove(moves[i], st);
-        curr = perft(cb, 5);
+        curr = perft(cb, 6);
         std::cout << moveToStr(moves[i]) << ": " << curr << std::endl;
         cb.undoMove(moves[i]);
         total += curr;

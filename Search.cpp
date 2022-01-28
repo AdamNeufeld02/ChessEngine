@@ -18,7 +18,7 @@ Move Search::searchStart(ChessBoard& cb, int depth) {
         }
         nodesSearched++;
     }
-    std::cout << "Eval: " << topScore << std::endl;
+    std::cout << "Eval: " << (double)topScore / mgVals[PAWN] << std::endl;
     std::cout << "Nodes Visited: " << nodesSearched << std::endl;
     return topMove;
 }

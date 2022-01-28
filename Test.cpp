@@ -9,6 +9,7 @@
 
 TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
     BitBoards::precomputeAttackSets();
+    Evaluation::init();
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo state;
     ChessBoard cb = ChessBoard(startingFen, state);

@@ -66,6 +66,23 @@ enum Move : short {
     NOMOVE
 };
 
+struct ScoredMove {
+    Move move;
+    int score;
+};
+
+constexpr bool operator < (ScoredMove sm1, ScoredMove sm2) {
+    return sm1.score < sm2.score;
+}
+
+constexpr bool operator == (ScoredMove sm1, ScoredMove sm2) {
+    return sm1.score == sm2.score;
+}
+
+constexpr bool operator <= (ScoredMove sm1, ScoredMove sm2) {
+    return sm1.score <= sm2.score;
+}
+
 constexpr Move makeMove(int from, int to, PieceType prom) {
     return Move((PROMOTION << 14) + ((prom - 2) << 12) + (to << 6) + from);
 }

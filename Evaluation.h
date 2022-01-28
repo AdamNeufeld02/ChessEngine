@@ -20,6 +20,8 @@ class ChessBoard;
 static const int infinity = 20000;
 static const int draw = -1;
 
+// A simple way to evaluate a chess board. Material scores are kept within the board and updated at every do and undo move.
+
 namespace Evaluation {
     int evaluate(ChessBoard& cb);
     void init();

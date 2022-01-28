@@ -8,10 +8,6 @@
 // A chess move generator utilizing magic bitboards
 // For more info on magic bitboards visit: https://www.chessprogramming.org/Magic_Bitboards
 
-// TODO:
-//  - filter illegal castles
-//  - Clean up
-
 namespace MoveGenerator {
     // Generates pseudo legal chess moves for the chessBoard given based on which side is to move
     // Places all moves in the move list provided
