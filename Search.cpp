@@ -2,21 +2,25 @@
 
 Move Search::searchStart(ChessBoard& cb, int depth) {
     nodesSearched = 0;
+    currDepth = depth;
     int topScore = -infinity;
-    Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves, false);
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
     int length = end - moves;
-    Move topMove = moves[0];
+    MovePick mp = MovePick(moves, length, cb);
+    Move curr = mp.getNext();
+    Move topMove = moves[0].move;
     StateInfo si;
-    for (int i = 0; i < length; i++) {
-        cb.doMove(moves[i], si);
+    while (curr != NOMOVE) {
+        cb.doMove(curr, si);
         int tempScore = -search(cb, -infinity, -topScore, depth - 1);
-        cb.undoMove(moves[i]);
+        cb.undoMove(curr);
         if (tempScore > topScore) {
             topScore = tempScore;
-            topMove = moves[i];
+            topMove = curr;
         }
         nodesSearched++;
+        curr = mp.getNext();
     }
     std::cout << "Eval: " << (double)topScore / mgVals[PAWN] << std::endl;
     std::cout << "Nodes Visited: " << nodesSearched << std::endl;
@@ -29,21 +33,23 @@ int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
         return quiesce(cb, alpha, beta);
     }
     int topScore = -infinity;
-    Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves, false);
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
     int length = end - moves;
     if (length == 0) {
         if (cb.checkers()) {
-            return -infinity;
+            return -infinity + (currDepth - depth);
         } else {
             return draw;
         }
     }
+    MovePick mp = MovePick(moves, length, cb);
+    Move curr = mp.getNext();
     StateInfo si;
-    for (int i = 0; i < length; i++) {
-        cb.doMove(moves[i], si);
+    while (curr != NOMOVE) {
+        cb.doMove(curr, si);
         int tempScore = -search(cb, -beta, -alpha, depth - 1);
-        cb.undoMove(moves[i]);
+        cb.undoMove(curr);
         if (tempScore >= beta) {
             return tempScore;
         }
@@ -53,6 +59,7 @@ int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
                 alpha = tempScore;
             }
         }
+        curr = mp.getNext();
     }
     return topScore;
 }
@@ -66,23 +73,27 @@ int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
     if (eval > alpha) {
         alpha = eval;
     }
-    Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves, true);
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, true);
     int length = end - moves;
+    MovePick mp = MovePick(moves, length, cb);
+    Move curr = mp.getNext();
     StateInfo si;
-    for (int i = 0; i < length; i++) {
-        cb.doMove(moves[i], si);
+
+    while (curr != NOMOVE) {
+        cb.doMove(curr, si);
         int tempScore = -quiesce(cb, -beta, -alpha);
-        cb.undoMove(moves[i]);
+        cb.undoMove(curr);
         if (tempScore >= beta) {
             return tempScore;
         }
         if (tempScore > eval) {
             eval = tempScore;
-            if (tempScore > alpha) {
+            if(tempScore > alpha) {
                 alpha = tempScore;
             }
         }
+        curr = mp.getNext();
     }
     return eval;
 }

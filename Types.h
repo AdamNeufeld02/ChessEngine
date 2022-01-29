@@ -69,6 +69,10 @@ enum Move : short {
 struct ScoredMove {
     Move move;
     int score;
+
+    constexpr void operator = (Move m) {
+        move = m;
+    }
 };
 
 constexpr bool operator < (ScoredMove sm1, ScoredMove sm2) {

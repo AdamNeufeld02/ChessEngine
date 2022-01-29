@@ -9,6 +9,7 @@
 static int nodesSearched;
 
 namespace Search {
+    static int currDepth;
     Move searchStart(ChessBoard& cb, int depth);
     int search(ChessBoard& cb, int alpha, int beta, int depth);
     int quiesce(ChessBoard& cb, int alpha, int beta);

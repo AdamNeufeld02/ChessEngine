@@ -4,6 +4,8 @@
 #include "ChessBoard.h"
 #include "BitBoards.h"
 #include "Search.h"
+#include "MovePick.h"
+#include "Evaluation.h"
 #include <bitset>
 #include <chrono>
 
@@ -19,9 +21,17 @@ TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
 }
 
 TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
-    std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
     StateInfo state;
     ChessBoard cb = ChessBoard(startingFen, state);
-    Move move = Search::searchStart(cb, 7);
-    REQUIRE(move != NOMOVE);
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
+    MovePick mp = MovePick(moves, end - moves, cb);
+    std::cout << moves[0].score << std::endl;
+    Move move = mp.getNext();
+    int i = 0;
+    while(move != NOMOVE) {
+        std::cout << moves[i].score << std::endl;
+        move = mp.getNext();
+    }
 }

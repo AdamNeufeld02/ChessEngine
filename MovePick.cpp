@@ -8,6 +8,7 @@ MovePick::MovePick(ScoredMove* allMoves, int initLength, ChessBoard& cb) {
 }
 
 Move MovePick::getNext() {
+    if (length == 0) return NOMOVE;
     Move ret = moves[0].move;
     swap(0, --length);
     heapifyDown(0);
@@ -19,7 +20,7 @@ void MovePick::score(ChessBoard& cb) {
         Move move = moves[i].move;
         PieceType capt = typeOf(cb.pieceOn(getTo(move)));
         PieceType pc = typeOf(cb.pieceOn(getFrom(move)));
-        moves[i].score = mgVals[capt] + (mgVals[pc]/100);
+        moves[i].score = mgVals[capt] + (900 - mgVals[pc])/100;
     }
 }
 

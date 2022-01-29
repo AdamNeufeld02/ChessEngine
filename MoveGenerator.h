@@ -12,23 +12,23 @@ namespace MoveGenerator {
     // Generates pseudo legal chess moves for the chessBoard given based on which side is to move
     // Places all moves in the move list provided
     // Returns a pointer to the end of the list of generated moves
-    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bool onlyCaptures);
+    ScoredMove* generateMoves(ChessBoard& chessBoard, ScoredMove* moves, bool onlyCaptures);
     // Function that was used to generate magics for rooks and bishops.
     // Heavily inspired by the routine found on https://www.chessprogramming.org/Looking_for_Magics
     bitBoard generateMagicNumber(int square, int rook);
 
     template<GenType t>
-    Move* generateAllMoves(ChessBoard& chessBoard, Move* moves);
+    ScoredMove* generateAllMoves(ChessBoard& chessBoard, ScoredMove* moves);
     template<GenType t, Colour us>
-    Move* generateMoves(ChessBoard& chessBoard, Move* moves);
+    ScoredMove* generateMoves(ChessBoard& chessBoard, ScoredMove* moves);
     template<PieceType pt, Colour us>
-    Move* generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets);
+    ScoredMove* generateMoves(ChessBoard& chessBoard, ScoredMove* moves, bitBoard targets);
     // generates moves for pawns including enpassent, promotions and double pushes
     template<GenType t, Colour us>
-    Move* generatePawnMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets);
+    ScoredMove* generatePawnMoves(ChessBoard& chessBoard, ScoredMove* moves, bitBoard targets);
     //generates all king moves
     template<GenType t, Colour us>
-    Move* generateKingMoves(ChessBoard& ChessBoard, Move* moves);
+    ScoredMove* generateKingMoves(ChessBoard& ChessBoard, ScoredMove* moves);
     
     unsigned int XORShift32Rand();
     // generates 64 bit number with low number of set bits (ideal candidate)

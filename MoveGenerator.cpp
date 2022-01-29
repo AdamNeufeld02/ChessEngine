@@ -1,14 +1,14 @@
 #include "MoveGenerator.h"
 
-Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bool onlyCaptures) {
-    Move* curr = moves;
+ScoredMove* MoveGenerator::generateMoves(ChessBoard& chessBoard, ScoredMove* moves, bool onlyCaptures) {
+    ScoredMove* curr = moves;
     Colour us = chessBoard.colourToMove();
     int ksq = getLSBIndex(chessBoard.pieces(us, KING));
     bitBoard pinned = chessBoard.pinned() & chessBoard.pieces(us);
     moves = chessBoard.checkers() ? generateAllMoves<Evasions>(chessBoard, moves) : onlyCaptures? generateAllMoves<Captures>(chessBoard, moves) : generateAllMoves<Legal>(chessBoard, moves);
     if (pinned) {
         while (curr != moves) {
-            if ((pinned & squares[getFrom(*curr)]) && !isAligned(getFrom(*curr), getTo(*curr), ksq)) {
+            if ((pinned & squares[getFrom(curr->move)]) && !isAligned(getFrom(curr->move), getTo(curr->move), ksq)) {
                 *curr = *--moves;
             } else {
                 ++curr;
@@ -19,13 +19,13 @@ Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bool onl
 }
 
 template<GenType t>
-Move* MoveGenerator::generateAllMoves(ChessBoard& chessBoard, Move* moves) {
+ScoredMove* MoveGenerator::generateAllMoves(ChessBoard& chessBoard, ScoredMove* moves) {
     Colour us = chessBoard.colourToMove();
     return us == WHITE? generateMoves<t, WHITE>(chessBoard, moves) : generateMoves<t, BLACK>(chessBoard, moves);
 }
 
 template<GenType t, Colour us>
-Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
+ScoredMove* MoveGenerator::generateMoves(ChessBoard& chessBoard, ScoredMove* moves) {
     bitBoard targets;
     int ksq = getLSBIndex(chessBoard.pieces(us, KING));
     if (t != Evasions || !moreThanOne(chessBoard.checkers())) {
@@ -43,7 +43,7 @@ Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves) {
 }
 
 template<PieceType pt, Colour us>
-Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets) {
+ScoredMove* MoveGenerator::generateMoves(ChessBoard& chessBoard, ScoredMove* moves, bitBoard targets) {
     int from, to;
     bitBoard attacks;
     bitBoard pieces = chessBoard.pieces(us, pt);
@@ -60,7 +60,7 @@ Move* MoveGenerator::generateMoves(ChessBoard& chessBoard, Move* moves, bitBoard
 }
 
 template<GenType t, Colour us>
-Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
+ScoredMove* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, ScoredMove* moves) {
     bitBoard attacks;
     bitBoard pieces = chessBoard.pieces(us, KING);
     bitBoard targets = t == Captures ? chessBoard.pieces(~us) : ~chessBoard.pieces(us);
@@ -109,7 +109,7 @@ Move* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, Move* moves) {
 }
 
 template<GenType t, Colour us>
-Move* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, Move* moves, bitBoard targets) {
+ScoredMove* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, ScoredMove* moves, bitBoard targets) {
     Colour them = ~us;
     constexpr Direction upRight = us == WHITE ? NORTHEAST : SOUTHEAST;
     constexpr Direction upLeft = us == WHITE ? NORTHWEST : SOUTHWEST;

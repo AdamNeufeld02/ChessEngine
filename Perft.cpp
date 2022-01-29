@@ -4,8 +4,8 @@
 #include <chrono>
 
 int perft(ChessBoard& cb, int depth) {
-    Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves, false);
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
     int total = 0;
     int size = end - moves;
     StateInfo si;
@@ -13,9 +13,9 @@ int perft(ChessBoard& cb, int depth) {
         return size;
     } else {
         for (int i = 0; i < size; i++) {
-            cb.doMove(moves[i], si);
+            cb.doMove(moves[i].move, si);
             total += perft(cb, depth - 1);
-            cb.undoMove(moves[i]);
+            cb.undoMove(moves[i].move);
             end--;
         }
         return total;
@@ -98,18 +98,18 @@ int main(int arc, char** argv) {
     std::string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo si;
     ChessBoard cb = ChessBoard(startFen, si);
-    Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(cb, moves, false);
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
     int size = end - moves;
     int curr = 0;
     long long total = 0;
     StateInfo st;
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < size; i++) {
-        cb.doMove(moves[i], st);
+        cb.doMove(moves[i].move, st);
         curr = perft(cb, 6);
-        std::cout << moveToStr(moves[i]) << ": " << curr << std::endl;
-        cb.undoMove(moves[i]);
+        std::cout << moveToStr(moves[i].move) << ": " << curr << std::endl;
+        cb.undoMove(moves[i].move);
         total += curr;
         end--;
     }

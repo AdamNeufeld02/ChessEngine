@@ -10,7 +10,7 @@ GameState::GameState() {
     gameState = PLAYING_GAME;
     player1.colour = WHITE;
     player2.colour = BLACK;
-    player1.isHuman = true;
+    player1.isHuman = false;
     player2.isHuman = false;
 }
 
@@ -44,9 +44,8 @@ void GameState::gameLoop() {
 }
 
 Move GameState::getMoveFromComp() {
-    Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(*chessBoard, moves, false);
-    int moveIndex;
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(*chessBoard, moves, false);
     int length = end - moves;
     int movMat[64];
     resetMoveMatrix(movMat);
@@ -56,14 +55,14 @@ Move GameState::getMoveFromComp() {
         std::cout << "COMPUTER LOST";
         return NOMOVE;
     }
-    Move move = Search::searchStart(*chessBoard, 4);
+    Move move = Search::searchStart(*chessBoard, 6);
     return move;
 }
 
 Move GameState::getMoveFromUser() {
     Move move = NOMOVE;
-    Move moves[MAXMOVES];
-    Move* end = MoveGenerator::generateMoves(*chessBoard, moves, false);
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(*chessBoard, moves, false);
     SDL_Event ev;
     Piece promPiece;
     int x, y;
@@ -132,10 +131,10 @@ Piece GameState::getPromotionFromUser(Colour colour) {
     return promPiece;
 }
 
-Move GameState::findMove(Move* begin, Move* end, int from, int to) {
+Move GameState::findMove(ScoredMove* begin, ScoredMove* end, int from, int to) {
     int size = end - begin;
     for (int i = 0; i < size; i++) {
-        Move move = begin[i];
+        Move move = begin[i].move;
         if (getFrom(move) == from && getTo(move) == to) {
             return move;
         }
@@ -148,14 +147,14 @@ void GameState::resetMoveMatrix(int* movMat) {
     for (int i = 0; i < 64; i++) movMat[i] = 0;
 }
 
-void GameState::makeMoveMatrix(Move* begin, Move* end, int index, int* movMat) {
+void GameState::makeMoveMatrix(ScoredMove* begin, ScoredMove* end, int index, int* movMat) {
     int size = end - begin;
     // init movMat to 0
     resetMoveMatrix(movMat);
     // Find moves and set squares in matrix
     for (int i = 0; i < size; i++) {
-        if (getFrom(begin[i]) == index) {
-            movMat[getTo(begin[i])] += 1;
+        if (getFrom(begin[i].move) == index) {
+            movMat[getTo(begin[i].move)] += 1;
         }
     }
 }
