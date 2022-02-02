@@ -11,7 +11,7 @@ GameState::GameState() {
     player1.colour = WHITE;
     player2.colour = BLACK;
     player1.isHuman = false;
-    player2.isHuman = false;
+    player2.isHuman = true;
 }
 
 void GameState::start() {
@@ -38,6 +38,7 @@ void GameState::gameLoop() {
         }
         states->emplace_back();
         chessBoard->doMove(move, states->back());
+        std::cout << chessBoard->key() <<std::endl;
         playerToMove = getPlayerToMove();
         //_sleep(100);
     }

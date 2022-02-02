@@ -23,30 +23,46 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
         if (flag == ENPASSENT) {
             capsq = us == WHITE ? to - 8 : to + 8;
         }
+        si.key ^= Zobrist::psq[pieceOn(capsq)][capsq];
         removePiece(capsq);
     }
     if (flag == PROMOTION) {
+        si.key ^= Zobrist::psq[pieceOn(from)][from];
         removePiece(from);
         putPiece(makePiece(us, getProm(move)), from);
+        si.key ^= Zobrist::psq[pieceOn(from)][from];
     }
     if (flag == CASTLE) {
         if (to > from) {
+            si.key ^= Zobrist::psq[pieceOn(to + 1)][to + 1];
             movePiece(to + 1, to - 1);
+            si.key ^= Zobrist::psq[pieceOn(to - 1)][to - 1];
         } else {
+            si.key ^= Zobrist::psq[pieceOn(to - 2)][to - 2];
             movePiece(to - 2, to + 1);
+            si.key ^= Zobrist::psq[pieceOn(to + 1)][to + 1];
         }
+    }
+    if (si.epSquare > 0) {
+        si.key ^= Zobrist::epSquare[si.epSquare];
     }
     si.epSquare = -1;
     if (typeOf(moved) == PAWN) {
         if ((to ^ from) == 16) {
             si.epSquare = us == WHITE ? from + 8 : from - 8;
+            si.key ^= Zobrist::epSquare[si.epSquare];
         }
     }
+    si.key ^= Zobrist::psq[pieceOn(from)][from];
     movePiece(from, to);
+    si.key ^= Zobrist::psq[pieceOn(to)][to];
     si.previous = st;
     st = &si;
     colToMove = ~colToMove;
+    st->key ^= Zobrist::colToMove;
+    st->key ^= Zobrist::castlingKeys[st->castlingRights];
     st->castlingRights &= castlingRights[from] & castlingRights[to];
+    st->key ^= Zobrist::castlingKeys[st->castlingRights];
     updateChecksAndPins(colToMove);
 }
 
@@ -170,28 +186,40 @@ void ChessBoard::fenToBoard(std::string fenString) {
         } else { 
             switch(curr) {
                 case(*"P"): putPiece(WHITEPAWN, boardIndex);
+                    st->key ^= Zobrist::psq[WHITEPAWN][boardIndex];
                     break;
                 case(*"N"): putPiece(WHITEKNIGHT, boardIndex);
+                    st->key ^= Zobrist::psq[WHITEKNIGHT][boardIndex];
                     break;
                 case(*"R"): putPiece(WHITEROOK, boardIndex);
+                    st->key ^= Zobrist::psq[WHITEROOK][boardIndex];
                     break;
                 case(*"B"): putPiece(WHITEBISHOP, boardIndex);
+                    st->key ^= Zobrist::psq[WHITEBISHOP][boardIndex];
                     break;
                 case(*"Q"): putPiece(WHITEQUEEN, boardIndex);
+                    st->key ^= Zobrist::psq[WHITEQUEEN][boardIndex];
                     break;
                 case(*"K"): putPiece(WHITEKING, boardIndex);
+                    st->key ^= Zobrist::psq[WHITEKING][boardIndex];
                     break;
                 case(*"p"): putPiece(BLACKPAWN, boardIndex);
+                    st->key ^= Zobrist::psq[BLACKPAWN][boardIndex];
                     break;
                 case(*"n"): putPiece(BLACKKNIGHT, boardIndex);
+                    st->key ^= Zobrist::psq[BLACKKNIGHT][boardIndex];
                     break;
                 case(*"r"): putPiece(BLACKROOK, boardIndex);
+                    st->key ^= Zobrist::psq[BLACKROOK][boardIndex];
                     break;
                 case(*"b"): putPiece(BLACKBISHOP, boardIndex);
+                    st->key ^= Zobrist::psq[BLACKBISHOP][boardIndex];
                     break;
                 case(*"q"): putPiece(BLACKQUEEN, boardIndex);
+                    st->key ^= Zobrist::psq[BLACKQUEEN][boardIndex];
                     break;
                 case(*"k"): putPiece(BLACKKING, boardIndex);
+                    st->key ^= Zobrist::psq[BLACKKING][boardIndex];
                     break;
             }
             boardIndex++;
@@ -207,6 +235,7 @@ void ChessBoard::fenToBoard(std::string fenString) {
         colToMove = WHITE;
     } else {
         colToMove = BLACK;
+        st->key ^= Zobrist::colToMove;
     }
 
     // Parse Castling Rights
@@ -227,6 +256,7 @@ void ChessBoard::fenToBoard(std::string fenString) {
             curr = fenString[stringIndex];
         }
     }
+    st->key ^= Zobrist::castlingKeys[st->castlingRights];
 
     stringIndex++;
     curr = fenString[stringIndex];
@@ -254,6 +284,7 @@ void ChessBoard::fenToBoard(std::string fenString) {
         curr = fenString[stringIndex];
         num = strtol(&curr, NULL, 10);
         st->epSquare += (8 - num) * 8;
+        st->key ^= Zobrist::epSquare[st->epSquare];
     } else {
         st->epSquare = -1;
     }
@@ -274,6 +305,7 @@ void ChessBoard::initBoard(StateInfo& si) {
 
     st = &si;
 
+    st->key = 0;
     st->castlingRights = NO_CASTLING;
     st->epSquare = -1;
     st->previous = NULL;

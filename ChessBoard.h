@@ -7,6 +7,7 @@
 #include "Types.h"
 #include "BitBoards.h"
 #include "Evaluation.h"
+#include "Zobrist.h"
 
 
 // Inspired by stockFish's stateInfo struct.
@@ -14,6 +15,7 @@
 struct StateInfo {
     char castlingRights;
     char epSquare;
+    zobristKey key;
 
     Piece captured;
     bitBoard checkersBB;
@@ -55,6 +57,8 @@ class ChessBoard {
     bitBoard checkers();
     bitBoard pinners();
     bitBoard pinned();
+
+    zobristKey key();
 
     private:
 
@@ -118,6 +122,10 @@ inline bitBoard ChessBoard::pinned() {
 
 inline bool ChessBoard::canCastle(CastlingRights cr) const {
     return st->castlingRights & cr;
+}
+
+inline zobristKey ChessBoard::key() {
+    return st->key;
 }
 
 inline void ChessBoard::putPiece(Piece pc, int sq) {

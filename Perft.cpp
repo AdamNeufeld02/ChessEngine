@@ -1,6 +1,7 @@
 #include "BitBoards.h"
 #include "ChessBoard.h"
 #include "MoveGenerator.h"
+#include "Zobrist.h"
 #include <chrono>
 
 int perft(ChessBoard& cb, int depth) {
@@ -95,6 +96,7 @@ std::string moveToStr(Move move) {
 int main(int arc, char** argv) {
     BitBoards::precomputeAttackSets();
     Evaluation::init();
+    Zobrist::init();
     std::string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     StateInfo si;
     ChessBoard cb = ChessBoard(startFen, si);
