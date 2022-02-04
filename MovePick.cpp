@@ -1,9 +1,9 @@
 #include "MovePick.h"
 
-MovePick::MovePick(ScoredMove* allMoves, int initLength, ChessBoard& cb) {
+MovePick::MovePick(ScoredMove* allMoves, int initLength, Move pref, ChessBoard& cb) {
     moves = allMoves;
     length = initLength;
-    score(cb);
+    score(cb, pref);
     buildHeap();
 }
 
@@ -15,12 +15,18 @@ Move MovePick::getNext() {
     return ret;
 }
 
-void MovePick::score(ChessBoard& cb) {
+void MovePick::score(ChessBoard& cb, Move pref) {
     for (int i = 0; i < length; i++) {
         Move move = moves[i].move;
         PieceType capt = typeOf(cb.pieceOn(getTo(move)));
-        PieceType pc = typeOf(cb.pieceOn(getFrom(move)));
-        moves[i].score = mgVals[capt] + (900 - mgVals[pc])/100;
+        if (capt) {
+            PieceType pc = typeOf(cb.pieceOn(getFrom(move)));
+            moves[i].score = mgVals[capt] + (900 - mgVals[pc])/100;
+        } else {
+            moves[i].score = 0;
+        }
+        // Prioritize the preferred move
+        if (move == pref) moves[i].score = infinity;
     }
 }
 

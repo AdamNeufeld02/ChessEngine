@@ -5,11 +5,13 @@
 #include "Types.h"
 #include "Evaluation.h"
 #include "MovePick.h"
-
-static int nodesSearched;
+#include "TransposTable.h"
 
 namespace Search {
-    static int currDepth;
+    extern int nodesSearched;
+    extern int currDepth;
+    extern TransposTable tTable;
+    void init();
     Move searchStart(ChessBoard& cb, int depth);
     int search(ChessBoard& cb, int alpha, int beta, int depth);
     int quiesce(ChessBoard& cb, int alpha, int beta);

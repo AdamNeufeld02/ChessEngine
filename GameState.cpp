@@ -38,7 +38,7 @@ void GameState::gameLoop() {
         }
         states->emplace_back();
         chessBoard->doMove(move, states->back());
-        std::cout << chessBoard->key() <<std::endl;
+        std::cout << "Hash: " << chessBoard->key() <<std::endl;
         playerToMove = getPlayerToMove();
         //_sleep(100);
     }

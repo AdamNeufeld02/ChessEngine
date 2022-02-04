@@ -1,4 +1,11 @@
 #include "Search.h"
+int Search::currDepth;
+int Search::nodesSearched;
+TransposTable Search::tTable;
+
+void Search::init() {
+    tTable.clear();
+}
 
 Move Search::searchStart(ChessBoard& cb, int depth) {
     nodesSearched = 0;
@@ -7,7 +14,7 @@ Move Search::searchStart(ChessBoard& cb, int depth) {
     ScoredMove moves[MAXMOVES];
     ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
     int length = end - moves;
-    MovePick mp = MovePick(moves, length, cb);
+    MovePick mp = MovePick(moves, length, NOMOVE, cb);
     Move curr = mp.getNext();
     Move topMove = moves[0].move;
     StateInfo si;
@@ -29,10 +36,13 @@ Move Search::searchStart(ChessBoard& cb, int depth) {
 
 int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
     nodesSearched++;
+    Move best = NOMOVE;
+    int topScore;
+    if (tTable.probe(cb.key(), depth, beta, &topScore, &best)) return topScore;
     if (depth <= 0) {
         return quiesce(cb, alpha, beta);
     }
-    int topScore = -infinity;
+    topScore = -infinity;
     ScoredMove moves[MAXMOVES];
     ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
     int length = end - moves;
@@ -43,7 +53,7 @@ int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
             return draw;
         }
     }
-    MovePick mp = MovePick(moves, length, cb);
+    MovePick mp = MovePick(moves, length, best, cb);
     Move curr = mp.getNext();
     StateInfo si;
     while (curr != NOMOVE) {
@@ -51,16 +61,19 @@ int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
         int tempScore = -search(cb, -beta, -alpha, depth - 1);
         cb.undoMove(curr);
         if (tempScore >= beta) {
+            tTable.addEntry(cb.key(), curr, tempScore, depth, Lower);
             return tempScore;
         }
         if (tempScore > topScore) {
             topScore = tempScore;
+            best = curr;
             if (tempScore > alpha) {
                 alpha = tempScore;
             }
         }
         curr = mp.getNext();
     }
+    tTable.addEntry(cb.key(), best, topScore, depth, Exact);
     return topScore;
 }
 
@@ -76,7 +89,7 @@ int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
     ScoredMove moves[MAXMOVES];
     ScoredMove* end = MoveGenerator::generateMoves(cb, moves, true);
     int length = end - moves;
-    MovePick mp = MovePick(moves, length, cb);
+    MovePick mp = MovePick(moves, length, NOMOVE, cb);
     Move curr = mp.getNext();
     StateInfo si;
 

@@ -3,8 +3,8 @@ EXET = ChessTest
 EXEP = Perft
 
 #OBJS specifies which files to compile as part of the project
-OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o
-OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o
+OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o
+OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o
 OBJS_EXEP = Perft.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Zobrist.o Misc.o
 
 #CC specifies which compiler we're using
@@ -67,7 +67,7 @@ BitBoards.o : BitBoards.cpp BitBoards.h
 Evaluation.o : Evaluation.cpp Evaluation.h ChessBoard.h
 	$(CC) Evaluation.cpp $(CXX_FLAGS) -o $@
 
-Search.o : Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h MovePick.h
+Search.o : Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h MovePick.h TransposTable.h
 	$(CC) Search.cpp $(CXX_FLAGS) -o $@
 
 MovePick.o : MovePick.cpp MovePick.h Types.h ChessBoard.h
@@ -78,4 +78,7 @@ Misc.o : Misc.cpp Misc.h BitBoards.h
 
 Zobrist.o : Zobrist.cpp Zobrist.h Types.h Misc.h
 	$(CC) Zobrist.cpp $(CXX_FLAGS) -o $@
+
+TransposTable.o : TransposTable.cpp TransposTable.h Types.h Zobrist.h ChessBoard.h
+	$(CC) TransposTable.cpp $(CXX_FLAGS) -o $@
 
