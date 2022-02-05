@@ -10,8 +10,8 @@ GameState::GameState() {
     gameState = PLAYING_GAME;
     player1.colour = WHITE;
     player2.colour = BLACK;
-    player1.isHuman = false;
-    player2.isHuman = true;
+    player1.isHuman = true;
+    player2.isHuman = false;
 }
 
 void GameState::start() {
@@ -39,8 +39,8 @@ void GameState::gameLoop() {
         states->emplace_back();
         chessBoard->doMove(move, states->back());
         std::cout << "Hash: " << chessBoard->key() <<std::endl;
+        std::cout << "--------------------" << std::endl;
         playerToMove = getPlayerToMove();
-        //_sleep(100);
     }
 }
 
@@ -56,7 +56,7 @@ Move GameState::getMoveFromComp() {
         std::cout << "COMPUTER LOST";
         return NOMOVE;
     }
-    Move move = Search::searchStart(*chessBoard, 6);
+    Move move = Search::searchStart(*chessBoard, 3);
     return move;
 }
 
