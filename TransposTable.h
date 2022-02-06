@@ -5,6 +5,8 @@
 #include "Types.h"
 #include "ChessBoard.h"
 
+// Todo speed up transposition table store in clusters and reduce bytes per entry
+
 enum Type {
     Exact, Upper, Lower
 };
@@ -46,7 +48,7 @@ class TransposTable {
 
     private:
     // Number of entryies in the hash table
-    static const int size = 4000000;
+    static const int size = 1000000;
     // The table storing all entries
     Entry table[size];
 };

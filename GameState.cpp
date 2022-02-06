@@ -10,8 +10,8 @@ GameState::GameState() {
     gameState = PLAYING_GAME;
     player1.colour = WHITE;
     player2.colour = BLACK;
-    player1.isHuman = true;
-    player2.isHuman = false;
+    player1.isHuman = false;
+    player2.isHuman = true;
 }
 
 void GameState::start() {

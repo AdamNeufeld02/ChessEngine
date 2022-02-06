@@ -1,5 +1,6 @@
 #include "Search.h"
 int Search::currDepth;
+Move Search::bestFound;
 int Search::nodesSearched;
 bool Search::abort;
 std::chrono::steady_clock::time_point Search::start;
@@ -12,53 +13,27 @@ void Search::init() {
 
 Move Search::searchStart(ChessBoard& cb, int time) {
     nodesSearched = 0;
-    int topScore;
 
     start = std::chrono::steady_clock::now();
     abort = false;
     alloted = time * 1000;
 
-    Move bestFound = NOMOVE;
-    int iterEval = 0;
+    bestFound = NOMOVE;
+
     int depthReached = 0;
 
-    for (int depth = 1; depth < 64; depth++) {
-        currDepth = depth;
-        topScore = -infinity;
-        ScoredMove moves[MAXMOVES];
-        ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
-        int length = end - moves;
-        MovePick mp = MovePick(moves, length, bestFound, cb);
-        Move curr = mp.getNext();
-        Move topMove = moves[0].move;
+    int val = searchRoot(cb, -infinity, infinity, 1);
 
-        StateInfo si;
-        while (curr != NOMOVE) {
-            if (abort)  {
-                std::cout << "Eval: " << (double)iterEval / mgVals[PAWN] << std::endl;
-                std::cout << "Nodes Visited: " << nodesSearched << std::endl;
-                std::cout << "Depth: " << depthReached << std::endl;
-                return bestFound;
-            }
-
-            cb.doMove(curr, si);
-            int tempScore = -search(cb, -infinity, -topScore, depth - 1);
-            cb.undoMove(curr);
-            if (tempScore > topScore) {
-                topScore = tempScore;
-                topMove = curr;
-            }
-            nodesSearched++;
-            curr = mp.getNext();
-        }
-        bestFound = topMove;
+    for (int depth = 2; depth < 64; depth++) {
+        val = widenSearch(cb, val, depth);
+        if (abort) return bestFound;
         depthReached = depth;
-        iterEval = topScore;
+        std::cout << "Eval: " << (double)val / mgVals[PAWN] << std::endl;
+        std::cout << "Nodes Visited: " << nodesSearched << std::endl;
+        std::cout << "Depth: " << depthReached << std::endl;
+        std::cout << "--------------------" << std::endl;
     }
 
-    
-    std::cout << "Eval: " << (double)iterEval / mgVals[PAWN] << std::endl;
-    std::cout << "Nodes Visited: " << nodesSearched << std::endl;
     return bestFound;
 }
 
@@ -66,6 +41,50 @@ void Search::checkTime() {
     auto curr = std::chrono::steady_clock::now();
     int elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(curr - start).count();
     abort = elapsed >= alloted;
+}
+
+int Search::widenSearch(ChessBoard& cb, int val, int depth) {
+    int alpha = val - aspiration;
+    int beta = val + aspiration;
+    int temp = searchRoot(cb, alpha, beta, depth);
+    if (temp <= alpha || temp >= beta) {
+        temp = searchRoot(cb, -infinity, infinity, depth);
+    }
+    return temp;
+}
+
+int Search::searchRoot(ChessBoard& cb, int alpha, int beta, int depth) {
+    currDepth = depth;
+    int topScore = -infinity;
+    ScoredMove moves[MAXMOVES];
+    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
+    int length = end - moves;
+    MovePick mp = MovePick(moves, length, bestFound, cb);
+    Move curr = mp.getNext();
+    Move topMove = moves[0].move;
+
+    StateInfo si;
+    while (curr != NOMOVE) {
+
+        if (abort)  {
+            return 0;
+        }
+
+        cb.doMove(curr, si);
+        int tempScore = -search(cb, -beta, -alpha, depth - 1);
+        cb.undoMove(curr);
+        if (tempScore > topScore) {
+            topScore = tempScore;
+            if (topScore > alpha) {
+                alpha = topScore;
+                topMove = curr;
+            }
+        }
+        nodesSearched++;
+        curr = mp.getNext();
+    }
+    bestFound = topMove;
+    return topScore;
 }
 
 int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
@@ -112,8 +131,8 @@ int Search::search(ChessBoard& cb, int alpha, int beta, int depth) {
         }
         if (tempScore > topScore) {
             topScore = tempScore;
-            best = curr;
             if (tempScore > alpha) {
+                best = curr;
                 alpha = tempScore;
             }
         }
