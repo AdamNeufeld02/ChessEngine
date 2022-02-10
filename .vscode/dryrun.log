@@ -6,6 +6,7 @@ g++ GameState.cpp -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -
 g++ MoveGenerator.cpp -c -g -Ofast -Wall -Wextra -pedantic -o MoveGenerator.o
 g++ ChessBoard.cpp -c -g -Ofast -Wall -Wextra -pedantic -o ChessBoard.o
 g++ BitBoards.cpp -c -g -Ofast -Wall -Wextra -pedantic -o BitBoards.o
+ 
 g++ Evaluation.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Evaluation.o
 g++ Search.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Search.o
 g++ MovePick.cpp -c -g -Ofast -Wall -Wextra -pedantic -o MovePick.o 
@@ -13,6 +14,7 @@ g++ Zobrist.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Zobrist.o
 g++ Misc.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Misc.o
 g++ TransposTable.cpp -c -g -Ofast -Wall -Wextra -pedantic -o TransposTable.o
 g++ main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o -IC:\Users\adamn\SDL2\include\SDL2 -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ChessEngine
+ 
 g++ Test.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Test.o
 g++ Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o -o ChessTest
 g++ Perft.cpp -c -g -Ofast -Wall -Wextra -pedantic -o Perft.o

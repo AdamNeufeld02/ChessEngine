@@ -10,14 +10,14 @@
 class MovePick {
     public:
     // Constructs a scored move priority queue
-    MovePick(ScoredMove* allMoves, int initLength, Move pref, ChessBoard& cb);
+    MovePick(ScoredMove* allMoves, int initLength, Move pref, Move* killers, ChessBoard& cb);
     // Returns the most promising next move if no moves left return NOMOVE
     Move getNext();
     private:
     ScoredMove* moves;
     int length;
     // scores all moves by MVV LVA
-    void score(ChessBoard& cb, Move pref);
+    void score(ChessBoard& cb, Move pref, Move* killers);
     void buildHeap();
     void heapifyDown(int start);
     int getLeftChild(int parent);

@@ -94,6 +94,19 @@ void ChessBoard::undoMove(Move move) {
     }
 }
 
+zobristKey ChessBoard::keyAfter(Move move) {
+    int from = getFrom(move);
+    int to = getTo(move);
+    Piece pc = pieceOn(from);
+    Piece captured = pieceOn(to);
+    zobristKey k = st->key ^ Zobrist::colToMove;
+
+    if (captured)
+        k ^= Zobrist::psq[captured][to];
+
+    return k ^ Zobrist::psq[pc][to] ^ Zobrist::psq[pc][from];
+}
+
 void ChessBoard::updateChecksAndPins(Colour toMove) {
     st->checkersBB = getAttackers(getLSBIndex(pieces(toMove, KING)), ~toMove);
     st->pinnedBB = blockersForSq(getLSBIndex(pieces(toMove, KING)), toMove, st->pinnersBB);

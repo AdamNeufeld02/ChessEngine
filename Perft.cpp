@@ -1,6 +1,7 @@
 #include "BitBoards.h"
 #include "ChessBoard.h"
 #include "MoveGenerator.h"
+#include "Misc.h"
 #include "Zobrist.h"
 #include <chrono>
 
@@ -23,76 +24,6 @@ int perft(ChessBoard& cb, int depth) {
     }
 }
 
-std::string indexToStr(int index) {
-    int rank = index / 8;
-    int file = index % 8;
-    std::string r;
-    std::string f;
-    switch (rank)
-    {
-    case 0:
-        r = "1";
-        break;
-    case 1:
-        r = "2";
-        break;
-    case 2:
-        r = "3";
-        break;
-    case 3:
-        r = "4";
-        break;
-    case 4:
-        r = "5";
-        break;
-    case 5:
-        r = "6";
-        break;
-    case 6:
-        r = "7";
-        break;
-    case 7:
-        r = "8";
-        break;
-    }
-    switch (file)
-    {
-    case 0:
-        f = "a";
-        break;
-    case 1:
-        f = "b";
-        break;
-    case 2:
-        f = "c";
-        break;
-    case 3:
-        f = "d";
-        break;
-    case 4:
-        f = "e";
-        break;
-    case 5:
-        f = "f";
-        break;
-    case 6:
-        f = "g";
-        break;
-    case 7:
-        f = "h";
-        break;
-    }
-    f.append(r);
-    return f;
-}
-
-std::string moveToStr(Move move) {
-    std::string from = indexToStr(getFrom(move));
-    std::string to = indexToStr(getTo(move));
-    from.append(to);
-    return from;
-}
-
 int main(int arc, char** argv) {
     BitBoards::precomputeAttackSets();
     Evaluation::init();
@@ -110,7 +41,7 @@ int main(int arc, char** argv) {
     for (int i = 0; i < size; i++) {
         cb.doMove(moves[i].move, st);
         curr = perft(cb, 6);
-        std::cout << moveToStr(moves[i].move) << ": " << curr << std::endl;
+        std::cout << Misc::moveToString(moves[i].move) << ": " << curr << std::endl;
         cb.undoMove(moves[i].move);
         total += curr;
         end--;

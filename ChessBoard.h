@@ -60,6 +60,10 @@ class ChessBoard {
 
     zobristKey key();
 
+    // Calculates what the hash key will be after the move is made.
+    // Used in prefetch
+    zobristKey keyAfter(Move move);
+
     private:
 
     // Fields 

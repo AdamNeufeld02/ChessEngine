@@ -1,5 +1,22 @@
 #include "Misc.h"
 
+std::string Misc::indexToString(int idx) {
+    static std::string rankMap[8] = {"1", "2", "3", "4", "5", "6", "7", "8"};
+    static std::string fileMap[8] = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    int rank = idx / 8;
+    int file = idx % 8;
+    std::string ret = fileMap[file];
+    return ret.append(rankMap[rank]);
+}
+
+std::string Misc::moveToString(Move move) {
+    std::string from = indexToString(getFrom(move));
+    std::string to = indexToString(getTo(move));
+    from.append(to);
+    return from;
+}
+
+
 unsigned int Misc::XORShift32Rand() {
     static unsigned int state = 1804289383; // seed
     // XORShift32 algorithm

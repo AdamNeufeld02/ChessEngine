@@ -1,6 +1,8 @@
 #ifndef MISC_H
 #define MISC_H
 #include "BitBoards.h"
+#include "Types.h"
+#include <string>
 
 namespace Misc{
     // Function that was used to generate magics for rooks and bishops.
@@ -10,6 +12,8 @@ namespace Misc{
     // generates 64 bit number with low number of set bits (ideal candidate)
     bitBoard getMagicNumberCandidate();
     bitBoard genRand64();
+    std::string indexToString(int idx);
+    std::string moveToString(Move move);
 }
 
 #endif

@@ -5,7 +5,6 @@
 #include "Types.h"
 #include "ChessBoard.h"
 
-// Todo speed up transposition table store in clusters and reduce bytes per entry
 
 enum Type {
     Exact, Upper, Lower
@@ -14,8 +13,8 @@ enum Type {
 struct Entry {
     zobristKey key;
     int eval;
-    int depth;
     Move hashMove;
+    int depth;
     Type type;
 
     Entry() {
@@ -45,6 +44,10 @@ class TransposTable {
     void addEntry(zobristKey key, Move hashMove, int eval, int depth, Type type);
     // Returns true if we can use the evaluation stored in the hash table and false otherwise
     bool probe(zobristKey key, int depth, int beta, int* eval, Move *hashMove);
+
+    Entry* getEntry(zobristKey key) {
+        return &table[key % size];
+    }
 
     private:
     // Number of entryies in the hash table
