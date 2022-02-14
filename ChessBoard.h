@@ -41,6 +41,7 @@ class ChessBoard {
     char epSquare() const;
 
     int getMaterial(Colour col);
+    Score getPSQT(Colour col);
 
     // Returns the bitboard of all attackers of one colour of a certain square
     bitBoard getAttackers(int sq, Colour c);
@@ -64,6 +65,8 @@ class ChessBoard {
     // Used in prefetch
     zobristKey keyAfter(Move move);
 
+    bool onOpenFile(Colour col, int sq);
+
     private:
 
     // Fields 
@@ -75,6 +78,7 @@ class ChessBoard {
     // The Occupancy of all pieces
     bitBoard allPieces;
     int material[2];
+    Score psqtv[2];
 
     void fenToBoard(std::string fenString);
     void initBoard(StateInfo& si);
@@ -87,6 +91,14 @@ class ChessBoard {
     void putPiece(Piece pc, int sq);
     
 };
+
+inline bool ChessBoard::onOpenFile(Colour col, int sq) {
+    return !(pieces(col, PAWN) & fileBB[sq % 8]);
+}
+
+inline Score ChessBoard::getPSQT(Colour col) {
+    return psqtv[col];
+}
 
 inline int ChessBoard::getMaterial(Colour col) {
     return material[col];
@@ -136,7 +148,7 @@ inline void ChessBoard::putPiece(Piece pc, int sq) {
     bitBoard place = squares[sq];
     Colour col = colourOf(pc);
     material[col] += mgVals[typeOf(pc)];
-    material[col] += pieceSquareTables[pc][sq];
+    psqtv[col] += pieceSquareTables[pc][sq];
     board[sq] = pc;
     piecesByType[pc] |= place;
     piecesByColour[col] |= place;
@@ -148,7 +160,7 @@ inline void ChessBoard::removePiece(int sq) {
     Piece pc = board[sq];
     Colour col = colourOf(pc);
     material[col] -= mgVals[typeOf(pc)];
-    material[col] -= pieceSquareTables[pc][sq];
+    psqtv[col] -= pieceSquareTables[pc][sq];
     board[sq] = EMPTY;
     piecesByType[pc] ^= place;
     piecesByColour[col] ^= place;
@@ -163,7 +175,7 @@ inline void ChessBoard::movePiece(int from, int to) {
     bitBoard fromTo = (squares[from] | squares[to]);
     Piece pc = board[from];
     Colour col = colourOf(pc);
-    material[col] += pieceSquareTables[pc][to] - pieceSquareTables[pc][from];
+    psqtv[col] += pieceSquareTables[pc][to] - pieceSquareTables[pc][from];
     allPieces ^= fromTo;
     piecesByType[pc] ^= fromTo;
     piecesByColour[col] ^= fromTo;

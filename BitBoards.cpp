@@ -15,6 +15,8 @@ bitBoard bishopAttacks[5248];
 MagicSquare rookMagics[64];
 MagicSquare bishopMagics[64];
 
+bitBoard fileBB[8];
+bitBoard rankBB[8];
 
 // Precompute attack tables and initialize magic bitboards
 void BitBoards::precomputeAttackSets() {
@@ -26,6 +28,16 @@ void BitBoards::precomputeAttackSets() {
         pawnAttacks[1][i] = computePawnAttack(i, 0);
         knightAttacks[i] = computeKnightAttack(i);
         kingAttacks[i] = computeKingAttack(i);
+    }
+    for (int i = 0; i < 8; i++) {
+        bitBoard file = 0;
+        bitBoard rank = 0;
+        for (int j = 0; j < 8; j++) {
+            setBit(rank, i * 8 + j);
+            setBit(file, j * 8 + i);
+        }
+        rankBB[i] = rank;
+        fileBB[i] = file;
     }
     initRookMagics();
     initBishopMagics();

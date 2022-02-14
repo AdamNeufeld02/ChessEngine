@@ -12,6 +12,7 @@ GameState::GameState() {
     player2.colour = BLACK;
     player1.isHuman = false;
     player2.isHuman = true;
+    chessBoard->printBoard(chessBoard->pieces());
 }
 
 void GameState::start() {
@@ -40,6 +41,8 @@ void GameState::gameLoop() {
         chessBoard->doMove(move, states->back());
         std::cout << "Hash: " << chessBoard->key() <<std::endl;
         std::cout << "--------------------" << std::endl;
+        std::cout << chessBoard->getPSQT(WHITE).mg << std::endl;
+        std::cout << chessBoard->getPSQT(BLACK).mg << std::endl;
         playerToMove = getPlayerToMove();
     }
 }

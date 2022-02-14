@@ -64,7 +64,7 @@ ChessBoard.o : ChessBoard.cpp ChessBoard.h Types.h BitBoards.h Evaluation.h
 BitBoards.o : BitBoards.cpp BitBoards.h
 	$(CC) BitBoards.cpp $(CXX_FLAGS) -o $@
 
-Evaluation.o : Evaluation.cpp Evaluation.h ChessBoard.h
+Evaluation.o : Evaluation.cpp Evaluation.h ChessBoard.h Types.h BitBoards.h
 	$(CC) Evaluation.cpp $(CXX_FLAGS) -o $@
 
 Search.o : Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h MovePick.h TransposTable.h

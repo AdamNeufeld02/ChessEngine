@@ -34,7 +34,7 @@ Move Search::searchStart(ChessBoard& cb, int time) {
 
     int val = searchRoot(cb, ss, -infinity, infinity, 1);
     // Iterative Deepening:
-    // Repeatedly search up till max depth or time runs out
+    // Repeatedly search with increasing depth up until max depth or time runs out
     // Use the results of the previous search for move ordering
     for (int depth = 2; depth < MAXDEPTH; depth++) {
         val = widenSearch(cb, ss, val, depth);
@@ -76,7 +76,10 @@ int Search::widenSearch(ChessBoard& cb, Stack* ss, int val, int depth) {
         std::cout << "Re-Searching" << std::endl;
         temp = searchRoot(cb, ss, -infinity, infinity, depth);
     }
-    bestFound = ss->pv[0];
+    // Update PV on non aborted searches
+    if (!abort) {
+        bestFound = ss->pv[0];
+    }
     return temp;
 }
 
@@ -260,12 +263,6 @@ int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
     MovePick mp = MovePick(moves, length, NOMOVE, blank, cb);
     Move curr = mp.getNext();
     StateInfo si;
-
-    // When in check our movegenerator produces all evaisions even if we specified captures only.
-    // Thus we know when there are no moves and we are in check it is mate.
-    if (length == 0 && cb.checkers()) {
-        return -infinity;
-    }
 
     while (curr != NOMOVE) {
         cb.doMove(curr, si);

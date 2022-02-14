@@ -75,6 +75,49 @@ struct ScoredMove {
     }
 };
 
+struct Score {
+    short mg;
+    short eg;
+
+    Score() {
+        mg = 0;
+        eg = 0;
+    }
+
+    Score(int mg_, int eg_) {
+        mg = mg_;
+        eg = eg_;
+    }
+
+    Score operator +=(Score s){
+        mg += s.mg;
+        eg += s.eg;
+        return *this;
+    }
+
+    Score operator -=(Score s) {
+        mg -= s.mg;
+        eg -= s.eg;
+        return *this;
+    }
+
+    Score operator + (Score s) {
+        s.mg += mg;
+        s.eg += eg;
+        return s;
+    }
+
+    Score operator - (Score s) {
+        return Score(mg - s.mg, eg - s.eg);
+    }
+
+    Score operator +=(int cnst) {
+        mg += cnst;
+        eg += cnst;
+        return *this;
+    }
+};
+
 constexpr bool operator < (ScoredMove sm1, ScoredMove sm2) {
     return sm1.score < sm2.score;
 }

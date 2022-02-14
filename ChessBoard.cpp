@@ -328,6 +328,8 @@ void ChessBoard::initBoard(StateInfo& si) {
     st->captured = EMPTY;
     material[WHITE] = 0;
     material[BLACK] = 0;
+    psqtv[WHITE] = Score(0, 0);
+    psqtv[BLACK] = Score(0, 0);
     colToMove = WHITE;
 }
 

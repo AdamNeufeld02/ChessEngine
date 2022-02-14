@@ -111,6 +111,9 @@ static constexpr bitBoard bishopMagicNums[64] = {
     1161950831810052608ULL, 2464735771073020416ULL, 54610562058947072ULL, 580611413180448ULL
 };
 
+extern bitBoard fileBB[8];
+extern bitBoard rankBB[8];
+
 // Castles masks used in generating castle moves
 extern bitBoard castleMasks[9];
 // The bitboard of squares between two squares. If squares are not in a straight line the between bitboard is only the second index
@@ -149,6 +152,10 @@ inline int getLSBIndex(bitBoard bb) {
     return __builtin_ctzll(bb);
 }
 
+inline int getMSBIndex(bitBoard bb) {
+    return 64 - __builtin_clzll(bb);
+}
+
 inline int popLSB(bitBoard& bb) {
     int sq = getLSBIndex(bb);
     bb &= bb-1;
@@ -165,6 +172,10 @@ inline void setBit(bitBoard& bb, int index) {
 
 inline bitBoard moreThanOne(bitBoard bb) {
     return bb & (bb - 1);
+}
+
+inline int getFrontMost(Colour col, bitBoard bb) {
+    return col == WHITE ? getMSBIndex(bb) : getLSBIndex(bb);
 }
 
 template<PieceType pt>

@@ -28,4 +28,7 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     zobristKey before = cb.key();
     Search::searchStart(cb, 6);
     REQUIRE(before == cb.key());
+    cb.printBoard(rankBB[4]);
+    std::cout << std::endl;
+    cb.printBoard(rankBB[7]);
 }
