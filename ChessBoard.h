@@ -13,9 +13,11 @@
 // Inspired by stockFish's stateInfo struct.
 // Used to restore the position of a board on undoMove
 struct StateInfo {
+    zobristKey key;
+    zobristKey pawnKey;
+    int ply;
     char castlingRights;
     char epSquare;
-    zobristKey key;
 
     Piece captured;
     bitBoard checkersBB;
@@ -36,6 +38,11 @@ class ChessBoard {
     void doMove(Move move, StateInfo& si);
     // Undos the given move. Must have been the last move played
     void undoMove(Move move);
+
+    // TODO
+    void doNullMove();
+    void undoNullMove();
+
     // prints a bitboard
     static void printBoard(bitBoard bb);
     char epSquare() const;
@@ -55,11 +62,15 @@ class ChessBoard {
     bitBoard pieces(Colour c);
     bitBoard pieces();
 
+    char getCR();
     bitBoard checkers();
     bitBoard pinners();
     bitBoard pinned();
 
     zobristKey key();
+    zobristKey pawnKey();
+
+    int ply();
 
     // Calculates what the hash key will be after the move is made.
     // Used in prefetch
@@ -124,6 +135,10 @@ inline char ChessBoard::epSquare() const {
     return st->epSquare;
 }
 
+inline char ChessBoard::getCR() {
+    return st->castlingRights;
+}
+
 inline bitBoard ChessBoard::checkers() {
     return st->checkersBB;
 }
@@ -142,6 +157,14 @@ inline bool ChessBoard::canCastle(CastlingRights cr) const {
 
 inline zobristKey ChessBoard::key() {
     return st->key;
+}
+
+inline zobristKey ChessBoard::pawnKey() {
+    return st->pawnKey;
+}
+
+inline int ChessBoard::ply() {
+    return st->ply;
 }
 
 inline void ChessBoard::putPiece(Piece pc, int sq) {

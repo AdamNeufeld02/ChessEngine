@@ -41,8 +41,6 @@ void GameState::gameLoop() {
         chessBoard->doMove(move, states->back());
         std::cout << "Hash: " << chessBoard->key() <<std::endl;
         std::cout << "--------------------" << std::endl;
-        std::cout << chessBoard->getPSQT(WHITE).mg << std::endl;
-        std::cout << chessBoard->getPSQT(BLACK).mg << std::endl;
         playerToMove = getPlayerToMove();
     }
 }

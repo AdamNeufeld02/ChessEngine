@@ -24,13 +24,16 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
             capsq = us == WHITE ? to - 8 : to + 8;
         }
         si.key ^= Zobrist::psq[pieceOn(capsq)][capsq];
+        if (typeOf(capt) == PAWN) {
+            si.pawnKey ^= Zobrist::psq[pieceOn(capsq)][capsq];
+        }
         removePiece(capsq);
     }
     if (flag == PROMOTION) {
         si.key ^= Zobrist::psq[pieceOn(from)][from];
+        si.pawnKey ^= Zobrist::psq[pieceOn(from)][from];
         removePiece(from);
         putPiece(makePiece(us, getProm(move)), from);
-        si.key ^= Zobrist::psq[pieceOn(from)][from];
     }
     if (flag == CASTLE) {
         if (to > from) {
@@ -52,17 +55,32 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
             si.epSquare = us == WHITE ? from + 8 : from - 8;
             si.key ^= Zobrist::epSquare[si.epSquare];
         }
+
+        if (flag != PROMOTION) {
+            si.pawnKey ^= Zobrist::psq[pieceOn(from)][from];
+            si.pawnKey ^= Zobrist::psq[pieceOn(from)][to];
+        }
     }
+
+    if (typeOf(moved) == KING) {
+        si.pawnKey ^= Zobrist::psq[pieceOn(from)][from];
+        si.pawnKey ^= Zobrist::psq[pieceOn(from)][to];
+    }
+
     si.key ^= Zobrist::psq[pieceOn(from)][from];
     movePiece(from, to);
     si.key ^= Zobrist::psq[pieceOn(to)][to];
+
     si.previous = st;
     st = &si;
     colToMove = ~colToMove;
+
     st->key ^= Zobrist::colToMove;
     st->key ^= Zobrist::castlingKeys[st->castlingRights];
     st->castlingRights &= castlingRights[from] & castlingRights[to];
     st->key ^= Zobrist::castlingKeys[st->castlingRights];
+
+    st->ply++;
     updateChecksAndPins(colToMove);
 }
 
@@ -200,6 +218,7 @@ void ChessBoard::fenToBoard(std::string fenString) {
             switch(curr) {
                 case(*"P"): putPiece(WHITEPAWN, boardIndex);
                     st->key ^= Zobrist::psq[WHITEPAWN][boardIndex];
+                    st->pawnKey ^= Zobrist::psq[WHITEPAWN][boardIndex];
                     break;
                 case(*"N"): putPiece(WHITEKNIGHT, boardIndex);
                     st->key ^= Zobrist::psq[WHITEKNIGHT][boardIndex];
@@ -215,9 +234,11 @@ void ChessBoard::fenToBoard(std::string fenString) {
                     break;
                 case(*"K"): putPiece(WHITEKING, boardIndex);
                     st->key ^= Zobrist::psq[WHITEKING][boardIndex];
+                    st->pawnKey ^= Zobrist::psq[WHITEKING][boardIndex];
                     break;
                 case(*"p"): putPiece(BLACKPAWN, boardIndex);
                     st->key ^= Zobrist::psq[BLACKPAWN][boardIndex];
+                    st->pawnKey ^= Zobrist::psq[BLACKPAWN][boardIndex];
                     break;
                 case(*"n"): putPiece(BLACKKNIGHT, boardIndex);
                     st->key ^= Zobrist::psq[BLACKKNIGHT][boardIndex];
@@ -233,6 +254,7 @@ void ChessBoard::fenToBoard(std::string fenString) {
                     break;
                 case(*"k"): putPiece(BLACKKING, boardIndex);
                     st->key ^= Zobrist::psq[BLACKKING][boardIndex];
+                    st->pawnKey ^= Zobrist::psq[BLACKKING][boardIndex];
                     break;
             }
             boardIndex++;
@@ -319,6 +341,8 @@ void ChessBoard::initBoard(StateInfo& si) {
     st = &si;
 
     st->key = 0;
+    st->ply = 0;
+    st->pawnKey = 0;
     st->castlingRights = NO_CASTLING;
     st->epSquare = -1;
     st->previous = NULL;

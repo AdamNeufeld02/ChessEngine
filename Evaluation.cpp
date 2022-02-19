@@ -1,5 +1,7 @@
 #include "Evaluation.h"
 
+pawnTT Evaluation::pTT;
+
 // Midgame material values, King has no material values as it is assumed it is always on the board
 int mgVals[8] = {0, 100, 300, 330, 500, 900, 0};
 
@@ -165,17 +167,34 @@ void Evaluation::init() {
         }
         neighbourFiles[i] = adjFiles;
     }
+    pTT.set(120000);
+    pTT.clear();
 }
 
 int Evaluation::evaluate(ChessBoard& cb) {
-    Score whiteScore = evaluatePawnStructure<WHITE>(cb) + evaluateKingShelter<WHITE>(cb) + evaluateKingZone<WHITE>(cb) + cb.getPSQT(WHITE);
-    Score blackScore = evaluatePawnStructure<BLACK>(cb) + evaluateKingShelter<BLACK>(cb) + evaluateKingZone<BLACK>(cb) + cb.getPSQT(BLACK);
+    zobristKey key = cb.pawnKey();
+    pawnEntry* tableEntry = pTT.probe(key);
+    Score pawnStructScore;
+
+    if (key == tableEntry->key) {
+        pawnStructScore = tableEntry->score;
+    } else {
+        pawnStructScore = evaluatePawnStructure<WHITE>(cb) + evaluateKingShelter<WHITE>(cb) 
+                          - evaluatePawnStructure<BLACK>(cb) - evaluateKingShelter<BLACK>(cb);
+        tableEntry->key = key;
+        tableEntry->score = pawnStructScore;
+    }
+
+    Score total = cb.getPSQT(WHITE) + evaluateKingZone<WHITE>(cb)
+                 - cb.getPSQT(BLACK) - evaluateKingZone<BLACK>(cb);
+    
     int whiteMat = cb.getMaterial(WHITE);
     int blackMat = cb.getMaterial(BLACK);
+    
     int totalMat = whiteMat + blackMat;
-    int whiteInterp = (whiteScore.mg * ((double)totalMat / 7920)) + (whiteScore.eg * (((double)7920 - totalMat) / 7920)) + whiteMat;
-    int blackInterp = (blackScore.mg * ((double)totalMat / 7920)) + (blackScore.eg * (((double)7920 - totalMat) / 7920)) + blackMat;
-    return cb.colourToMove() == WHITE? whiteInterp - blackInterp : blackInterp - whiteInterp;
+    total += pawnStructScore;
+    int ret = total.mg *((double)totalMat / 7920) + total.eg *((double)7920 - totalMat) / 7920 + whiteMat - blackMat;
+    return cb.colourToMove() == WHITE? ret : -ret;
 }
 
 template<Colour col>

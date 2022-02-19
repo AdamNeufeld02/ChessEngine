@@ -2,6 +2,7 @@
 #define EVALUATION_H
 #include "Types.h"
 #include "BitBoards.h"
+#include "Zobrist.h"
 
 extern int mgVals[8];
 extern Score psPawn[64];
@@ -46,24 +47,57 @@ extern int attackerWeight[8];
 
 class ChessBoard;
 
-static const int infinity = 20000;
 static const int draw = -1;
+
+struct pawnEntry {
+    zobristKey key;
+    Score score;
+};
+
+class pawnTT {
+    public:
+    void set(size_t size_) {
+        size = size_;
+        table = (pawnEntry* )malloc(size * sizeof(pawnEntry));
+    }
+
+    void clear() {
+        for (unsigned int i = 0; i < size; i++) {
+            table[i].key = 0;
+            table[i].score = Score(0, 0);
+        }
+    }
+    pawnEntry* probe(zobristKey key) {
+        return &table[key % size];
+    }
+
+    private:
+    size_t size;
+    pawnEntry* table;
+};
 
 // A simple way to evaluate a chess board. Material scores are kept within the board and updated at every do and undo move.
 
 namespace Evaluation {
     int evaluate(ChessBoard& cb);
+
     template<Colour col>
     Score evaluatePawnStructure(ChessBoard& cb);
+
     template<Colour col>
     Score evaluateKingShelter(ChessBoard& cb);
+
     template<Colour col>
     Score evaluateKingZone(ChessBoard& cb);
+
     template<PieceType pt>
     int getWeightedAttacks(bitBoard kingZone, bitBoard attackers, bitBoard occ);
+    
     int relativeRank(Colour col, int sq);
     int distToSide(int file);
     void init();
+
+    extern pawnTT pTT;
 }
 
 #endif

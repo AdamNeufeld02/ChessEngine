@@ -18,7 +18,7 @@ struct Stack {
 };
 
 enum NodeType {
-    PV, NonPV
+    PV, RootPV, NonPV
 };
 
 namespace Search {

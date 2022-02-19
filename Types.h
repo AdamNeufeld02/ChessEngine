@@ -75,6 +75,12 @@ struct ScoredMove {
     }
 };
 
+enum Value : int{
+    Draw = -1,
+    Infinity = 20000,
+    NoValue = 20001
+};
+
 struct Score {
     short mg;
     short eg;

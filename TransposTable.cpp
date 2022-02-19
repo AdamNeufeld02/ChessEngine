@@ -6,30 +6,44 @@ TransposTable::TransposTable() {
 
 void TransposTable::clear() {
     for (int i = 0; i < size; i++) {
-        table[i].key = 0;
-        table[i].hashMove = NOMOVE;
-        table[i].eval = 0;
-        table[i].depth = 0;
-        table[i].type = Exact;
+        table[i] = Entry(0, 0, NoValue, 0, NOMOVE, Exact);
     }
 }
 
-void TransposTable::addEntry(zobristKey key, Move hashMove, int eval, int depth, Type type) {
-    table[key % size] = Entry(key, eval, depth, hashMove, type);
+void TransposTable::addEntry(zobristKey key, Move hashMove, int score, int eval, int depth, Type type) {
+    Entry* tte = getEntry(key);
+
+    // Overwrite entries that search to a deeper depth. With slight priority to new entries. Also include exact entries always
+    if (depth >= tte->getDepth() - 1 || type == Exact) {
+        Move move = hashMove;
+        int nEval = eval;
+        if (key == tte->key) {
+            if (move == NOMOVE) {
+                move = tte->getMove();
+            }
+
+            if (nEval == NoValue) {
+                nEval = tte->getEval();
+            }
+        }
+        table[key % size] = Entry(key, score, nEval, depth, move, type);
+        return;
+    // If we do not have an evaluation stored try and store one
+    } else if (key == tte->key) {
+        if(tte->getEval() == NoValue) {
+            tte->setEval(eval);
+        }
+    }
 }
 
-bool TransposTable::probe(zobristKey key, int depth, int beta, int* eval, Move* hashMove) {
+Entry* TransposTable::probe(zobristKey key, bool* hit) {
     Entry* entry = getEntry(key);
-    // If the key is not in the table we must continue searching
-    if (entry->key != key) return false;
-    *hashMove = entry->hashMove;
-    // If the depth stored is less then search depth we must continue searching
-    if (depth > entry->depth) return false;
-    *eval = entry->eval;
-    // If the lower estimate does not cause a beta cuttoff we must continue searching
-    if (entry->eval >= beta) {
-        return entry->type == Lower;
+
+    if (entry->key == key) {
+        *hit = true;
     } else {
-        return entry->type == Upper || entry->type == Exact;
+        *hit = false;
     }
+
+    return entry;
 }
