@@ -56,7 +56,7 @@ struct Entry {
     }
 
     void setEval(uint16_t eval) {
-        data &= ~((uint64_t)0xff << 32);
+        data ^= (uint64_t)getEval() << 32;
         data |= (uint64_t)eval << 32;
     }
 };

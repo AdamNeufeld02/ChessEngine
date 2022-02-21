@@ -50,7 +50,7 @@ GameState.o : GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h 
 main.o : main.cpp GameState.h
 	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
-Test.o : Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h Search.h Evaluation.h MovePick.h
+Test.o : Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h Search.h Evaluation.h MovePick.h TransposTable.h
 	$(CC) Test.cpp $(CXX_FLAGS) -o $@
 
 ChessBoard.o : ChessBoard.cpp ChessBoard.h Types.h BitBoards.h Evaluation.h Zobrist.h

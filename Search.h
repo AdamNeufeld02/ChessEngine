@@ -15,6 +15,7 @@ struct Stack {
     int ply;
     Move* pv;
     Move killers[2];
+    bool didNull;
 };
 
 enum NodeType {

@@ -14,7 +14,7 @@ void TransposTable::addEntry(zobristKey key, Move hashMove, int score, int eval,
     Entry* tte = getEntry(key);
 
     // Overwrite entries that search to a deeper depth. With slight priority to new entries. Also include exact entries always
-    if (depth >= tte->getDepth() - 1 || type == Exact) {
+    if (depth >= tte->getDepth() || type == Exact) {
         Move move = hashMove;
         int nEval = eval;
         if (key == tte->key) {

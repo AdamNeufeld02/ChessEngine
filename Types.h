@@ -78,7 +78,8 @@ struct ScoredMove {
 enum Value : int{
     Draw = -1,
     Infinity = 20000,
-    NoValue = 20001
+    NoValue = 20001,
+    MateInMax = Infinity - 64
 };
 
 struct Score {

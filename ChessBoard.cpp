@@ -112,6 +112,26 @@ void ChessBoard::undoMove(Move move) {
     }
 }
 
+void ChessBoard::doNullMove(StateInfo& si) {
+    memcpy(&si, st, offsetof(StateInfo, captured));
+    si.key ^= Zobrist::colToMove;
+    si.captured = EMPTY;
+    if (si.epSquare != -1) {
+        si.key ^= Zobrist::epSquare[si.epSquare];
+        si.epSquare = -1;
+    }
+    colToMove = ~colToMove;
+    si.previous = st;
+    st = &si;
+    updateChecksAndPins(colToMove);
+    
+}
+
+void ChessBoard::undoNullMove() {
+    colToMove = ~colToMove;
+    st = st->previous;
+}
+
 zobristKey ChessBoard::keyAfter(Move move) {
     int from = getFrom(move);
     int to = getTo(move);

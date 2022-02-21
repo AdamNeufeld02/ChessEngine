@@ -93,7 +93,7 @@ int Search::searchRoot(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth
     Move curr = mp.getNext();
     
     Move topMove = NOMOVE;
-
+    ss->didNull = false;
     Move pv[MAXDEPTH];
     (ss+1)->pv = pv;
     StateInfo si;
@@ -191,18 +191,41 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
         }
     }
 
+    if (staticEval == NoValue) {
+        staticEval = Evaluation::evaluate(cb);
+    }
+
     // Razoring:
     // If A Node is doing particularly bad we can drop into quiscence
     // If it fails low we can stop searching.
     if (!(isPV) && depth < 3 && !cb.checkers()) {
-        if (staticEval == NoValue) {
-            staticEval = Evaluation::evaluate(cb);
-        }
         if (staticEval + 150 * depth * depth < alpha) {
             int val = quiesce<NonPV>(cb, alpha, alpha+1);
             if (val < alpha) return val;
         }
     }
+
+    StateInfo si;
+
+    // Null Move Pruning:
+    // If our position is so good that we can let the opponent move twice in row and still have a good position
+    // Then we can return this good score
+    if(!isPV && !(ss-1)->didNull && staticEval >= beta && !cb.checkers() && cb.nonPawnMaterial(cb.colourToMove())) {
+        ss->didNull = true;
+        cb.doNullMove(si);
+        int nullVal = -search<NonPV>(cb, ss+1, -beta, -beta+1, depth - 3);
+        cb.undoNullMove();
+        if (abort) return 0;
+        if (nullVal >= beta) {
+            if (nullVal >= MateInMax || nullVal <= -MateInMax) {
+                return beta;
+            } else {
+                return nullVal;
+            }
+        }
+    }
+
+    ss->didNull = false;
 
     if (type == RootPV) {
         best = (ss - ss->ply)->pv[ss->ply];
@@ -214,7 +237,7 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
 
     int value;
     int moveCount = 1;
-    StateInfo si;
+    
     while (curr != NOMOVE) {
         __builtin_prefetch(tTable.getEntry(cb.keyAfter(curr)));
         cb.doMove(curr, si);
@@ -284,6 +307,9 @@ int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
     if (hit && !isPV) {
         Type ttType = ttEntry->getType();
         int ttScore = ttEntry->getScore();
+        if (ttScore == Infinity || ttScore == -Infinity) {
+            std::cout << "Error" << std::endl;
+        }
         if (ttType == Lower && ttScore >= beta) {
             return ttScore;
         } else if (ttScore < beta && (ttType == Upper || ttType == Exact)) {

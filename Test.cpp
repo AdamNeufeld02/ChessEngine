@@ -59,8 +59,8 @@ TEST_CASE("TransPosTable::Entry", "[Weight=1][part=TransPosTable]") {
     Type type = Lower;
     int depth = 9;
     int score = -Infinity;
-    int eval = -Infinity;
-    Entry entry = Entry(key, score, 0, depth, move, type);
+    int eval = -1;
+    Entry entry = Entry(key, score, NoValue, depth, move, type);
     entry.setEval(eval);
 
     REQUIRE(key == entry.key);

@@ -40,12 +40,14 @@ class ChessBoard {
     void undoMove(Move move);
 
     // TODO
-    void doNullMove();
+    void doNullMove(StateInfo& si);
     void undoNullMove();
 
     // prints a bitboard
     static void printBoard(bitBoard bb);
     char epSquare() const;
+
+    bool nonPawnMaterial(Colour col);
 
     int getMaterial(Colour col);
     Score getPSQT(Colour col);
@@ -113,6 +115,10 @@ inline Score ChessBoard::getPSQT(Colour col) {
 
 inline int ChessBoard::getMaterial(Colour col) {
     return material[col];
+}
+
+inline bool ChessBoard::nonPawnMaterial(Colour col) {
+    return pieces(col, KNIGHT) || pieces(col, ROOK) || pieces(col, BISHOP) || pieces(col, QUEEN);
 }
 
 inline Colour ChessBoard::colourToMove() const {
