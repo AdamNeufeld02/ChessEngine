@@ -6,6 +6,7 @@
 #include "MoveGenerator.h"
 #include "SDL.h"
 #include "Search.h"
+#include "Threads.h"
 #include <iostream>
 #include <deque>
 #include <memory>
@@ -47,6 +48,7 @@ class GameState {
     ChessGUI* gui;
     struct Player player1;
     struct Player player2;
+    ThreadPool* tp;
 };
 
 #endif

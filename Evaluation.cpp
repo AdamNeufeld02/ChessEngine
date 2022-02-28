@@ -1,4 +1,5 @@
 #include "Evaluation.h"
+#include "Threads.h"
 
 pawnTT Evaluation::pTT;
 
@@ -173,7 +174,13 @@ void Evaluation::init() {
 
 int Evaluation::evaluate(ChessBoard& cb) {
     zobristKey key = cb.pawnKey();
-    pawnEntry* tableEntry = pTT.probe(key);
+    pawnEntry* tableEntry; 
+    if (cb.thisThread) {
+        tableEntry = cb.thisThread->pTT.probe(key);
+    } else {
+        tableEntry = pTT.probe(key);
+    }
+    
     Score pawnStructScore;
 
     if (key == tableEntry->key) {

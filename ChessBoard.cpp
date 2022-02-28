@@ -6,6 +6,27 @@ ChessBoard::ChessBoard(std::string fenString, StateInfo& si) {
     fenToBoard(fenString);
 }
 
+ChessBoard::ChessBoard() {
+    
+}
+
+void ChessBoard::copy(ChessBoard& cb) {
+    colToMove = cb.colToMove;
+    allPieces = cb.allPieces;
+    st = cb.st;
+    for (int i = 0; i < 64; i++) {
+        board[i] = cb.board[i];
+    }
+    for (int i = 0; i < PIECENB; i++) {
+        piecesByType[i] = cb.piecesByType[i];
+    }
+    for (int i = 0; i < 2; i++) {
+        piecesByColour[i] = cb.piecesByColour[i];
+        material[i] = cb.material[i];
+        psqtv[i] = cb.psqtv[i];
+    }
+}
+
 void ChessBoard::doMove(Move move, StateInfo& si) {
     FLAGS flag = getFlag(move);
     int from = getFrom(move);
@@ -17,6 +38,8 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
     Piece capt = flag == ENPASSENT? makePiece(them, PAWN) : pieceOn(to);
 
     memcpy(&si, st, offsetof(StateInfo, captured));
+    si.pliesFromNull += 1;
+    si.rule50 += 1;
     si.captured = capt;
     if (capt) {
         int capsq = to;
@@ -28,6 +51,7 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
             si.pawnKey ^= Zobrist::psq[pieceOn(capsq)][capsq];
         }
         removePiece(capsq);
+        si.rule50 = 0;
     }
     if (flag == PROMOTION) {
         si.key ^= Zobrist::psq[pieceOn(from)][from];
@@ -60,6 +84,7 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
             si.pawnKey ^= Zobrist::psq[pieceOn(from)][from];
             si.pawnKey ^= Zobrist::psq[pieceOn(from)][to];
         }
+        si.rule50 = 0;
     }
 
     if (typeOf(moved) == KING) {
@@ -82,6 +107,22 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
 
     st->ply++;
     updateChecksAndPins(colToMove);
+
+    st->repetitions = 0;
+    int end = std::min(st->rule50, st->pliesFromNull);
+    if (end >= 4)
+    {
+        StateInfo* stp = st->previous->previous;
+        for (int i = 4; i <= end; i += 2)
+        {
+            stp = stp->previous->previous;
+            if (stp->key == st->key)
+            {
+                st->repetitions = stp->repetitions + 1;
+                break;
+            }
+        }
+    }
 }
 
 void ChessBoard::undoMove(Move move) {
@@ -122,6 +163,8 @@ void ChessBoard::doNullMove(StateInfo& si) {
     }
     colToMove = ~colToMove;
     si.previous = st;
+    si.pliesFromNull = 0;
+    si.repetitions = 0;
     st = &si;
     updateChecksAndPins(colToMove);
     
@@ -370,10 +413,14 @@ void ChessBoard::initBoard(StateInfo& si) {
     st->pinnedBB = 0;
     st->pinnersBB = 0;
     st->captured = EMPTY;
+    st->rule50 = 0;
+    st->pliesFromNull = 0;
+    st->repetitions = 0;
     material[WHITE] = 0;
     material[BLACK] = 0;
     psqtv[WHITE] = Score(0, 0);
     psqtv[BLACK] = Score(0, 0);
     colToMove = WHITE;
+    thisThread = NULL;
 }
 

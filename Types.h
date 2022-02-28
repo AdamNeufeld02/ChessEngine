@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#define MAXDEPTH 64
+
 enum Colour {
     WHITE, BLACK
 };

@@ -12,7 +12,7 @@ GameState::GameState() {
     player2.colour = BLACK;
     player1.isHuman = false;
     player2.isHuman = true;
-    chessBoard->printBoard(chessBoard->pieces());
+    tp = new ThreadPool(16);
 }
 
 void GameState::start() {
@@ -24,6 +24,7 @@ void GameState::start() {
         }
     }
     gui->quitChessGUI();
+    tp->destroy();
     delete chessBoard;
     delete gui;
 }
@@ -41,6 +42,10 @@ void GameState::gameLoop() {
         chessBoard->doMove(move, states->back());
         std::cout << "Hash: " << chessBoard->key() <<std::endl;
         std::cout << "--------------------" << std::endl;
+        if (chessBoard->isDraw()) {
+            std::cout << "Draw" << std::endl;
+            gameState = GAME_OVER;
+        }
         playerToMove = getPlayerToMove();
     }
 }
@@ -57,7 +62,14 @@ Move GameState::getMoveFromComp() {
         std::cout << "COMPUTER LOST";
         return NOMOVE;
     }
-    Move move = Search::searchStart(*chessBoard, 3);
+    tp->startSearching(*chessBoard, 3);
+    tp->waitForAllThreads();
+    SearchInfo si = tp->getBestThread();
+    std::cout << "Depth: " << si.depth << std::endl;
+    std::cout << "Eval: "  << (double)si.score/mgVals[PAWN] << std::endl;
+    std::cout << "Nodes Searched: "<< si.nodesSearched << std::endl;
+    std::cout << "--------------------" << std::endl;
+    Move move = si.best;
     return move;
 }
 

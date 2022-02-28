@@ -1,8 +1,12 @@
 #include "MovePick.h"
+#include "Threads.h"
 
-MovePick::MovePick(ScoredMove* allMoves, int initLength, Move pref, Move* killers, ChessBoard& cb) {
+MovePick::MovePick(ScoredMove* allMoves, int initLength, Move pref, Move prev, Move* killers, ChessBoard& cb) {
     moves = allMoves;
     length = initLength;
+    if (prev) {
+        counter = cb.thisThread->counterMoves[cb.pieceOn(getTo(prev))][getTo(prev)];
+    }
     score(cb, pref, killers);
     buildHeap();
 }
@@ -21,15 +25,17 @@ void MovePick::score(ChessBoard& cb, Move pref, Move* killers) {
         PieceType capt = typeOf(cb.pieceOn(getTo(move)));
         if (capt) {
             PieceType pc = typeOf(cb.pieceOn(getFrom(move)));
-            moves[i].score = mgVals[capt] + (900 - mgVals[pc])/100;
+            moves[i].score = mgVals[capt] + (1000 - mgVals[pc]);
         } else if (getFlag(move) == PROMOTION) {
             moves[i].score = mgVals[getProm(move)];
+        }  else if (move == counter) {
+            moves[i].score = 95;
         } else if (move == killers[0]) {
             moves[i].score = 90;
         } else if (move == killers[1]) {
             moves[i].score = 80;
         } else {
-            moves[i].score = 0;
+            moves[i].score = cb.thisThread->history[cb.colourToMove()][getFrom(move)][getTo(move)];
         }
         if (move == pref) {
             moves[i].score = Infinity;

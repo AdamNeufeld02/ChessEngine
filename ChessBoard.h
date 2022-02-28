@@ -9,6 +9,8 @@
 #include "Evaluation.h"
 #include "Zobrist.h"
 
+class Thread;
+
 
 // Inspired by stockFish's stateInfo struct.
 // Used to restore the position of a board on undoMove
@@ -18,6 +20,9 @@ struct StateInfo {
     int ply;
     char castlingRights;
     char epSquare;
+    int rule50;
+    int pliesFromNull;
+    int repetitions;
 
     Piece captured;
     bitBoard checkersBB;
@@ -29,8 +34,13 @@ struct StateInfo {
 class ChessBoard {
 
     public:
+    Thread* thisThread;
     // fenString constructor
     ChessBoard(std::string fenString, StateInfo& si);
+
+    ChessBoard();
+    // copies the given board to this board
+    void copy(ChessBoard& cb);
     // return piece code at specific index
     Piece pieceOn(int sq);
     Colour colourToMove() const;
@@ -39,9 +49,12 @@ class ChessBoard {
     // Undos the given move. Must have been the last move played
     void undoMove(Move move);
 
-    // TODO
+    // Performs a null move
     void doNullMove(StateInfo& si);
+    // Takes back a null move
     void undoNullMove();
+
+    bool isDraw();
 
     // prints a bitboard
     static void printBoard(bitBoard bb);
@@ -92,6 +105,8 @@ class ChessBoard {
     bitBoard allPieces;
     int material[2];
     Score psqtv[2];
+
+    
 
     void fenToBoard(std::string fenString);
     void initBoard(StateInfo& si);
@@ -171,6 +186,10 @@ inline zobristKey ChessBoard::pawnKey() {
 
 inline int ChessBoard::ply() {
     return st->ply;
+}
+
+inline bool ChessBoard::isDraw() {
+    return st->repetitions >= 2;
 }
 
 inline void ChessBoard::putPiece(Piece pc, int sq) {

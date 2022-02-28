@@ -7,6 +7,7 @@
 #include "MovePick.h"
 #include "Evaluation.h"
 #include "TransposTable.h"
+#include "Threads.h"
 #include <bitset>
 #include <chrono>
 
@@ -39,9 +40,6 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
     std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
     StateInfo state;
     ChessBoard cb = ChessBoard(startingFen, state);
-    zobristKey before = cb.key();
-    Search::searchStart(cb, 6);
-    REQUIRE(before == cb.key());
     zobristKey key = 0;
     for (int i = 0; i < 64; i++) {
         if(typeOf(cb.pieceOn(i)) == PAWN) {
@@ -60,15 +58,16 @@ TEST_CASE("TransPosTable::Entry", "[Weight=1][part=TransPosTable]") {
     int depth = 9;
     int score = -Infinity;
     int eval = -1;
-    Entry entry = Entry(key, score, NoValue, depth, move, type);
-    entry.setEval(eval);
+    Entry entry;
+    entry.save(key, score, eval, depth, move, type);
+    uint64_t data = entry.data;
 
-    REQUIRE(key == entry.key);
-    REQUIRE(move == entry.getMove());
-    REQUIRE(eval == entry.getEval());
-    REQUIRE(depth == entry.getDepth());
-    REQUIRE(score == entry.getScore());
-    REQUIRE(type == entry.getType());
+    REQUIRE(key ^ data == entry.keyXData);
+    REQUIRE(move == unpackMove(data));
+    REQUIRE(eval == unpackEval(data));
+    REQUIRE(depth == unpackDepth(data));
+    REQUIRE(score == unpackScore(data));
+    REQUIRE(type == unpackType(data));
 }
 
 TEST_CASE("ChessBoard::Key", "[Weight=1][part=ChessBoard]") {
@@ -88,4 +87,10 @@ TEST_CASE("ChessBoard::Key", "[Weight=1][part=ChessBoard]") {
             testKey(cb);
         }
     }
+}
+
+TEST_CASE("Threads::Threads", "[Weight=1][part=Threads]") {
+    StateInfo si;
+    std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
+    ChessBoard cb = ChessBoard(startingFen, si);
 }

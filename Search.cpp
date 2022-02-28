@@ -1,25 +1,17 @@
 #include "Search.h"
-int Search::currDepth;
-Move Search::bestFound;
-int Search::nodesSearched;
-bool Search::abort;
-std::chrono::steady_clock::time_point Search::start;
-int Search::alloted;
+#include "Threads.h"
 TransposTable Search::tTable;
 
 void Search::init() {
     tTable.clear();
 }
 
-Move Search::searchStart(ChessBoard& cb, int time) {
+void Thread::searchStart() {
     nodesSearched = 0;
-
-    start = std::chrono::steady_clock::now();
-    abort = false;
-    alloted = time * 1000;
+    bestMove = NOMOVE;
+    depthReached = 0;
 
     Stack ss[MAXDEPTH];
-    Move pv[MAXDEPTH];
     for (int i = 0; i < MAXDEPTH; i++) {
         ss[i].ply = i;
         ss[i].killers[0] = NOMOVE;
@@ -28,96 +20,94 @@ Move Search::searchStart(ChessBoard& cb, int time) {
     ss->pv = pv;
     ss->pv[0] = NOMOVE;
 
-    bestFound = NOMOVE;
+    
 
-    int depthReached = 0;
-
-    int val = searchRoot(cb, ss, -Infinity, Infinity, 1);
+    int val = rootSearch(ss, -Infinity, Infinity, currDepth);
+    if (searching) {
+        bestMove = pv[0];
+        bestScore = val;
+        depthReached = 1;
+    }
     // Iterative Deepening:
     // Repeatedly search with increasing depth up until max depth or time runs out
     // Use the results of the previous search for move ordering
-    for (int depth = 2; depth < MAXDEPTH; depth++) {
-        val = widenSearch(cb, ss, val, depth);
-        if (abort) {
-            std::cout << "Total Nodes Visited: " << nodesSearched << std::endl;
-            return bestFound;
+    for (int depth = currDepth + 1; depth < MAXDEPTH; depth++) {
+        depth = parent->getNextDepth(depth);
+        currDepth = depth;
+        val = aspirationSearch(ss, val, depth);
+        if (!searching) {
+            return;
         }
-        depthReached = depth;
-        std::cout << "Eval: " << (double)val / mgVals[PAWN] << std::endl;
-        std::cout << "Nodes Visited: " << nodesSearched << std::endl;
-        std::cout << "Depth: " << depthReached << std::endl;
-        std::cout << "PV: ";
-        for (int i = 0; i < depth; i++) {
-            if (pv[i] == NOMOVE) break;
-            std::cout << Misc::moveToString(pv[i]);
-            std::cout << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "--------------------" << std::endl;
     }
-
-    return bestFound;
 }
 
-void Search::checkTime() {
-    auto curr = std::chrono::steady_clock::now();
-    int elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(curr - start).count();
-    abort = elapsed >= alloted;
-}
-
-int Search::widenSearch(ChessBoard& cb, Stack* ss, int val, int depth) {
-    int alpha = val - aspiration;
-    int beta = val + aspiration;
+int Thread::aspirationSearch(Stack* ss, int center, int depth) {
+    
+    int delta = Search::aspiration;
+    int alpha = center - delta;
+    int beta = center + delta;
     // Aspiration Windows:
     // We can use the results of the previous iteration to guide us in the next iteration
     // by limiting the window [alpha, beta] if this fails we must research with a full window.
-    int temp = searchRoot(cb, ss, alpha, beta, depth);
-    if (temp <= alpha || temp >= beta) {
-        std::cout << "Re-Searching" << std::endl;
-        temp = searchRoot(cb, ss, -Infinity, Infinity, depth);
+    int temp = rootSearch(ss, alpha, beta, depth);
+    while (true) {
+        if (temp > alpha && temp < beta) break;
+        else if (temp >= beta) beta += delta;
+        else alpha -= delta;
+
+        delta += delta + delta / 2;
+        temp = rootSearch(ss, alpha, beta, depth);
     }
-    // Update PV on non aborted searches
-    if (!abort) {
-        bestFound = ss->pv[0];
+    // Update Thread info on completed searches
+    if (searching) {
+        bestMove = ss->pv[0];
+        bestScore = temp;
+        depthReached = depth;
     }
     return temp;
 }
 
-int Search::searchRoot(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
-    currDepth = depth;
+int Thread::rootSearch(Stack* ss, int alpha, int beta, int depth) {
     int topScore = -Infinity;
     ScoredMove moves[MAXMOVES];
     ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
     int length = end - moves;
-    MovePick mp = MovePick(moves, length, bestFound, ss->killers, cb);
+    MovePick mp = MovePick(moves, length, bestMove, NOMOVE, ss->killers, cb);
     Move curr = mp.getNext();
     
     Move topMove = NOMOVE;
     ss->didNull = false;
+    ss->current = NOMOVE;
     Move pv[MAXDEPTH];
     (ss+1)->pv = pv;
+
     StateInfo si;
     int moveCount = 1;
     int value = -Infinity;
     while (curr != NOMOVE) {
 
-        if (abort)  {
+        if (!searching)  {
             return 0;
         }
-
+        ss->current = curr;
         cb.doMove(curr, si);
 
         if (moveCount > 1) {
-            value = -search<NonPV>(cb, ss+1, -(alpha+1), -alpha, depth-1);
+            value = -search<NonPV>(ss+1, -(alpha+1), -alpha, depth-1);
         }
 
         if (moveCount == 1 || (value > alpha && value < beta)) {
             (ss+1)->pv = pv;
             (ss+1)->pv[0] = NOMOVE;
-            value = -search<PV>(cb, ss+1, -beta, -alpha, depth-1);
+            value = -search<PV>(ss+1, -beta, -alpha, depth-1);
         }
         
         cb.undoMove(curr);
+
+        if (!searching) {
+            return 0;
+        }
+
         if (value >= beta) {
             return value;
         }
@@ -126,25 +116,30 @@ int Search::searchRoot(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth
             if (topScore > alpha) {
                 alpha = topScore;
                 topMove = curr;
-                updatePv(ss->pv, curr, (ss+1)->pv);
+                Search::updatePv(ss->pv, curr, (ss+1)->pv);
             }
         }
-        nodesSearched++;
         moveCount++;
         curr = mp.getNext();
     }
+    nodesSearched++;
     return topScore;
 }
 
 template<NodeType type>
-int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
+int Thread::search(Stack* ss, int alpha, int beta, int depth) {
     // Check the time every 4096 nodes searched
-    if (!abort && !(nodesSearched & 4095)) {
-        checkTime();
+    if (id == 0 && !(nodesSearched & 4095) && searching) {
+        static_cast<MainThread*>(this)->checkTime();
     }
 
-    if (abort) {
+    if (!searching) {
         return 0;
+    }
+
+    // Drop into quiescense when we reach the required depth
+    if (depth <= 0) {
+        return quiesce<type>(ss+1, alpha, beta);
     }
 
     nodesSearched++;
@@ -153,16 +148,17 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
     
     Move pv[MAXDEPTH];
     (ss+1)->pv = pv;
+    ss->current = NOMOVE;
     bool isPV = type != NonPV;
 
     bool hit;
     zobristKey key = cb.key();
-    Entry* ttEntry = tTable.probe(key, &hit);
+    uint64_t ttData = Search::tTable.probe(key, &hit);
     int staticEval = NoValue;
 
-    if (hit && ttEntry->getDepth() >= depth && !isPV) {
-        Type ttType = ttEntry->getType();
-        int ttScore = ttEntry->getScore();
+    if (hit && unpackDepth(ttData) >= depth && !isPV) {
+        Type ttType = unpackType(ttData);
+        int ttScore = unpackScore(ttData);
         if (ttType == Lower && ttScore >= beta) {
             return ttScore;
         } else if (ttScore < beta && (ttType == Upper || ttType == Exact)) {
@@ -170,14 +166,10 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
         }
     }
     if (hit) {
-        best = ttEntry->getMove();
-        staticEval = ttEntry->getEval();
+        best = unpackMove(ttData);
+        staticEval = unpackEval(ttData);
     }
 
-    // Drop into quiescense when we reach the required depth
-    if (depth <= 0) {
-        return quiesce<type>(cb, alpha, beta);
-    }
     topScore = -Infinity;
     ScoredMove moves[MAXMOVES];
     ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
@@ -185,11 +177,13 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
 
     if (length == 0) {
         if (cb.checkers()) {
-            return -Infinity + (currDepth - depth);
+            return -Infinity + (ss->ply);
         } else {
             return Draw;
         }
     }
+
+    if (cb.isDraw()) return draw;
 
     if (staticEval == NoValue) {
         staticEval = Evaluation::evaluate(cb);
@@ -200,7 +194,7 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
     // If it fails low we can stop searching.
     if (!(isPV) && depth < 3 && !cb.checkers()) {
         if (staticEval + 150 * depth * depth < alpha) {
-            int val = quiesce<NonPV>(cb, alpha, alpha+1);
+            int val = quiesce<NonPV>(ss+1, alpha, alpha+1);
             if (val < alpha) return val;
         }
     }
@@ -213,9 +207,9 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
     if(!isPV && !(ss-1)->didNull && staticEval >= beta && !cb.checkers() && cb.nonPawnMaterial(cb.colourToMove())) {
         ss->didNull = true;
         cb.doNullMove(si);
-        int nullVal = -search<NonPV>(cb, ss+1, -beta, -beta+1, depth - 3);
+        int nullVal = -search<NonPV>(ss+1, -beta, -beta+1, depth - 3);
         cb.undoNullMove();
-        if (abort) return 0;
+        if (!searching) return 0;
         if (nullVal >= beta) {
             if (nullVal >= MateInMax || nullVal <= -MateInMax) {
                 return beta;
@@ -231,20 +225,46 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
         best = (ss - ss->ply)->pv[ss->ply];
     }
 
-    MovePick mp = MovePick(moves, length, best, ss->killers, cb);
+    MovePick mp = MovePick(moves, length, best, (ss-1)->current, ss->killers, cb);
     
     Move curr = mp.getNext();
 
     int value;
     int moveCount = 1;
+    int quietCount = 0;
+
+    Move quiets[MAXMOVES];
+
+    bool doFullDepth = false;
     
     while (curr != NOMOVE) {
-        __builtin_prefetch(tTable.getEntry(cb.keyAfter(curr)));
+        __builtin_prefetch(Search::tTable.getEntry(cb.keyAfter(curr)));
+        ss->current = curr;
         cb.doMove(curr, si);
+
+        if (!isPV && depth >= 2 && !cb.checkers() && moveCount > 1) {
+            int R = 1;
+
+            R += moveCount / 5;
+
+            value = -search<NonPV>(ss+1, -(alpha+1), -alpha, depth - 1 - R);
+
+            if (value > alpha) {
+                doFullDepth = true;
+            } else {
+                doFullDepth = false;
+            }
+                
+        } else {
+            doFullDepth = !isPV || moveCount > 1;
+        }
+
+        //doFullDepth = !isPV || moveCount > 1;
+
         // If we are in a non pv node or have already searched the first move of a PV node
         // We do a null window search on the move. If that fails low we know it wont surpass alpha
-        if (!isPV || moveCount > 1) {
-            value = -search<NonPV>(cb, ss+1, -(alpha+1), -alpha, depth - 1);
+        if (doFullDepth) {
+            value = -search<NonPV>(ss+1, -(alpha+1), -alpha, depth - 1);
         }
 
         // If this is the first move of a pv node or the previous null window search failed high
@@ -252,22 +272,22 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
         if (isPV && (moveCount == 1 || (value > alpha && value < beta))) {
             (ss+1)->pv = pv;
             (ss+1)->pv[0] = NOMOVE;
-            value = -search<PV>(cb, ss+1, -beta, - alpha, depth - 1);
+            value = -search<PV>(ss+1, -beta, - alpha, depth - 1);
         }
 
         cb.undoMove(curr);
-        if (abort) return 0;
+        if (!searching) return 0;
         if (value > topScore) {
             topScore = value;
             if (value > alpha) {
                 best = curr;
                 if (isPV) {
                     alpha = value;
-                    updatePv(ss->pv, curr, (ss+1)->pv);
+                    Search::updatePv(ss->pv, curr, (ss+1)->pv);
                 }
             }
             if (value >= beta) {
-                tTable.addEntry(key, curr, value, staticEval, depth, Lower);
+                Search::tTable.addEntry(key, curr, value, staticEval, depth, Lower);
                 // Update killers
                 if (!cb.pieceOn(getTo(curr)) && !(getFlag(curr) == PROMOTION)) {
                     if (ss->killers[0] != curr) {
@@ -275,41 +295,55 @@ int Search::search(ChessBoard& cb, Stack* ss, int alpha, int beta, int depth) {
                         ss->killers[0] = curr;
                     }
                 }
+                // Update CounterMoves
+                counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = curr;
+                updateHistory(quiets, quietCount, curr);
                 return value;
             }
         }
+
+        // Save quiet moves to update history at end
+        if (!cb.pieceOn(getTo(curr)) && !(getFlag(curr) == PROMOTION)) {
+            quiets[quietCount++] = curr;
+        }
+
         curr = mp.getNext();
         moveCount++;
     }
     Type bound = isPV && best ? Exact : Upper; 
-    tTable.addEntry(key, best, topScore, staticEval, depth, bound);
+    Search::tTable.addEntry(key, best, topScore, staticEval, depth, bound);
+    updateHistory(quiets, quietCount, best);
+    if (best) {
+        counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = best;
+    }
     return topScore;
 }
 
 template<NodeType type>
-int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
-    if (!abort && !(nodesSearched & 4095)) {
-        checkTime();
+int Thread::quiesce(Stack* ss, int alpha, int beta) {
+    // Check the time every 4096 nodes searched
+    if (id == 0 && !(nodesSearched & 4095) && searching) {
+        static_cast<MainThread*>(this)->checkTime();
     }
-    if (abort) {
+
+    if (!searching) {
         return 0;
     }
+
+    if (cb.isDraw()) return draw;
 
     bool isPV = type != NonPV;
 
     bool hit;
     zobristKey key = cb.key();
-    Entry* ttEntry = tTable.probe(key, &hit);
+    uint64_t ttData = Search::tTable.probe(key, &hit);
     int staticEval = NoValue;
     Move best = NOMOVE;
     int topScore;
 
     if (hit && !isPV) {
-        Type ttType = ttEntry->getType();
-        int ttScore = ttEntry->getScore();
-        if (ttScore == Infinity || ttScore == -Infinity) {
-            std::cout << "Error" << std::endl;
-        }
+        Type ttType = unpackType(ttData);
+        int ttScore = unpackScore(ttData);
         if (ttType == Lower && ttScore >= beta) {
             return ttScore;
         } else if (ttScore < beta && (ttType == Upper || ttType == Exact)) {
@@ -317,8 +351,8 @@ int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
         }
     }
     if (hit) {
-        best = ttEntry->getMove();
-        staticEval = ttEntry->getEval();
+        best = unpackMove(ttData);
+        staticEval = unpackEval(ttData);
     }
 
     nodesSearched++;
@@ -341,19 +375,20 @@ int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
     ScoredMove moves[MAXMOVES];
     ScoredMove* end = MoveGenerator::generateMoves(cb, moves, true);
     int length = end - moves;
-    Move blank[2] = {NOMOVE, NOMOVE};
-    MovePick mp = MovePick(moves, length, best, blank, cb);
+    MovePick mp = MovePick(moves, length, best, (ss-1)->current, ss->killers, cb);
     Move curr = mp.getNext();
     StateInfo si;
 
     while (curr != NOMOVE) {
-        __builtin_prefetch(tTable.getEntry(cb.keyAfter(curr)));
+        __builtin_prefetch(Search::tTable.getEntry(cb.keyAfter(curr)));
+        ss->current = curr;
         cb.doMove(curr, si);
-        int tempScore = -quiesce<type>(cb, -beta, -alpha);
+        int tempScore = -quiesce<type>(ss+1, -beta, -alpha);
         cb.undoMove(curr);
-        if (abort) return 0;
+        if (!searching) return 0;
         if (tempScore >= beta) {
-            tTable.addEntry(key, curr, tempScore, staticEval, 0, Lower);
+            Search::tTable.addEntry(key, curr, tempScore, staticEval, 0, Lower);
+            counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = curr;
             return tempScore;
         }
         if (tempScore > topScore) {
@@ -367,8 +402,33 @@ int Search::quiesce(ChessBoard& cb, int alpha, int beta) {
         }
         curr = mp.getNext();
     }
-    tTable.addEntry(key, best, topScore, staticEval, 0, Upper);
+    Search::tTable.addEntry(key, best, topScore, staticEval, 0, Upper);
+    if (best) {
+        counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = best;
+    }
     return topScore;
+}
+
+
+void Thread::updateHistory(Move* quiets, int quietCount, Move best) {
+    Move curr;
+    int to, from;
+    int val;
+    for (int i = 0; i < quietCount; i++) {
+        curr = quiets[i];
+        if (curr == best) continue;
+        from = getFrom(curr);
+        to = getTo(curr);
+        val = history[colourOf(cb.pieceOn(from))][from][to];
+        history[colourOf(cb.pieceOn(from))][from][to] = std::max(val - penalty, 0);
+    }
+
+    if (!cb.pieceOn(getTo(best)) && !(getFlag(best) == PROMOTION)) {
+        from = getFrom(best);
+        to = getTo(best);
+        val = history[colourOf(cb.pieceOn(from))][from][to];
+        history[colourOf(cb.pieceOn(from))][from][to] = std::min(val + bonus, 75);
+    }
 }
 
 void Search::updatePv(Move* pv, Move move, Move* childPv) {

@@ -2,8 +2,8 @@ EXE = ChessEngine
 EXET = ChessTest
 
 #OBJS specifies which files to compile as part of the project
-OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o
-OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o
+OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o Threads.o
+OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o Threads.o
 
 #CC specifies which compiler we're using
 CC = g++
@@ -50,7 +50,7 @@ GameState.o : GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h 
 main.o : main.cpp GameState.h
 	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
 
-Test.o : Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h Search.h Evaluation.h MovePick.h TransposTable.h
+Test.o : Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h Search.h Evaluation.h MovePick.h TransposTable.h Threads.h
 	$(CC) Test.cpp $(CXX_FLAGS) -o $@
 
 ChessBoard.o : ChessBoard.cpp ChessBoard.h Types.h BitBoards.h Evaluation.h Zobrist.h
@@ -76,3 +76,6 @@ Zobrist.o : Zobrist.cpp Zobrist.h Types.h Misc.h
 
 TransposTable.o : TransposTable.cpp TransposTable.h Types.h Zobrist.h ChessBoard.h
 	$(CC) TransposTable.cpp $(CXX_FLAGS) -o $@
+
+Threads.o : Threads.cpp Threads.h Search.h ChessBoard.h Evaluation.h
+	$(CC) Threads.cpp $(CXX_FLAGS) -o $@
