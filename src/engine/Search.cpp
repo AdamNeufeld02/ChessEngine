@@ -1,6 +1,7 @@
 #include "Search.h"
 #include "Threads.h"
 TransposTable Search::tTable;
+int Search::reductions[MAXMOVES];
 
 void Search::init() {
     tTable.clear();
@@ -17,23 +18,27 @@ void Thread::searchStart() {
         ss[i].killers[0] = NOMOVE;
         ss[i].killers[1] = NOMOVE;
     }
-    ss->pv = pv;
+    ss->pv = rootPV;
     ss->pv[0] = NOMOVE;
 
-    
+    // init root moves
+    end = MoveGenerator::generateMoves(cb, rootMoves, false);
 
-    int val = rootSearch(ss, -Infinity, Infinity, currDepth);
+    // initial scoring of root Moves
+    MovePick(rootMoves, end - rootMoves, NOMOVE, NOMOVE, ss->killers, cb);
+
+
+    int val = rootSearch(ss, -Infinity, Infinity, 1);
     if (searching) {
-        bestMove = pv[0];
+        bestMove = rootPV[0];
         bestScore = val;
         depthReached = 1;
     }
     // Iterative Deepening:
     // Repeatedly search with increasing depth up until max depth or time runs out
     // Use the results of the previous search for move ordering
-    for (int depth = currDepth + 1; depth < MAXDEPTH; depth++) {
-        depth = parent->getNextDepth(depth);
-        currDepth = depth;
+    for (int depth = 2; depth < MAXDEPTH; depth++) {
+        ss->pv[0] = NOMOVE;
         val = aspirationSearch(ss, val, depth);
         if (!searching) {
             return;
@@ -52,8 +57,8 @@ int Thread::aspirationSearch(Stack* ss, int center, int depth) {
     int temp = rootSearch(ss, alpha, beta, depth);
     while (true) {
         if (temp > alpha && temp < beta) break;
-        else if (temp >= beta) beta += delta;
-        else alpha -= delta;
+        else if (temp >= beta) beta = Infinity;
+        else alpha = -Infinity;
 
         delta += delta + delta / 2;
         temp = rootSearch(ss, alpha, beta, depth);
@@ -63,19 +68,23 @@ int Thread::aspirationSearch(Stack* ss, int center, int depth) {
         bestMove = ss->pv[0];
         bestScore = temp;
         depthReached = depth;
+        int iter = 0;
+        Move curr = ss->pv[iter];
+        while (curr != NOMOVE) {
+            bestPV[iter] = curr;
+            curr = ss->pv[++iter];
+        }
+        bestPV[iter] = NOMOVE;
     }
     return temp;
 }
 
 int Thread::rootSearch(Stack* ss, int alpha, int beta, int depth) {
     int topScore = -Infinity;
-    ScoredMove moves[MAXMOVES];
-    ScoredMove* end = MoveGenerator::generateMoves(cb, moves, false);
-    int length = end - moves;
-    MovePick mp = MovePick(moves, length, bestMove, NOMOVE, ss->killers, cb);
-    Move curr = mp.getNext();
+
+    std::stable_sort(rootMoves, end, descComp);
+    end->move = NOMOVE;
     
-    Move topMove = NOMOVE;
     ss->didNull = false;
     ss->current = NOMOVE;
     Move pv[MAXDEPTH];
@@ -84,13 +93,15 @@ int Thread::rootSearch(Stack* ss, int alpha, int beta, int depth) {
     StateInfo si;
     int moveCount = 1;
     int value = -Infinity;
-    while (curr != NOMOVE) {
+    int iter = 0;
+    ScoredMove curr = rootMoves[iter];
+    while (curr.move != NOMOVE) {
 
         if (!searching)  {
             return 0;
         }
-        ss->current = curr;
-        cb.doMove(curr, si);
+        ss->current = curr.move;
+        cb.doMove(curr.move, si);
 
         if (moveCount > 1) {
             value = -search<NonPV>(ss+1, -(alpha+1), -alpha, depth-1);
@@ -102,7 +113,9 @@ int Thread::rootSearch(Stack* ss, int alpha, int beta, int depth) {
             value = -search<PV>(ss+1, -beta, -alpha, depth-1);
         }
         
-        cb.undoMove(curr);
+        cb.undoMove(curr.move);
+
+        curr.score = value;
 
         if (!searching) {
             return 0;
@@ -115,12 +128,12 @@ int Thread::rootSearch(Stack* ss, int alpha, int beta, int depth) {
             topScore = value;
             if (topScore > alpha) {
                 alpha = topScore;
-                topMove = curr;
-                Search::updatePv(ss->pv, curr, (ss+1)->pv);
+                Search::updatePv(ss->pv, curr.move, (ss+1)->pv);
             }
         }
         moveCount++;
-        curr = mp.getNext();
+        iter++;
+        curr = rootMoves[iter];
     }
     nodesSearched++;
     return topScore;
@@ -136,6 +149,8 @@ int Thread::search(Stack* ss, int alpha, int beta, int depth) {
     if (!searching) {
         return 0;
     }
+
+    if (cb.isDraw()) return Draw;
 
     // Drop into quiescense when we reach the required depth
     if (depth <= 0) {
@@ -155,6 +170,7 @@ int Thread::search(Stack* ss, int alpha, int beta, int depth) {
     zobristKey key = cb.key();
     uint64_t ttData = Search::tTable.probe(key, &hit);
     int staticEval = NoValue;
+    bool ttPV = isPV;
 
     if (hit && unpackDepth(ttData) >= depth && !isPV) {
         Type ttType = unpackType(ttData);
@@ -168,6 +184,7 @@ int Thread::search(Stack* ss, int alpha, int beta, int depth) {
     if (hit) {
         best = unpackMove(ttData);
         staticEval = unpackEval(ttData);
+        ttPV = isPV || unpackTTPV(ttData);
     }
 
     topScore = -Infinity;
@@ -192,9 +209,9 @@ int Thread::search(Stack* ss, int alpha, int beta, int depth) {
     // Razoring:
     // If A Node is doing particularly bad we can drop into quiscence
     // If it fails low we can stop searching.
-    if (!(isPV) && depth < 3 && !cb.checkers()) {
+    if (!(isPV) && depth < 3 && !cb.checkers() && !(ss-1)->didNull) {
         if (staticEval + 150 * depth * depth < alpha) {
-            int val = quiesce<NonPV>(ss+1, alpha, alpha+1);
+            int val = quiesce<NonPV>(ss+1, alpha-1, alpha);
             if (val < alpha) return val;
         }
     }
@@ -232,29 +249,40 @@ int Thread::search(Stack* ss, int alpha, int beta, int depth) {
     int value;
     int moveCount = 1;
     int quietCount = 0;
+    int captureCount = 0;
+    bool captureOrProm;
 
     Move quiets[MAXMOVES];
+    Move captures[MAXMOVES];
 
     bool doFullDepth = false;
     
     while (curr != NOMOVE) {
         __builtin_prefetch(Search::tTable.getEntry(cb.keyAfter(curr)));
         ss->current = curr;
+        captureOrProm = cb.pieceOn(getTo(curr)) || (getFlag(curr) == PROMOTION);
         cb.doMove(curr, si);
+        
 
-        if (!isPV && depth >= 2 && !cb.checkers() && moveCount > 1) {
-            int R = 1;
+        if (depth >= 2 && !cb.checkers() && moveCount > 1 && (!ttPV || !captureOrProm)) {
+            int R = (Search::reductions[moveCount] * Search::reductions[depth]);
 
-            R += moveCount / 5;
-
-            value = -search<NonPV>(ss+1, -(alpha+1), -alpha, depth - 1 - R);
-
-            if (value > alpha) {
-                doFullDepth = true;
-            } else {
-                doFullDepth = false;
+            if (isPV && moveCount < 3) {
+                R--;
             }
-                
+
+            if (R > 1) {
+                value = -search<NonPV>(ss+1, -(alpha+1), -alpha, depth - R);
+
+                if (value > alpha) {
+                    doFullDepth = true;
+                } else {
+                    doFullDepth = false;
+                }
+            } else {
+                doFullDepth = true;
+            }
+              
         } else {
             doFullDepth = !isPV || moveCount > 1;
         }
@@ -287,9 +315,9 @@ int Thread::search(Stack* ss, int alpha, int beta, int depth) {
                 }
             }
             if (value >= beta) {
-                Search::tTable.addEntry(key, curr, value, staticEval, depth, Lower);
+                Search::tTable.addEntry(key, curr, value, staticEval, depth, Lower, ttPV);
                 // Update killers
-                if (!cb.pieceOn(getTo(curr)) && !(getFlag(curr) == PROMOTION)) {
+                if (!captureOrProm) {
                     if (ss->killers[0] != curr) {
                         ss->killers[1] = ss->killers[0];
                         ss->killers[0] = curr;
@@ -297,22 +325,24 @@ int Thread::search(Stack* ss, int alpha, int beta, int depth) {
                 }
                 // Update CounterMoves
                 counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = curr;
-                updateHistory(quiets, quietCount, curr);
+                updateHistory(quiets, quietCount, captures, captureCount, depth, curr);
                 return value;
             }
         }
 
         // Save quiet moves to update history at end
-        if (!cb.pieceOn(getTo(curr)) && !(getFlag(curr) == PROMOTION)) {
+        if (!captureOrProm) {
             quiets[quietCount++] = curr;
+        } else {
+            captures[captureCount++] = curr;
         }
 
         curr = mp.getNext();
         moveCount++;
     }
     Type bound = isPV && best ? Exact : Upper; 
-    Search::tTable.addEntry(key, best, topScore, staticEval, depth, bound);
-    updateHistory(quiets, quietCount, best);
+    Search::tTable.addEntry(key, best, topScore, staticEval, depth, bound, ttPV);
+    updateHistory(quiets, quietCount, captures, captureCount, depth, best);
     if (best) {
         counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = best;
     }
@@ -340,6 +370,7 @@ int Thread::quiesce(Stack* ss, int alpha, int beta) {
     int staticEval = NoValue;
     Move best = NOMOVE;
     int topScore;
+    bool ttPV = isPV;
 
     if (hit && !isPV) {
         Type ttType = unpackType(ttData);
@@ -353,6 +384,7 @@ int Thread::quiesce(Stack* ss, int alpha, int beta) {
     if (hit) {
         best = unpackMove(ttData);
         staticEval = unpackEval(ttData);
+        ttPV = isPV || unpackTTPV(ttData);
     }
 
     nodesSearched++;
@@ -387,7 +419,7 @@ int Thread::quiesce(Stack* ss, int alpha, int beta) {
         cb.undoMove(curr);
         if (!searching) return 0;
         if (tempScore >= beta) {
-            Search::tTable.addEntry(key, curr, tempScore, staticEval, 0, Lower);
+            Search::tTable.addEntry(key, curr, tempScore, staticEval, 0, Lower, ttPV);
             counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = curr;
             return tempScore;
         }
@@ -402,7 +434,7 @@ int Thread::quiesce(Stack* ss, int alpha, int beta) {
         }
         curr = mp.getNext();
     }
-    Search::tTable.addEntry(key, best, topScore, staticEval, 0, Upper);
+    Search::tTable.addEntry(key, best, topScore, staticEval, 0, Upper, ttPV);
     if (best) {
         counterMoves[cb.pieceOn(getTo((ss-1)->current))][getTo((ss-1)->current)] = best;
     }
@@ -410,10 +442,11 @@ int Thread::quiesce(Stack* ss, int alpha, int beta) {
 }
 
 
-void Thread::updateHistory(Move* quiets, int quietCount, Move best) {
+void Thread::updateHistory(Move* quiets, int quietCount, Move* captures, int captureCount, int depth, Move best) {
     Move curr;
     int to, from;
     int val;
+    // Penalize quiets that failed low
     for (int i = 0; i < quietCount; i++) {
         curr = quiets[i];
         if (curr == best) continue;
@@ -422,12 +455,26 @@ void Thread::updateHistory(Move* quiets, int quietCount, Move best) {
         val = history[colourOf(cb.pieceOn(from))][from][to];
         history[colourOf(cb.pieceOn(from))][from][to] = std::max(val - penalty, 0);
     }
-
+    // Penalize Captures that failed low
+    for (int i = 0; i < captureCount; i++) {
+        curr = captures[i];
+        if (curr == best) continue;
+        from = getFrom(curr);
+        to = getTo(curr);
+        val = captureHistory[cb.pieceOn(from)][to][typeOf(cb.pieceOn(to))];
+        captureHistory[cb.pieceOn(from)][to][typeOf(cb.pieceOn(to))] = std::max(val - bonus * depth, 0);
+    }
+    // Reward the best move
     if (!cb.pieceOn(getTo(best)) && !(getFlag(best) == PROMOTION)) {
         from = getFrom(best);
         to = getTo(best);
         val = history[colourOf(cb.pieceOn(from))][from][to];
         history[colourOf(cb.pieceOn(from))][from][to] = std::min(val + bonus, 75);
+    } else {
+        from = getFrom(best);
+        to = getTo(best);
+        val = captureHistory[cb.pieceOn(from)][to][typeOf(cb.pieceOn(to))];
+        captureHistory[cb.pieceOn(from)][to][typeOf(cb.pieceOn(to))] = std::min(val + bonus * depth, 1000);
     }
 }
 

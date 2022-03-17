@@ -20,7 +20,6 @@ void Thread::reset() {
     bestScore = -Infinity;
     depthReached = 0;
     nodesSearched = 0;
-    currDepth = 0;
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 64; j++) {
@@ -91,6 +90,11 @@ ThreadPool::ThreadPool(int size_) {
             threads[i]->penalty = 1 + i % 2;
             threads[i]->bonus = 5 + i % 3;
         }
+
+        // Init reduction table
+        for (int i = 0; i < MAXMOVES; i++) {
+            Search::reductions[i] = std::log(i);
+        }
     }
     // Wait for all threads to be ready before returning
     waitForAllThreads();
@@ -99,6 +103,7 @@ ThreadPool::ThreadPool(int size_) {
 void ThreadPool::startSearching(ChessBoard& cb, int time) {
     // Make sure no threads are searching
     waitForAllThreads();
+    // Init main thread
     MainThread* mt = static_cast<MainThread*>(threads[0]);
     mt->alloted = time * 1000;
     mt->start = std::chrono::steady_clock::now();
@@ -108,7 +113,6 @@ void ThreadPool::startSearching(ChessBoard& cb, int time) {
         threads[i]->cb.copy(cb);
         threads[i]->nodesSearched = 0;
         threads[i]->depthReached = 0;
-        threads[i]->currDepth = getNextDepth(1);
         threads[i]->cb.thisThread = threads[i];
     }
     wakeAllThreads();
@@ -132,19 +136,6 @@ void ThreadPool::stopAllThreads() {
     }
 }
 
-int ThreadPool::getNextDepth(int iterDepth) {
-    double prop = 0;
-    for (int i = 0; i < size; i++) {
-        if (threads[i]->currDepth >= iterDepth) {
-            prop++;
-        }
-    }
-    if ((prop / size) >= 0.5) {
-        return iterDepth + 1;
-    }
-    return iterDepth;
-}
-
 SearchInfo ThreadPool::getBestThread() {
     SearchInfo si;
     si.depth = 0;
@@ -161,7 +152,12 @@ SearchInfo ThreadPool::getBestThread() {
 
     for (int i = 0; i < size; i++) {
         std::cout << "Depth: " << threads[i]->depthReached << std::endl;
-        std::cout << "Eval: "  << (double)threads[i]->bestScore/mgVals[PAWN] << std::endl;
+        std::cout << "Eval: "  << (double)threads[i]->bestScore/pieceVals[PAWN].mg << std::endl;
+        std::cout << "PV: ";
+        for (int k = 0; k < threads[i]->depthReached; k++) {
+            std::cout << " " << Misc::moveToString(threads[i]->bestPV[k]);
+        }
+        std::cout << std::endl;
         std::cout << "Thread id: "<< threads[i]->id << std::endl;
         std::cout << "--------------------" << std::endl;
 

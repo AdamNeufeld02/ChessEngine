@@ -66,7 +66,7 @@ Move GameState::getMoveFromComp() {
     tp->waitForAllThreads();
     SearchInfo si = tp->getBestThread();
     std::cout << "Depth: " << si.depth << std::endl;
-    std::cout << "Eval: "  << (double)si.score/mgVals[PAWN] << std::endl;
+    std::cout << "Eval: "  << (double)si.score/pieceVals[PAWN].mg << std::endl;
     std::cout << "Nodes Searched: "<< si.nodesSearched << std::endl;
     std::cout << "--------------------" << std::endl;
     Move move = si.best;

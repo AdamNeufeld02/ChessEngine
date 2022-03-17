@@ -11,9 +11,9 @@ void TransposTable::clear() {
     }
 }
 
-void TransposTable::addEntry(zobristKey key, Move hashMove, int score, int eval, int depth, Type type) {
+void TransposTable::addEntry(zobristKey key, Move hashMove, int score, int eval, int depth, Type type, bool ttPV) {
     Entry* tte = getEntry(key);
-    tte->save(key, score, eval, depth, hashMove, type);
+    tte->save(key, score, eval, depth, hashMove, type, ttPV);
 }
 
 uint64_t TransposTable::probe(zobristKey key, bool* hit) {

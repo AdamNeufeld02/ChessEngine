@@ -4,7 +4,7 @@
 #define MAXDEPTH 64
 
 enum Colour {
-    WHITE, BLACK
+    WHITE, BLACK, COLOURNB
 };
 
 constexpr Colour operator~(Colour c) {
@@ -56,7 +56,7 @@ constexpr int castlingRights[64] = {
 };
 
 enum GenType {
-    Legal, PseudoLegal, Evasions, Captures
+    Legal, Evasions, Captures, Quiets
 };
 
 // representing an encoded move
@@ -66,6 +66,10 @@ enum GenType {
 // bits(14- 15) flags
 enum Move : short {
     NOMOVE
+};
+
+enum Phase {
+    mg, eg, PHASENB
 };
 
 struct ScoredMove {
@@ -126,6 +130,11 @@ struct Score {
         return *this;
     }
 };
+
+// Used for descending stable sort
+constexpr bool descComp(ScoredMove sm1, ScoredMove sm2) {
+    return sm1.score > sm2.score;
+}
 
 constexpr bool operator < (ScoredMove sm1, ScoredMove sm2) {
     return sm1.score < sm2.score;

@@ -1,29 +1,27 @@
 #include "Evaluation.h"
 #include "Threads.h"
 
-pawnTT Evaluation::pTT;
-
-// Midgame material values, King has no material values as it is assumed it is always on the board
-int mgVals[8] = {0, 100, 300, 330, 500, 900, 0};
+// material values, King has no material values as it is assumed it is always on the board
+Score pieceVals[8] = {Score(0, 0), Score(100, 100), Score(300, 300), Score(330, 330), Score(500, 500), Score(900, 900), Score(0, 0)};
 
 Score passedBonus[8] = {Score(0, 0), Score(7, 13), Score(12, 19), Score(18, 27), Score(24, 37), Score(31, 47), Score(42, 55), Score(0, 0)};
-int connectedBonus[8] = {0, 7, 9, 11, 15, 22, 28, 0};
+Score connectedBonus[8] = {Score(0, 0), Score(7, 7), Score(9, 9), Score(11, 11), Score(15, 15), Score(22, 22), Score(28, 28), Score(0, 0)};
 Score isolated = Score(-5, -12);
 Score doubled = Score(-5, -11);
-Score unsupported = Score(-9, -22);
+Score unsupported = Score(-9, -13);
 
 int manhattanDist[64][64];
 
 bitBoard aheadMasks[2][64];
 bitBoard neighbourFiles[8];
 
-int shelterBonus[4][8] = {{-2, 30, 27, 15, 0, -5, -9, -15},
-                          {-15, 27, 18, 7, -7, -13, -15, -22},
-                          {-4, 22, 11, 3, -9, -18, -20, -27},
-                          {-13, 17, 10, -1, -15, -20, -25, -35}};
+Score shelterBonus[4][8] = {{Score(-2, 0), Score(30, 0), Score(27, 0), Score(15, 0), Score(0, 0), Score(-5, 0), Score(-9, 0), Score(-15, 0)},
+                          {Score(-15, 0), Score(27, 0), Score(18, 0), Score(7, 0), Score(-7, 0), Score(-13, 0), Score(-15, 0), Score(-22, 0)},
+                          {Score(-4, 0), Score(22, 0), Score(11, 0), Score(3, 0), Score(-9, 0), Score(-18, 0), Score(-20, 0), Score(-27, 0)},
+                          {Score(-13, 0), Score(17, 0), Score(10, 0), Score(-1, 0), Score(-15, 0), Score(-20, 0), Score(-25, 0), Score(-35, 0)}};
 
-int blockedStorm[8] = {0, 35, 4, -4, -4, -4, -4, -4};
-int unblockedStorm[8] = {17, -50, -30, 2, 8, 12, 12, 12};
+Score blockedStorm[8] = {Score(0, 0), Score(35, 0), Score(4, 0), Score(-4, 0), Score(-4, 0), Score(-4, 0), Score(-4, 0), Score(-4, 0)};
+Score unblockedStorm[8] = {Score(17, 0), Score(-50, 0), Score(-30, 0), Score(2, 0), Score(8, 0), Score(12, 0), Score(12, 0), Score(12, 0)};
 Score openFileBonus[2][2] = {{Score(22, -4), Score(13, -3)},
                              {Score(0, 4), Score(-12, 10)}};
 
@@ -41,6 +39,24 @@ int safetyTable[100] = {
 };
 
 int attackerWeight[8] = {0, 1, 2, 2, 3, 6, 0};
+
+Score knightMobility[9] = {Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                           Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0)};
+
+Score bishopMobility[14] = {Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                            Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                            Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0)};
+
+Score rookMobility[15] = {Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                          Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                          Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0)};
+
+Score queenMobility[28] = {Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                           Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                           Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                           Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                           Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0), Score(0, 0),
+                           Score(0, 0), Score(0, 0), Score(0, 0)};
 
 // Piece Square table for pawns oriented to blacks perspective
 Score psPawn[64] = {
@@ -116,7 +132,11 @@ Score psKing[64] = {
 
 Score pieceSquareTables[PIECENB][64];
 
+bool Evaluation::doTrace = false;
+EvalTrace Evaluation::trace;
+
 void Evaluation::init() {
+    doTrace = false;
     for (int i = 0; i < 64; i++) {
         // init psq tables
         pieceSquareTables[BLACKPAWN][i] = psPawn[i];
@@ -168,39 +188,40 @@ void Evaluation::init() {
         }
         neighbourFiles[i] = adjFiles;
     }
-    pTT.set(120000);
-    pTT.clear();
 }
 
 int Evaluation::evaluate(ChessBoard& cb) {
     zobristKey key = cb.pawnKey();
-    pawnEntry* tableEntry; 
+    pawnEntry* tableEntry = NULL; 
     if (cb.thisThread) {
         tableEntry = cb.thisThread->pTT.probe(key);
-    } else {
-        tableEntry = pTT.probe(key);
     }
     
     Score pawnStructScore;
 
-    if (key == tableEntry->key) {
+    if (tableEntry && !doTrace && key == tableEntry->key) {
         pawnStructScore = tableEntry->score;
     } else {
         pawnStructScore = evaluatePawnStructure<WHITE>(cb) + evaluateKingShelter<WHITE>(cb) 
                           - evaluatePawnStructure<BLACK>(cb) - evaluateKingShelter<BLACK>(cb);
-        tableEntry->key = key;
-        tableEntry->score = pawnStructScore;
+
+        if (tableEntry) {
+            tableEntry->key = key;
+            tableEntry->score = pawnStructScore;
+        }
     }
 
-    Score total = cb.getPSQT(WHITE) + evaluateKingZone<WHITE>(cb)
-                 - cb.getPSQT(BLACK) - evaluateKingZone<BLACK>(cb);
-    
-    int whiteMat = cb.getMaterial(WHITE);
-    int blackMat = cb.getMaterial(BLACK);
-    
-    int totalMat = whiteMat + blackMat;
+    Score total = cb.getPSQT(WHITE) + evaluateAttacks<WHITE>(cb) + cb.getMaterial(WHITE)
+                 - cb.getPSQT(BLACK) - evaluateAttacks<BLACK>(cb) - cb.getMaterial(BLACK);
+
     total += pawnStructScore;
-    int ret = total.mg *((double)totalMat / 7920) + total.eg *((double)7920 - totalMat) / 7920 + whiteMat - blackMat;
+
+    double phase = 4 * countBits(cb.pieces(QUEEN)) +
+                2 * countBits(cb.pieces(ROOK)) +
+                1 * countBits(cb.pieces(BISHOP)) +
+                1 * countBits(cb.pieces(KNIGHT));
+    
+    int ret = total.mg * phase / 24.0 + total.eg *(1 - phase / 24.0);
     return cb.colourToMove() == WHITE? ret : -ret;
 }
 
@@ -227,19 +248,35 @@ Score Evaluation::evaluatePawnStructure(ChessBoard& cb) {
         if (support || adj) {
             score += connectedBonus[relativeRank(col, idx)];
             score += 7 * countBits(support);
+
+            if (doTrace) 
+                trace.connected[col][relativeRank(col, idx)]++;
+
         // A pawn with no pawns in adjecent files is considered isolated and will be penalized
         } else if (!neighbours) {
             score += isolated;
+
+            if (doTrace)
+                trace.isolated[col]++;
         }
         // Passed pawns recieve a bonus
         if (!ahead && !opposing) {
             score += passedBonus[relativeRank(col, idx)];
+
+            if (doTrace)
+                trace.passed[col][relativeRank(col, idx)]++;
         // Doubled pawns are penalized
         } else if (ahead) {
             score += doubled;
+
+            if (doTrace)
+                trace.doubled[col]++;
         }
         if (!support) {
             score += unsupported;
+
+            if (doTrace)
+                trace.unsupported[col]++;
         }
 
     }
@@ -254,7 +291,7 @@ Score Evaluation::evaluateKingShelter(ChessBoard& cb) {
     int kingRank = ksq / 8;
     int kingFile = ksq % 8;
 
-    int shelter = 0;
+    Score shelter = Score(0, 0);
     int numfiles = 0;
 
     // Evaluation of Pawn Storm and Pawn Shelter
@@ -267,6 +304,9 @@ Score Evaluation::evaluateKingShelter(ChessBoard& cb) {
         int sideDist = distToSide(file);
         shelter += shelterBonus[sideDist][ourRank];
 
+        if (doTrace)
+            trace.shelter[col][sideDist][ourRank]++;
+
 
         // Evaluate Storming Pawns
         immediate = theirPawns & aheadMasks[col][8 * kingRank + file];
@@ -275,48 +315,86 @@ Score Evaluation::evaluateKingShelter(ChessBoard& cb) {
         int rankDist = theirRank ? theirRank - relativeRank(col, ksq) : 0;
         if (ourRank == theirRank - 1) {
             shelter += blockedStorm[rankDist];
+            if (doTrace) 
+                trace.blockedStorm[col][rankDist]++;
         } else {
             shelter += unblockedStorm[rankDist];
+            if (doTrace)
+                trace.unblockedStorm[col][rankDist]++;
         }
     }
-    Score ret = Score(shelter/(numfiles - 1), 0);
-    ret += openFileBonus[cb.onOpenFile(col, ksq)][cb.onOpenFile(~col, ksq)];
-    return ret;
+    shelter += openFileBonus[cb.onOpenFile(col, ksq)][cb.onOpenFile(~col, ksq)];
+
+    if (doTrace) 
+        trace.openFile[col][cb.onOpenFile(col, ksq)][cb.onOpenFile(~col, ksq)]++;
+    return shelter;
 }
 
-template<Colour col>
-Score Evaluation::evaluateKingZone(ChessBoard& cb) {
-    int ksq = getLSBIndex(cb.pieces(col, KING));
-    bitBoard kingZone = genAttacksBB<KING>(ksq) | squares[ksq];
-    bitBoard occ = cb.pieces() & ~squares[ksq];
+template<Colour us>
+Score Evaluation::evaluateAttacks(ChessBoard& cb) {
+    Score sc = Score(0, 0);
+    int theirKing = getLSBIndex(cb.pieces(~us, KING));
+    // Bonus for attack the enemy king zone
+    bitBoard targetKing = genAttacksBB<KING>(theirKing) | squares[theirKing];
+    bitBoard occ = cb.pieces();
+    bitBoard open = ~cb.pieces(us);
 
-    bitBoard bb = cb.pieces(~col, KNIGHT);
-    int weightedAttacks = getWeightedAttacks<KNIGHT>(kingZone, bb, occ);
-
-    bb = cb.pieces(~col, BISHOP);
-    weightedAttacks += getWeightedAttacks<BISHOP>(kingZone, bb, occ);
-
-    bb = cb.pieces(~col, ROOK);
-    weightedAttacks += getWeightedAttacks<ROOK>(kingZone, bb, occ);
-
-    bb = cb.pieces(~col, QUEEN);
-    weightedAttacks += getWeightedAttacks<QUEEN>(kingZone, bb, occ);
-    
-
-    return Score(-safetyTable[weightedAttacks], -safetyTable[weightedAttacks]);
-}
-
-template<PieceType pt>
-int Evaluation::getWeightedAttacks(bitBoard kingZone, bitBoard attackers, bitBoard occ) {
+    bitBoard bb = cb.pieces(us, KNIGHT);
+    bitBoard attacks = 0;
     int sq;
     int weightedAttacks = 0;
-    bitBoard attacks;
-    while (attackers) {
-        sq = popLSB(attackers);
-        attacks = genAttacksBB<pt>(sq, occ);
-        weightedAttacks += countBits(attacks & kingZone) * attackerWeight[pt];
+    // Evaluate Knight attacks
+    while (bb) {
+        sq = popLSB(bb);
+        attacks = genAttacksBB<KNIGHT>(sq);
+        sc += knightMobility[countBits(attacks & open)];
+        weightedAttacks += countBits(attacks & targetKing) * attackerWeight[KNIGHT];
+
+        if (doTrace) {
+            trace.knightMob[us][countBits(attacks & open)]++;
+        }
     }
-    return weightedAttacks;
+    // Evaluate Bishop attacks
+    bb = cb.pieces(us, BISHOP);
+    while (bb) {
+        sq = popLSB(bb);
+        attacks = genAttacksBB<BISHOP>(sq, occ);
+        sc += bishopMobility[countBits(attacks & open)];
+        weightedAttacks += countBits(attacks & targetKing) * attackerWeight[BISHOP];
+
+        if (doTrace) {
+            trace.bishopMob[us][countBits(attacks & open)]++;
+        }
+    }
+    // Evaluate Rook attacks
+    bb = cb.pieces(us, ROOK);
+    while (bb) {
+        sq = popLSB(bb);
+        attacks = genAttacksBB<ROOK>(sq, occ);
+        sc += rookMobility[countBits(attacks & open)];
+        weightedAttacks += countBits(attacks & targetKing) * attackerWeight[ROOK];
+
+        if (doTrace) {
+            trace.rookMob[us][countBits(attacks & open)]++;
+        }
+    }
+    // Evaluate Queen attacks
+    bb = cb.pieces(us, QUEEN);
+    while (bb) {
+        sq = popLSB(bb);
+        attacks = genAttacksBB<QUEEN>(sq, occ);
+        sc += queenMobility[countBits(attacks & open)];
+        weightedAttacks += countBits(attacks & targetKing) * attackerWeight[QUEEN];
+
+        if (doTrace) {
+            trace.queenMob[us][countBits(attacks & open)]++;
+        }
+    }
+    sc += safetyTable[weightedAttacks];
+    if (doTrace) {
+        trace.safety[us][weightedAttacks]++;
+    }
+    return sc;
 }
 
 int Evaluation::relativeRank(Colour col, int sq) {

@@ -8,6 +8,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <map>
+#include <cmath>
 
 struct SearchInfo {
     int depth;
@@ -28,12 +29,16 @@ class ThreadPool {
     void stopAllThreads();
     void destroy();
     SearchInfo getBestThread();
-    int getNextDepth(int iterDepth);
 
     private:
     int size;
     Thread** threads;
 };
+
+/*
+*** Each Thread has its own pawn hash table and a local copy of the board. Threads also store their own 
+*** history tables to encourage diverision of search trees when using the multi threaded search.
+*/
 
 class Thread {
     public:
@@ -49,10 +54,12 @@ class Thread {
     bool searching, quit = false;
     pawnTT pTT;
 
-    // The main history move table indexed by colour and the from then to square of a move
+    // The main quiet move history move table indexed by colour and the from then to square of a move
     int history[2][64][64];
     // The counter move history storing moves indexed by the Piece and to square of a move
     Move counterMoves[PIECENB][64];
+    // The main capture move history [piece][to][captured piece type]
+    int captureHistory[PIECENB][64][KING + 1];
 
     protected:
     friend class ThreadPool;
@@ -65,21 +72,24 @@ class Thread {
     template<NodeType type>
     int quiesce(Stack* ss, int alpha, int beta);
 
-    void updateHistory(Move* quiets, int quietCount, Move best);
+    void updateHistory(Move* quiets, int quietCount, Move* captures, int captureCount, int depth, Move best);
 
     int id;
 
     int bonus;
     int penalty;
-    int currDepth;
     
     Move bestMove;
     int bestScore;
     int depthReached;
     int nodesSearched;
     ChessBoard cb;
-    Move pv[MAXDEPTH];
-    
+    Move rootPV[MAXDEPTH];
+    Move bestPV[MAXDEPTH];
+
+    ScoredMove rootMoves[MAXMOVES];
+    ScoredMove* end;
+
     ThreadPool* parent;
     
 };
@@ -94,7 +104,6 @@ class MainThread : public Thread {
     friend class ThreadPool;
     int alloted;
     std::chrono::steady_clock::time_point start;
-
 };
 
 #endif

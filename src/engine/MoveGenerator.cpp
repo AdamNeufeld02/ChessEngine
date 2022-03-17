@@ -4,7 +4,7 @@ ScoredMove* MoveGenerator::generateMoves(ChessBoard& chessBoard, ScoredMove* mov
     ScoredMove* curr = moves;
     Colour us = chessBoard.colourToMove();
     int ksq = getLSBIndex(chessBoard.pieces(us, KING));
-    bitBoard pinned = chessBoard.pinned() & chessBoard.pieces(us);
+    bitBoard pinned = chessBoard.pinned(us) & chessBoard.pieces(us);
     moves = chessBoard.checkers() ? generateAllMoves<Evasions>(chessBoard, moves) : onlyCaptures? generateAllMoves<Captures>(chessBoard, moves) : generateAllMoves<Legal>(chessBoard, moves);
     if (pinned) {
         while (curr != moves) {
@@ -13,7 +13,7 @@ ScoredMove* MoveGenerator::generateMoves(ChessBoard& chessBoard, ScoredMove* mov
             } else {
                 ++curr;
             }
-        }
+        } 
     }
     return moves;
 }

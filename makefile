@@ -1,81 +1,57 @@
-EXE = ChessEngine
-EXET = ChessTest
 
-#OBJS specifies which files to compile as part of the project
-OBJS_EXE = main.o ChessGUI.o GameState.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o Threads.o
-OBJS_EXET =  Test.o MoveGenerator.o ChessBoard.o BitBoards.o Evaluation.o Search.o MovePick.o Zobrist.o Misc.o TransposTable.o Threads.o
+BUILD_DIR = build
+ENG_DIR = src/engine
+TST_DIR = src/test
+GUI_DIR = src/gui
+
+EXE = $(BUILD_DIR)/ChessGUI
+EXET = $(BUILD_DIR)/ChessTest
+
+# Get all of the source files
+SRCS_ENG := $(wildcard $(ENG_DIR)/*.cpp)
+SRCS_TST := $(wildcard $(TST_DIR)/*.cpp)
+SRCS_GUI := $(wildcard $(GUI_DIR)/*.cpp)
+
+OBJS_ENG := $(patsubst $(ENG_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS_ENG))
+OBJS_TST := $(patsubst $(TST_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS_TST))
+OBJS_GUI := $(patsubst $(GUI_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS_GUI))
 
 #CC specifies which compiler we're using
-CC = g++
+CXX = g++
 
 CXX_FLAGS = -c -g -Ofast -Wall -Wextra -pedantic
-#INCLUDE_PATHS specifies the additional include paths we'll need
-INCLUDE_PATHS = -IC:\Users\adamn\SDL2\include\SDL2
 
-#LIBRARY_PATHS specifies the additional library paths we'll need
+INCLUDE_ENGINE = -Isrc/engine
+
+INCLUDE_SDL = -IC:\msys64\mingw64\include\SDL2
+
 LIBRARY_PATHS = -LC:\Users\adamn\SDL2\lib
-
-#COMPILER_FLAGS specifies the additional compilation options we're using
-# -w suppresses all warnings
-# -Wl,-subsystem,windows gets rid of the console window
-#COMPILER_FLAGS = -w -Wl,-subsystem,windows
 
 #LINKER_FLAGS specifies the libraries we're linking against
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
 
-#OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = ChessEngine
+all : $(EXE) $(EXET)
 
-all : ChessEngine ChessTest
+#Rule for GUI exe
+$(EXE) : $(OBJS_ENG) $(OBJS_GUI)
+	$(CXX) $(OBJS_ENG) $(OBJS_GUI) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE)
 
-#This is the target that compiles our executable
-$(EXE) : $(OBJS_EXE)
-	$(CC) $(OBJS_EXE) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE)
+#Rule for Test exe
+$(EXET) : $(OBJS_ENG) $(OBJS_TST)
+	$(CXX) $(OBJS_ENG) $(OBJS_TST) -o $(EXET)
 
-$(EXET) : $(OBJS_EXET)
-	$(CC) $(OBJS_EXET) -o $(EXET)
+#Pattern for Engine objects
+$(BUILD_DIR)/%.o: $(ENG_DIR)/%.cpp
+	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
-$(EXEP) : $(OBJS_EXEP)
-	$(CC) $(OBJS_EXEP) -o $(EXEP)
+#Pattern for GUI objects
+$(BUILD_DIR)/%.o: $(GUI_DIR)/%.cpp
+	$(CXX) $(INCLUDE_SDL) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(GUI_DIR)/$*.cpp -o $@
 
-MoveGenerator.o : MoveGenerator.cpp MoveGenerator.h ChessBoard.h Types.h BitBoards.h
-	$(CC) MoveGenerator.cpp $(CXX_FLAGS) -o $@
+#Patter for Test objects
+$(BUILD_DIR)/%.o: $(TST_DIR)/%.cpp
+	$(CXX) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(TST_DIR)/$*.cpp -o $@
 
-ChessGUI.o : ChessGUI.cpp ChessGUI.h Types.h ChessBoard.h
-	$(CC) ChessGUI.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
-
-GameState.o : GameState.cpp GameState.h ChessGUI.h MoveGenerator.h ChessBoard.h Evaluation.h Search.h
-	$(CC) GameState.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
-
-main.o : main.cpp GameState.h
-	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) $(CXX_FLAGS) -o $@
-
-Test.o : Test.cpp MoveGenerator.h ChessBoard.h BitBoards.h Search.h Evaluation.h MovePick.h TransposTable.h Threads.h
-	$(CC) Test.cpp $(CXX_FLAGS) -o $@
-
-ChessBoard.o : ChessBoard.cpp ChessBoard.h Types.h BitBoards.h Evaluation.h Zobrist.h
-	$(CC) ChessBoard.cpp $(CXX_FLAGS) -o $@
-
-BitBoards.o : BitBoards.cpp BitBoards.h Types.h
-	$(CC) BitBoards.cpp $(CXX_FLAGS) -o $@
-
-Evaluation.o : Evaluation.cpp Evaluation.h ChessBoard.h Types.h BitBoards.h Zobrist.h
-	$(CC) Evaluation.cpp $(CXX_FLAGS) -o $@
-
-Search.o : Search.cpp Search.h Types.h MoveGenerator.h Evaluation.h MovePick.h TransposTable.h Misc.h
-	$(CC) Search.cpp $(CXX_FLAGS) -o $@
-
-MovePick.o : MovePick.cpp MovePick.h Types.h ChessBoard.h Evaluation.h
-	$(CC) MovePick.cpp $(CXX_FLAGS) -o $@ 
-
-Misc.o : Misc.cpp Misc.h BitBoards.h
-	$(CC) Misc.cpp $(CXX_FLAGS) -o $@
-
-Zobrist.o : Zobrist.cpp Zobrist.h Types.h Misc.h
-	$(CC) Zobrist.cpp $(CXX_FLAGS) -o $@
-
-TransposTable.o : TransposTable.cpp TransposTable.h Types.h Zobrist.h ChessBoard.h
-	$(CC) TransposTable.cpp $(CXX_FLAGS) -o $@
-
-Threads.o : Threads.cpp Threads.h Search.h ChessBoard.h Evaluation.h
-	$(CC) Threads.cpp $(CXX_FLAGS) -o $@
+clean:
+	del $(BUILD_DIR)\*.o
+	del $(BUILD_DIR)\*.exe

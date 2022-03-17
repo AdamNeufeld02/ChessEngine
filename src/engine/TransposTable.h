@@ -10,12 +10,13 @@ enum Type {
     Exact, Upper, Lower
 };
 
-inline uint64_t makeData(uint16_t _score, uint16_t _eval, uint8_t _depth, Move _hashMove, uint8_t _type) {
+inline uint64_t makeData(uint16_t _score, uint16_t _eval, uint8_t _depth, Move _hashMove, uint8_t _type, bool ttPV) {
     uint64_t data = (uint64_t) _hashMove;     // 0 - 16;
     data += (uint64_t) _score << 16; // 16 - 32
     data += (uint64_t) _eval << 32; // 32 - 48
     data += (uint64_t) _depth << 48; // 48 - 56
     data += (uint64_t) _type << 56;  // 56 - 64
+    data += (uint64_t) ttPV << 58;
     return data;
 }
 
@@ -37,7 +38,11 @@ inline int unpackDepth(uint64_t data) {
 }
 
 inline Type unpackType(uint64_t data) {
-    return Type((data >> 56) & 0xff);
+    return Type((data >> 56) & 0x3);
+}
+
+inline bool unpackTTPV(uint64_t data) {
+    return (bool)((data >> 58) & 1);
 }
 
 // 8 bytes for the data
@@ -45,7 +50,7 @@ inline Type unpackType(uint64_t data) {
 // bytes 2 - 4 for score
 // bytes 4 - 6 for eval
 // byte 6 for depth
-// byte 7 for type
+// byte 7 for type and pv
 struct Entry {
     zobristKey keyXData;
     uint64_t data;
@@ -55,13 +60,17 @@ struct Entry {
         data = 0;
     }
 
-    void save(zobristKey key, uint16_t score, uint16_t eval, uint8_t depth, Move hashMove, uint8_t type) {
-        if (depth >= unpackDepth(data) || type == Exact) {
-            uint64_t data_ = makeData(score, eval, depth, hashMove, type);
+    void save(zobristKey key, uint16_t score, uint16_t eval, uint8_t depth, Move hashMove, uint8_t type, bool ttPV) {
+        if (depth >= unpackDepth(data) + unpackTTPV(data) || type == Exact) {
+            uint64_t data_ = makeData(score, eval, depth, hashMove, type, ttPV);
             data = data_;
             keyXData = key ^ data_;
         }
     }
+};
+
+struct Cluster {
+
 };
 
 class TransposTable {
@@ -71,7 +80,7 @@ class TransposTable {
     // Clears all entries in a hash table
     void clear();
     // Adds an entry to the hash table replacing whatever was there previously
-    void addEntry(zobristKey key, Move hashMove, int score, int eval, int depth, Type type);
+    void addEntry(zobristKey key, Move hashMove, int score, int eval, int depth, Type type, bool ttPV);
     // Returns true if we can use the evaluation stored in the hash table and false otherwise
     uint64_t probe(zobristKey key, bool* hit);
 

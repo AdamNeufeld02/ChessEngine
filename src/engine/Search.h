@@ -1,6 +1,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 #include <chrono>
+#include <algorithm>
 #include "MoveGenerator.h"
 #include "ChessBoard.h"
 #include "Types.h"
@@ -23,6 +24,7 @@ enum NodeType {
 
 namespace Search {
     static const int aspiration = 50;
+    extern int reductions[MAXMOVES];
     extern TransposTable tTable;
     void init();
     void updatePv(Move* pv, Move move, Move* childPv);

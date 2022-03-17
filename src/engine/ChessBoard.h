@@ -18,7 +18,7 @@ struct StateInfo {
     zobristKey key;
     zobristKey pawnKey;
     int ply;
-    char castlingRights;
+    unsigned char castlingRights;
     char epSquare;
     int rule50;
     int pliesFromNull;
@@ -26,8 +26,8 @@ struct StateInfo {
 
     Piece captured;
     bitBoard checkersBB;
-    bitBoard pinnersBB;
-    bitBoard pinnedBB;
+    bitBoard pinnersBB[2];
+    bitBoard pinnedBB[2];
     StateInfo* previous;
 };
  
@@ -39,6 +39,8 @@ class ChessBoard {
     ChessBoard(std::string fenString, StateInfo& si);
 
     ChessBoard();
+
+    void fenToBoard(std::string fenString, StateInfo& si);
     // copies the given board to this board
     void copy(ChessBoard& cb);
     // return piece code at specific index
@@ -54,6 +56,9 @@ class ChessBoard {
     // Takes back a null move
     void undoNullMove();
 
+    // Returns true if the given capture is above the threshold and false otherwise
+    bool seeGE(Move move, int threshold);
+
     bool isDraw();
 
     // prints a bitboard
@@ -62,11 +67,14 @@ class ChessBoard {
 
     bool nonPawnMaterial(Colour col);
 
-    int getMaterial(Colour col);
+    Score getMaterial(Colour col);
     Score getPSQT(Colour col);
 
     // Returns the bitboard of all attackers of one colour of a certain square
     bitBoard getAttackers(int sq, Colour c);
+
+    // Returns the bitboard of all attackers to a given square for a given occ
+    bitBoard attackersForOcc(int sq, bitBoard occ);
 
     // returns the bitboard of sliding attacks that the given colour attacks for the given occ
     bitBoard getSlidingAttacks(bitBoard occ);
@@ -75,12 +83,13 @@ class ChessBoard {
 
     bitBoard pieces(Colour c, PieceType pt);
     bitBoard pieces(Colour c);
+    bitBoard pieces(PieceType pt);
     bitBoard pieces();
 
-    char getCR();
+    unsigned char getCR();
     bitBoard checkers();
-    bitBoard pinners();
-    bitBoard pinned();
+    bitBoard pinners(Colour col);
+    bitBoard pinned(Colour col);
 
     zobristKey key();
     zobristKey pawnKey();
@@ -103,12 +112,9 @@ class ChessBoard {
     bitBoard piecesByColour[2];
     // The Occupancy of all pieces
     bitBoard allPieces;
-    int material[2];
+    Score material[2];
     Score psqtv[2];
 
-    
-
-    void fenToBoard(std::string fenString);
     void initBoard(StateInfo& si);
 
     void updateChecksAndPins(Colour toMove);
@@ -128,7 +134,7 @@ inline Score ChessBoard::getPSQT(Colour col) {
     return psqtv[col];
 }
 
-inline int ChessBoard::getMaterial(Colour col) {
+inline Score ChessBoard::getMaterial(Colour col) {
     return material[col];
 }
 
@@ -141,11 +147,15 @@ inline Colour ChessBoard::colourToMove() const {
 }
 
 inline bitBoard ChessBoard::pieces(Colour c, PieceType pt) {
-    return piecesByType[(c << 3) + pt];
+    return piecesByType[makePiece(c, pt)];
 }
 
 inline bitBoard ChessBoard::pieces(Colour c) {
     return piecesByColour[c];
+}
+
+inline bitBoard ChessBoard::pieces(PieceType pt) {
+    return piecesByType[makePiece(WHITE, pt)] | piecesByType[makePiece(BLACK, pt)];
 }
 
 inline bitBoard ChessBoard::pieces() {
@@ -156,7 +166,7 @@ inline char ChessBoard::epSquare() const {
     return st->epSquare;
 }
 
-inline char ChessBoard::getCR() {
+inline unsigned char ChessBoard::getCR() {
     return st->castlingRights;
 }
 
@@ -164,12 +174,12 @@ inline bitBoard ChessBoard::checkers() {
     return st->checkersBB;
 }
 
-inline bitBoard ChessBoard::pinners() {
-    return st->pinnersBB;
+inline bitBoard ChessBoard::pinners(Colour col) {
+    return st->pinnersBB[col];
 }
 
-inline bitBoard ChessBoard::pinned() {
-    return st->pinnedBB;
+inline bitBoard ChessBoard::pinned(Colour col) {
+    return st->pinnedBB[col];
 }
 
 inline bool ChessBoard::canCastle(CastlingRights cr) const {
@@ -195,7 +205,7 @@ inline bool ChessBoard::isDraw() {
 inline void ChessBoard::putPiece(Piece pc, int sq) {
     bitBoard place = squares[sq];
     Colour col = colourOf(pc);
-    material[col] += mgVals[typeOf(pc)];
+    material[col] += pieceVals[typeOf(pc)];
     psqtv[col] += pieceSquareTables[pc][sq];
     board[sq] = pc;
     piecesByType[pc] |= place;
@@ -207,7 +217,7 @@ inline void ChessBoard::removePiece(int sq) {
     bitBoard place = squares[sq];
     Piece pc = board[sq];
     Colour col = colourOf(pc);
-    material[col] -= mgVals[typeOf(pc)];
+    material[col] -= pieceVals[typeOf(pc)];
     psqtv[col] -= pieceSquareTables[pc][sq];
     board[sq] = EMPTY;
     piecesByType[pc] ^= place;

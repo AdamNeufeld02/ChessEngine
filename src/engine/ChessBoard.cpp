@@ -2,8 +2,7 @@
 
 //Builds a chess Board from a given fenstring
 ChessBoard::ChessBoard(std::string fenString, StateInfo& si) {
-    initBoard(si);
-    fenToBoard(fenString);
+    fenToBoard(fenString, si);
 }
 
 ChessBoard::ChessBoard() {
@@ -71,13 +70,13 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
         }
     }
     if (si.epSquare > 0) {
-        si.key ^= Zobrist::epSquare[si.epSquare];
+        si.key ^= Zobrist::epSquare[(unsigned) si.epSquare];
     }
     si.epSquare = -1;
     if (typeOf(moved) == PAWN) {
         if ((to ^ from) == 16) {
             si.epSquare = us == WHITE ? from + 8 : from - 8;
-            si.key ^= Zobrist::epSquare[si.epSquare];
+            si.key ^= Zobrist::epSquare[(unsigned) si.epSquare];
         }
 
         if (flag != PROMOTION) {
@@ -158,7 +157,7 @@ void ChessBoard::doNullMove(StateInfo& si) {
     si.key ^= Zobrist::colToMove;
     si.captured = EMPTY;
     if (si.epSquare != -1) {
-        si.key ^= Zobrist::epSquare[si.epSquare];
+        si.key ^= Zobrist::epSquare[(unsigned) si.epSquare];
         si.epSquare = -1;
     }
     colToMove = ~colToMove;
@@ -190,7 +189,8 @@ zobristKey ChessBoard::keyAfter(Move move) {
 
 void ChessBoard::updateChecksAndPins(Colour toMove) {
     st->checkersBB = getAttackers(getLSBIndex(pieces(toMove, KING)), ~toMove);
-    st->pinnedBB = blockersForSq(getLSBIndex(pieces(toMove, KING)), toMove, st->pinnersBB);
+    st->pinnedBB[toMove] = blockersForSq(getLSBIndex(pieces(toMove, KING)), toMove, st->pinnersBB[~toMove]);
+    st->pinnedBB[~toMove] = blockersForSq(getLSBIndex(pieces(~toMove, KING)), ~toMove, st->pinnersBB[toMove]);
 }
 
 bitBoard ChessBoard::blockersForSq(int sq, Colour blockingCol, bitBoard& pinners) {
@@ -228,6 +228,15 @@ bitBoard ChessBoard::getAttackers(int sq, Colour c) {
     return attackers;
 }
 
+bitBoard ChessBoard::attackersForOcc(int sq, bitBoard occ) {
+    return (pawnAttacks[WHITE][sq] & pieces(WHITE, PAWN)) |
+           (pawnAttacks[BLACK][sq] & pieces(BLACK, PAWN)) |
+           (genAttacksBB<ROOK>(sq, occ) & (pieces(ROOK) | pieces(QUEEN))) |
+           (genAttacksBB<BISHOP>(sq, occ) & (pieces(BISHOP) | pieces(QUEEN))) |
+           (genAttacksBB<KNIGHT>(sq) & pieces(KNIGHT)) |
+           (genAttacksBB<KING>(sq) & pieces(KING)); 
+}
+
 bitBoard ChessBoard::getSlidingAttacks(bitBoard occ) {
     Colour attackingCol = ~colourToMove();
     bitBoard rooks = pieces(attackingCol, ROOK);
@@ -246,6 +255,75 @@ bitBoard ChessBoard::getSlidingAttacks(bitBoard occ) {
     return slidingAttacks;
 }
 
+bool ChessBoard::seeGE(Move move, int threshold) {
+    // Only deal with normal moves
+    if (getFlag(move) != NOFLAG) return true;
+
+    int from = getFrom(move);
+    int to = getTo(move);
+
+    int swap = pieceVals[typeOf(pieceOn(to))].mg - threshold;
+    if (swap < 0) return false;
+
+    swap = pieceVals[typeOf(pieceOn(from))].mg - swap;
+    if (swap <= 0) return true;
+
+    bitBoard occ = pieces() ^ squares[from] ^ squares[to];
+    bitBoard attackers = attackersForOcc(to, occ);
+    Colour stm = colToMove;
+    bitBoard stmAttackers, bb;
+    int res = 1;
+    while (true) {
+        stm = ~stm;
+        attackers &= occ;
+
+        // If the side to move has no more attackers we are finished
+        if (!(stmAttackers = attackers & pieces(stm))) break;
+
+        // Don't allow pinned pieces to attack
+        if (pinners(~stm) & occ) {
+            stmAttackers &= ~pinned(stm);
+        }
+
+        if (!stmAttackers) break;
+
+        res ^= 1;
+
+        // Get the least valuable attacker
+        if ((bb = stmAttackers & pieces(stm, PAWN))) {
+            if ((swap = pieceVals[PAWN].mg - swap) < res) break;
+
+            occ ^= squares[getLSBIndex(bb)];
+            attackers |= genAttacksBB<BISHOP>(to, occ) & (pieces(BISHOP) | pieces(QUEEN));
+        } else if ((bb = stmAttackers & pieces(stm, KNIGHT))) {
+            if ((swap = pieceVals[KNIGHT].mg - swap) < res) break;
+
+            occ ^= squares[getLSBIndex(bb)];
+        } else if ((bb = stmAttackers & pieces(stm, BISHOP))) {
+            if ((swap = pieceVals[BISHOP].mg - swap) < res) break;
+
+            occ ^= squares[getLSBIndex(bb)];
+            attackers |= genAttacksBB<BISHOP>(to, occ) & (pieces(BISHOP) | pieces(QUEEN));
+        } else if ((bb = stmAttackers & pieces(stm, ROOK))) {
+            if ((swap = pieceVals[ROOK].mg - swap) < res) break;
+
+            occ ^= squares[getLSBIndex(bb)];
+            attackers |= genAttacksBB<ROOK>(to, occ) & (pieces(ROOK) | pieces(QUEEN));
+        } else if ((bb = stmAttackers & pieces(stm, QUEEN))) {
+            if ((swap = pieceVals[QUEEN].mg - swap) < res) break;
+
+            occ ^= squares[getLSBIndex(bb)];
+            attackers |= genAttacksBB<ROOK>(to, occ) & (pieces(ROOK) | pieces(QUEEN));
+            attackers |= genAttacksBB<BISHOP>(to, occ) & (pieces(BISHOP) | pieces(QUEEN));
+        } else {
+            return (attackers & ~pieces(stm)) ? res ^ 1 : res;
+        }
+    }
+
+    return res;
+    
+}
+
 void ChessBoard::printBoard(bitBoard bb) {
     std::bitset<64> bits = std::bitset<64>(bb);
     int file;
@@ -258,7 +336,8 @@ void ChessBoard::printBoard(bitBoard bb) {
     }
 }
 
-void ChessBoard::fenToBoard(std::string fenString) {
+void ChessBoard::fenToBoard(std::string fenString, StateInfo& si) {
+    initBoard(si);
     int boardIndex = 56;
     int stringIndex = 0;
     char curr = fenString[0];
@@ -382,7 +461,7 @@ void ChessBoard::fenToBoard(std::string fenString) {
         curr = fenString[stringIndex];
         num = strtol(&curr, NULL, 10);
         st->epSquare += (8 - num) * 8;
-        st->key ^= Zobrist::epSquare[st->epSquare];
+        st->key ^= Zobrist::epSquare[(unsigned) st->epSquare];
     } else {
         st->epSquare = -1;
     }
@@ -410,14 +489,16 @@ void ChessBoard::initBoard(StateInfo& si) {
     st->epSquare = -1;
     st->previous = NULL;
     st->checkersBB = 0;
-    st->pinnedBB = 0;
-    st->pinnersBB = 0;
+    st->pinnedBB[WHITE] = 0;
+    st->pinnedBB[BLACK] = 0;
+    st->pinnersBB[WHITE] = 0;
+    st->pinnersBB[BLACK] = 0;
     st->captured = EMPTY;
     st->rule50 = 0;
     st->pliesFromNull = 0;
     st->repetitions = 0;
-    material[WHITE] = 0;
-    material[BLACK] = 0;
+    material[WHITE] = Score(0, 0);
+    material[BLACK] = Score(0, 0);
     psqtv[WHITE] = Score(0, 0);
     psqtv[BLACK] = Score(0, 0);
     colToMove = WHITE;

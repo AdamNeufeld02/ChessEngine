@@ -103,7 +103,7 @@ void BitBoards::initLineBB() {
             if (squares[sq2] & straight) {
                 lineBB[sq1][sq2] = (straight & genAttacksBB<ROOK>(sq2)) | squares[sq1] | squares[sq2];
             } else if (squares[sq2] & diagonal) {
-                lineBB[sq1][sq2] = (diagonal & genAttacksBB<BISHOP>(sq2) | squares[sq1] | squares[sq2]);
+                lineBB[sq1][sq2] = (diagonal & genAttacksBB<BISHOP>(sq2)) | squares[sq1] | squares[sq2];
             }
         }
     }

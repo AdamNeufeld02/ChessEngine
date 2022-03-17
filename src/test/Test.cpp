@@ -7,6 +7,7 @@
 #include "MovePick.h"
 #include "Evaluation.h"
 #include "TransposTable.h"
+#include "Tune.h"
 #include "Threads.h"
 #include <bitset>
 #include <chrono>
@@ -49,17 +50,24 @@ TEST_CASE("MoveGenerator::InitOccMasks", "[Weight=1][part=MoveGenerator]") {
         }
     }
     REQUIRE(key == cb.pawnKey());
+
+    // Simple SEE tests
+    REQUIRE(cb.seeGE(makeMove(12, 40), 330));
+    REQUIRE(!(cb.seeGE(makeMove(21, 45), -599)));
+    REQUIRE(cb.seeGE(makeMove(35, 44), 0));
+    REQUIRE(!(cb.seeGE(makeMove(36, 53), -199)));
 }
 
 TEST_CASE("TransPosTable::Entry", "[Weight=1][part=TransPosTable]") {
     zobristKey key = 0;
     Move move = NOMOVE;
     Type type = Lower;
-    int depth = 9;
+    int depth = 18;
     int score = -Infinity;
     int eval = -1;
     Entry entry;
-    entry.save(key, score, eval, depth, move, type);
+    bool ttPV = true;
+    entry.save(key, score, eval, depth, move, type, ttPV);
     uint64_t data = entry.data;
 
     REQUIRE(key ^ data == entry.keyXData);
@@ -68,6 +76,7 @@ TEST_CASE("TransPosTable::Entry", "[Weight=1][part=TransPosTable]") {
     REQUIRE(depth == unpackDepth(data));
     REQUIRE(score == unpackScore(data));
     REQUIRE(type == unpackType(data));
+    REQUIRE(ttPV == unpackTTPV(data));
 }
 
 TEST_CASE("ChessBoard::Key", "[Weight=1][part=ChessBoard]") {
@@ -79,6 +88,7 @@ TEST_CASE("ChessBoard::Key", "[Weight=1][part=ChessBoard]") {
     StateInfo si;
     testKey(cb);
     std::cout << "Initial Key success" << std::endl;
+
     for (int i = 0; i < 64; i++) {
         end = MoveGenerator::generateMoves(cb, moves, false);
         int length = (end - moves);
@@ -89,8 +99,14 @@ TEST_CASE("ChessBoard::Key", "[Weight=1][part=ChessBoard]") {
     }
 }
 
-TEST_CASE("Threads::Threads", "[Weight=1][part=Threads]") {
+TEST_CASE("Tune::initCoeffs", "[Weight=1][part=Tune]") {
     StateInfo si;
     std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
     ChessBoard cb = ChessBoard(startingFen, si);
+    Evaluation::doTrace = true;
+    TuningEntry entry;
+    entry.sEval = Evaluation::evaluate(cb);
+    Tuner::initCoeffs(entry, cb);
+
+    std::cout << std::log(10) << std::endl;
 }

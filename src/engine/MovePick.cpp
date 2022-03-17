@@ -25,9 +25,9 @@ void MovePick::score(ChessBoard& cb, Move pref, Move* killers) {
         PieceType capt = typeOf(cb.pieceOn(getTo(move)));
         if (capt) {
             PieceType pc = typeOf(cb.pieceOn(getFrom(move)));
-            moves[i].score = mgVals[capt] + (1000 - mgVals[pc]);
+            moves[i].score = pieceVals[capt].mg+ cb.thisThread->captureHistory[pc][getTo(move)][capt];
         } else if (getFlag(move) == PROMOTION) {
-            moves[i].score = mgVals[getProm(move)];
+            moves[i].score = pieceVals[getProm(move)].mg;
         }  else if (move == counter) {
             moves[i].score = 95;
         } else if (move == killers[0]) {

@@ -3,7 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\Users\\adamn\\SDL2\\include\\SDL2/**"
+                "${workspaceFolder}/src/engine",
+                "C:\\msys64\\mingw64\\include\\SDL2"
             ],
             "defines": [
                 "_DEBUG",
