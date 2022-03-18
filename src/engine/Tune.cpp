@@ -1,7 +1,27 @@
 #include "Tune.h"
 
 void Tuner::runTuner() {
-    
+    // params array stores the difference in the starting value param and the tuned value
+    double params[NPARAMS][PHASENB] = {0};
+    TuningEntry* entries = (TuningEntry*)malloc(NPOSITIONS * sizeof(TuningEntry));
+    initEntries(entries);
+    double k = minimizeK(entries);
+    double adaGrad[NPARAMS][PHASENB] = {0};
+
+    for (int i = 0; i < MAXEPOCHS; i++) {
+        double gradient[NPARAMS][PHASENB] = {0};
+        computeGradients(entries, params, gradient, k);
+
+        for (int j = 0; j < NPARAMS; j++) {
+            // Update the adaGrad vector which is the sum of squared gradients
+            adaGrad[j][mg] += pow(2 * k * gradient[j][mg]/ NPOSITIONS, 2);
+            adaGrad[j][eg] += pow(2 * k * gradient[j][eg]/ NPOSITIONS, 2);
+
+            // update the params
+            params[j][mg] += (2 * k / NPOSITIONS) * gradient[j][mg] * LEARNINGRATE / adaGrad[j][mg];
+            params[j][eg] += (2 * k / NPOSITIONS) * gradient[j][eg] * LEARNINGRATE / adaGrad[j][eg];
+        }
+    }
 }
 
 void Tuner::initEntries(TuningEntry* entries) {
@@ -33,7 +53,7 @@ void Tuner::initEntries(TuningEntry* entries) {
 }
 
 void Tuner::initSingleEntry(TuningEntry& entry, ChessBoard& cb) {
-    int phase = 4 * countBits(cb.pieces(QUEEN)) +
+    double phase = 4 * countBits(cb.pieces(QUEEN)) +
                 2 * countBits(cb.pieces(ROOK)) +
                 1 * countBits(cb.pieces(BISHOP)) +
                 1 * countBits(cb.pieces(KNIGHT));
@@ -41,6 +61,9 @@ void Tuner::initSingleEntry(TuningEntry& entry, ChessBoard& cb) {
     entry.phase[eg] = 1.0 - phase / 24;
     memset(&Evaluation::trace, 0, sizeof(EvalTrace));
     entry.sEval = Evaluation::evaluate(cb);
+    if (cb.colourToMove() == BLACK) {
+        entry.sEval = -entry.sEval;
+    }
     initCoeffs(entry, cb);
 
 }
@@ -58,7 +81,9 @@ void Tuner::initCoeffs(TuningEntry& entry, ChessBoard& cb) {
     if (TUNEPSQT) {
         for (int j = PAWN; j <= KING; j++) {
             for (int k = 0; k < 64; k++) {
-                coeffs[idx][WHITE] = cb.pieceOn(k) == makePiece(WHITE, PieceType(j));
+                int rank = k / 8;
+                int file = k % 8;
+                coeffs[idx][WHITE] = cb.pieceOn((7 - rank)* 8 + file) == makePiece(WHITE, PieceType(j));
                 coeffs[idx][BLACK] = cb.pieceOn(k) == makePiece(BLACK, PieceType(j));
                 idx++;
             }
@@ -86,6 +111,10 @@ void Tuner::initCoeffs(TuningEntry& entry, ChessBoard& cb) {
 
         coeffs[idx][WHITE] = Evaluation::trace.unsupported[WHITE];
         coeffs[idx][BLACK] = Evaluation::trace.unsupported[BLACK];
+        idx++;
+
+        coeffs[idx][WHITE] = Evaluation::trace.supported[WHITE];
+        coeffs[idx][BLACK] = Evaluation::trace.supported[BLACK];
         idx++;
 
         for (int j = 0; j < 4; j++) {
@@ -165,21 +194,21 @@ void Tuner::initCoeffs(TuningEntry& entry, ChessBoard& cb) {
         if (coeffs[i][WHITE] != coeffs[i][BLACK]) {
             entry.coeffs[coeffIdx].white = coeffs[i][WHITE];
             entry.coeffs[coeffIdx].black = coeffs[i][BLACK];
-            entry.coeffs[coeffIdx].index = coeffIdx;
+            entry.coeffs[coeffIdx].index = i;
             coeffIdx++;
         }
     }
 
 }
 
-double Tuner::linearEval(TuningEntry* entry, double** params) {
+double Tuner::linearEval(TuningEntry& entry, double params[NPARAMS][PHASENB]) {
     double score[PHASENB] = {0.0};
-    for (int i = 0; i < entry->nTerms; i++) {
-        score[mg] += params[mg][entry->coeffs->index] * (entry->coeffs->white - entry->coeffs->black);
-        score[eg] += params[eg][entry->coeffs->index] * (entry->coeffs->white - entry->coeffs->black);
+    for (int i = 0; i < entry.nTerms; i++) {
+        score[mg] += params[entry.coeffs[i].index][mg] * (entry.coeffs[i].white - entry.coeffs[i].black);
+        score[eg] += params[entry.coeffs[i].index][eg] * (entry.coeffs[i].white - entry.coeffs[i].black);
     }
 
-    return score[mg] * entry->phase[mg] + score[eg] * entry->phase[eg];
+    return score[mg] * entry.phase[mg] + score[eg] * entry.phase[eg];
 }
 
 double Tuner::minimizeK(TuningEntry* entries) {
@@ -217,6 +246,23 @@ double Tuner::sigmoid(double k, int eval) {
     return 1.0 / (1.0 + exp(-k * eval));
 }
 
-void Tuner::computeSingleGradient(TuningEntry* entry, double k) {
+void Tuner::computeGradients(TuningEntry* entries, double params[NPARAMS][PHASENB], double gradient[NPARAMS][PHASENB], double k) {
+    for (int i = 0; i < NPOSITIONS; i++) {
+        // We actually are computing the sum of the gradients. We take the average later to avoid precision loss when dividing
+        computeSingleGradient(entries[i], params, gradient, k);
+    }
+}
+
+void Tuner::computeSingleGradient(TuningEntry& entry, double params[NPARAMS][PHASENB], double gradient[NPARAMS][PHASENB], double k) {
+    double E = linearEval(entry, params);
+    double S = sigmoid(k, E);
+    double X = (entry.result - S) * k * S * (1 - S);
+    double mgBase = X * entry.phase[mg];
+    double egBase = X * entry.phase[eg];
+
+    for (int i = 0; i < entry.nTerms; i++) {
+        gradient[entry.coeffs[i].index][mg] += mgBase * (entry.coeffs[i].white - entry.coeffs[i].black);
+        gradient[entry.coeffs[i].index][eg] += egBase * (entry.coeffs[i].white - entry.coeffs[i].black);
+    }
 
 }

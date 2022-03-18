@@ -2,13 +2,14 @@
 #include "Threads.h"
 
 // material values, King has no material values as it is assumed it is always on the board
-Score pieceVals[8] = {Score(0, 0), Score(100, 100), Score(300, 300), Score(330, 330), Score(500, 500), Score(900, 900), Score(0, 0)};
+Score pieceVals[7] = {Score(0, 0), Score(100, 100), Score(300, 300), Score(330, 330), Score(500, 500), Score(900, 900), Score(0, 0)};
 
 Score passedBonus[8] = {Score(0, 0), Score(7, 13), Score(12, 19), Score(18, 27), Score(24, 37), Score(31, 47), Score(42, 55), Score(0, 0)};
 Score connectedBonus[8] = {Score(0, 0), Score(7, 7), Score(9, 9), Score(11, 11), Score(15, 15), Score(22, 22), Score(28, 28), Score(0, 0)};
 Score isolated = Score(-5, -12);
 Score doubled = Score(-5, -11);
 Score unsupported = Score(-9, -13);
+Score supported = Score(7, 7);
 
 int manhattanDist[64][64];
 
@@ -25,17 +26,27 @@ Score unblockedStorm[8] = {Score(17, 0), Score(-50, 0), Score(-30, 0), Score(2, 
 Score openFileBonus[2][2] = {{Score(22, -4), Score(13, -3)},
                              {Score(0, 4), Score(-12, 10)}};
 
-int safetyTable[100] = {
-    0,  0,   1,   2,   3,   5,   7,   9,  12,  15,
-    18,  22,  26,  30,  35,  39,  44,  50,  56,  62,
-    68,  75,  82,  85,  89,  97, 105, 113, 122, 131,
-    140, 150, 169, 180, 191, 202, 213, 225, 237, 248,
-    260, 272, 283, 295, 307, 319, 330, 342, 354, 366,
-    377, 389, 401, 412, 424, 436, 448, 459, 471, 483,
-    494, 500, 500, 500, 500, 500, 500, 500, 500, 500,
-    500, 500, 500, 500, 500, 500, 500, 500, 500, 500,
-    500, 500, 500, 500, 500, 500, 500, 500, 500, 500,
-    500, 500, 500, 500, 500, 500, 500, 500, 500, 500
+Score safetyTable[100] = {
+    Score(0, 0),  Score(0, 0),   Score(1, 1),   Score(2, 2),   Score(3, 3),
+    Score(5, 5),  Score(7, 7),   Score(9, 9),   Score(12, 12), Score(15, 15),
+    Score(18, 18),  Score(22, 22),  Score(26, 26),  Score(30, 30),  Score(35, 35),
+    Score(39, 39),  Score(44, 44),  Score(50, 50),  Score(56, 56),  Score(62, 62),
+    Score(68, 68),  Score(75, 75),  Score(82, 82),  Score(85, 85),  Score(89, 89),
+    Score(97, 97), Score(105, 105), Score(113, 113), Score(122, 122), Score(131,131),
+    Score(140, 140), Score(150, 150), Score(169, 169), Score(180, 180), Score(191, 191),
+    Score(202, 202), Score(213, 213), Score(225, 225), Score(237, 237), Score(248, 248),
+    Score(260, 260), Score(272, 272), Score(283, 283), Score(295, 295), Score(307, 307),
+    Score(319, 319), Score(330, 330), Score(342, 342), Score(354, 354), Score(366, 366),
+    Score(377, 377), Score(389, 389), Score(401, 401), Score(412, 412), Score(424, 424),
+    Score(436, 436), Score(448, 448), Score(459, 459), Score(471, 471), Score(483, 483),
+    Score(494, 494), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500),
+    Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500),
+    Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500),
+    Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500),
+    Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500),
+    Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500),
+    Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500),
+    Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500), Score(500, 500)
 };
 
 int attackerWeight[8] = {0, 1, 2, 2, 3, 6, 0};
@@ -138,6 +149,9 @@ EvalTrace Evaluation::trace;
 void Evaluation::init() {
     doTrace = false;
     for (int i = 0; i < 64; i++) {
+        int rank = i / 8;
+        int file = i % 8;
+        int whiteIdx = (7 - rank) * 8 + file;
         // init psq tables
         pieceSquareTables[BLACKPAWN][i] = psPawn[i];
         pieceSquareTables[BLACKKNIGHT][i] = psKnight[i];
@@ -145,16 +159,13 @@ void Evaluation::init() {
         pieceSquareTables[BLACKROOK][i] = psRook[i];
         pieceSquareTables[BLACKQUEEN][i] = psQueen[i];
         pieceSquareTables[BLACKKING][i] = psKing[i];
-        pieceSquareTables[WHITEPAWN][i] = psPawn[63 - i];
-        pieceSquareTables[WHITEKNIGHT][i] = psKnight[63 - i];
-        pieceSquareTables[WHITEBISHOP][i] = psBishop[63 - i];
-        pieceSquareTables[WHITEROOK][i] = psRook[63 - i];
-        pieceSquareTables[WHITEQUEEN][i] = psQueen[63 - i];
-        pieceSquareTables[WHITEKING][i] = psKing[63 - i];
+        pieceSquareTables[WHITEPAWN][i] = psPawn[whiteIdx];
+        pieceSquareTables[WHITEKNIGHT][i] = psKnight[whiteIdx];
+        pieceSquareTables[WHITEBISHOP][i] = psBishop[whiteIdx];
+        pieceSquareTables[WHITEROOK][i] = psRook[whiteIdx];
+        pieceSquareTables[WHITEQUEEN][i] = psQueen[whiteIdx];
+        pieceSquareTables[WHITEKING][i] = psKing[whiteIdx];
 
-
-        int rank = i / 8;
-        int file = i % 8;
         // init pawn structure masks
         bitBoard wAhead = 0;
         bitBoard bAhead = 0;
@@ -247,10 +258,12 @@ Score Evaluation::evaluatePawnStructure(ChessBoard& cb) {
         // A pawn supported by others recieves a bonus
         if (support || adj) {
             score += connectedBonus[relativeRank(col, idx)];
-            score += 7 * countBits(support);
+            score += supported * countBits(support);
 
-            if (doTrace) 
+            if (doTrace) {
                 trace.connected[col][relativeRank(col, idx)]++;
+                trace.supported[col] += countBits(support);
+            }
 
         // A pawn with no pawns in adjecent files is considered isolated and will be penalized
         } else if (!neighbours) {

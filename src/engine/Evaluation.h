@@ -4,7 +4,7 @@
 #include "BitBoards.h"
 #include "Zobrist.h"
 
-extern Score pieceVals[8];
+extern Score pieceVals[7];
 extern Score psPawn[64];
 extern Score psKnight[64];
 extern Score psBishop[64];
@@ -26,6 +26,8 @@ extern Score isolated;
 extern Score doubled;
 // A penalty for pawns with no supporting pawn
 extern Score unsupported;
+// A bonus for pawns protected by other pawns
+extern Score supported;
 
 extern int manhattanDist[64][64];
 
@@ -39,7 +41,7 @@ extern Score blockedStorm[8];
 extern Score unblockedStorm[8];
 
 // Penalties for the number of attacks on the king zone
-extern int safetyTable[100];
+extern Score safetyTable[100];
 // The weight of each attack on the king zone by piece
 extern int attackerWeight[8];
 
@@ -61,6 +63,7 @@ struct EvalTrace {
     int isolated[COLOURNB];
     int doubled[COLOURNB];
     int unsupported[COLOURNB];
+    int supported[COLOURNB];
     // King Shelter Trace
     int shelter[COLOURNB][4][8];
     int blockedStorm[COLOURNB][8];

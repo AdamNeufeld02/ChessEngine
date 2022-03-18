@@ -1,7 +1,21 @@
-make.exe --dry-run --keep-going --print-directory
+make.exe --dry-run --always-make --keep-going --print-directory
 make: Entering directory 'c:/Users/adamn/Desktop/ChessEngine'
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/BitBoards.cpp -o build/BitBoards.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/ChessBoard.cpp -o build/ChessBoard.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/Evaluation.cpp -o build/Evaluation.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/Misc.cpp -o build/Misc.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/MoveGenerator.cpp -o build/MoveGenerator.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/MovePick.cpp -o build/MovePick.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/Search.cpp -o build/Search.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/Threads.cpp -o build/Threads.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/TransposTable.cpp -o build/TransposTable.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/Tune.cpp -o build/Tune.o
+g++ -c -g -Ofast -Wall -Wextra -pedantic src/engine/Zobrist.cpp -o build/Zobrist.o
+g++ -IC:\msys64\mingw64\include\SDL2 -Isrc/engine -c -g -Ofast -Wall -Wextra -pedantic src/gui/ChessGUI.cpp -o build/ChessGUI.o
+g++ -IC:\msys64\mingw64\include\SDL2 -Isrc/engine -c -g -Ofast -Wall -Wextra -pedantic src/gui/GameState.cpp -o build/GameState.o
+g++ -IC:\msys64\mingw64\include\SDL2 -Isrc/engine -c -g -Ofast -Wall -Wextra -pedantic src/gui/main.cpp -o build/main.o
 g++  build/BitBoards.o  build/ChessBoard.o  build/Evaluation.o  build/Misc.o  build/MoveGenerator.o  build/MovePick.o  build/Search.o  build/Threads.o  build/TransposTable.o  build/Tune.o  build/Zobrist.o  build/ChessGUI.o  build/GameState.o  build/main.o -LC:\Users\adamn\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o build/ChessGUI
- 
+g++ -Isrc/engine -c -g -Ofast -Wall -Wextra -pedantic src/test/Test.cpp -o build/Test.o
 g++  build/BitBoards.o  build/ChessBoard.o  build/Evaluation.o  build/Misc.o  build/MoveGenerator.o  build/MovePick.o  build/Search.o  build/Threads.o  build/TransposTable.o  build/Tune.o  build/Zobrist.o  build/Test.o -o build/ChessTest
 make: Leaving directory 'c:/Users/adamn/Desktop/ChessEngine'
  

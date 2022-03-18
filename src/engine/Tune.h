@@ -5,6 +5,9 @@
 #include <string.h>
 #include "Evaluation.h"
 
+#define MAXEPOCHS 10000
+#define LEARNINGRATE 0.10
+
 #define NPOSITIONS 100
 #define TUNINGFILE ""
 #define KPRECISION 10
@@ -16,7 +19,7 @@
 
 #define NMATERIALPAR 5
 #define NPSQTPAR 384
-#define NPAWNSTRUCTPAR 71
+#define NPAWNSTRUCTPAR 72
 #define NKINGSAFETYPAR 100
 #define NTUNEMOBILITYPAR 66
 
@@ -25,7 +28,7 @@
 
 struct Coeffs
 {
-    uint8_t index;
+    uint16_t index;
     int white, black;
 };
 
@@ -48,10 +51,10 @@ namespace Tuner {
     double minimizeK(TuningEntry* entries);
     double staticEvalError(TuningEntry* entries, double k);
     double tunedEvalError(TuningEntry* entries, double k);
-    double linearEval(TuningEntry* entry, double** params);
+    double linearEval(TuningEntry& entry, double params[NPARAMS][PHASENB]);
     
-    void computeGradients(TuningEntry* entries);
-    void computeSingleGradient(TuningEntry* entry, double k);
+    void computeGradients(TuningEntry* entries, double params[NPARAMS][PHASENB], double gradient[NPARAMS][PHASENB], double k);
+    void computeSingleGradient(TuningEntry& entry, double params[NPARAMS][PHASENB], double gradients[NPARAMS][PHASENB], double k);
     void updateConsole(TuningEntry* entries);
 }
 

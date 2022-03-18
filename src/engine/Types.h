@@ -124,6 +124,10 @@ struct Score {
         return Score(mg - s.mg, eg - s.eg);
     }
 
+    Score operator * (int cnst) {
+        return Score(mg * cnst, eg * cnst);
+    }
+
     Score operator +=(int cnst) {
         mg += cnst;
         eg += cnst;

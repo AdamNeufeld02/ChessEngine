@@ -5,9 +5,8 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
- 
 
-# Make data base, printed on Wed Mar 16 21:21:41 2022
+# Make data base, printed on Thu Mar 17 22:05:54 2022
 
 # Variables
 
@@ -22,7 +21,7 @@ OBJS_TST :=  build/Test.o
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-676aac1a-27e7-454d-a15d-d622b2fb5deb-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-7a1b50d4-b1dc-41ee-952f-9920f90cc97e-sock
 # makefile (from 'makefile', line 5)
 GUI_DIR = src/gui
 # environment
@@ -40,7 +39,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_14188_LDEPVKFNVBEGASXG
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_12784_DUQHLZDWQBVYRDZS
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -96,7 +95,7 @@ VSCODE_VERBOSE_LOGGING = true
 # makefile (from 'makefile', line 15)
 OBJS_ENG :=  build/BitBoards.o  build/ChessBoard.o  build/Evaluation.o  build/Misc.o  build/MoveGenerator.o  build/MovePick.o  build/Search.o  build/Threads.o  build/TransposTable.o  build/Tune.o  build/Zobrist.o
 # environment
-VSCODE_PID = 14188
+VSCODE_PID = 12784
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # makefile (from 'makefile', line 12)
@@ -295,7 +294,7 @@ build/ChessTest: build/BitBoards.o build/ChessBoard.o build/Evaluation.o build/M
 build/MovePick.o: src/engine/MovePick.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'MovePick'
-#  Last modified 2022-03-16 21:19:49
+#  Last modified 2022-03-17 21:09:13
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -303,9 +302,8 @@ build/MovePick.o: src/engine/MovePick.cpp
 
 build/ChessGUI.o: src/gui/ChessGUI.cpp
 #  Implicit rule search has been done.
-#  Implicit/static 
- pattern stem: 'ChessGUI'
-#  Last modified 2022-03-16 21:19:53
+#  Implicit/static pattern stem: 'ChessGUI'
+#  Last modified 2022-03-17 21:09:17
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 49):
@@ -314,7 +312,7 @@ build/ChessGUI.o: src/gui/ChessGUI.cpp
 build/Tune.o: src/engine/Tune.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Tune'
-#  Last modified 2022-03-16 21:19:51
+#  Last modified 2022-03-17 21:09:16
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -323,7 +321,7 @@ build/Tune.o: src/engine/Tune.cpp
 build/Zobrist.o: src/engine/Zobrist.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Zobrist'
-#  Last modified 2022-03-16 21:19:52
+#  Last modified 2022-03-17 21:09:16
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -339,7 +337,7 @@ src/gui/ChessGUI.cpp:
 build/Threads.o: src/engine/Threads.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Threads'
-#  Last modified 2022-03-16 21:19:50
+#  Last modified 2022-03-17 21:09:15
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -356,7 +354,7 @@ clean:
 build/BitBoards.o: src/engine/BitBoards.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'BitBoards'
-#  Last modified 2022-03-16 21:19:45
+#  Last modified 2022-03-17 21:09:09
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -365,7 +363,7 @@ build/BitBoards.o: src/engine/BitBoards.cpp
 build/ChessBoard.o: src/engine/ChessBoard.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'ChessBoard'
-#  Last modified 2022-03-16 21:19:46
+#  Last modified 2022-03-17 21:09:10
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -381,7 +379,7 @@ src/gui/main.cpp:
 build/TransposTable.o: src/engine/TransposTable.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'TransposTable'
-#  Last modified 2022-03-16 21:19:51
+#  Last modified 2022-03-17 21:09:15
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -390,7 +388,7 @@ build/TransposTable.o: src/engine/TransposTable.cpp
 build/Search.o: src/engine/Search.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Search'
-#  Last modified 2022-03-16 21:19:50
+#  Last modified 2022-03-17 21:09:14
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -406,7 +404,7 @@ src/engine/BitBoards.cpp:
 build/Misc.o: src/engine/Misc.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Misc'
-#  Last modified 2022-03-16 21:19:47
+#  Last modified 2022-03-17 21:09:12
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -437,7 +435,7 @@ all: build/ChessGUI build/ChessTest
 build/GameState.o: src/gui/GameState.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'GameState'
-#  Last modified 2022-03-16 21:19:54
+#  Last modified 2022-03-17 21:09:18
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 49):
@@ -460,7 +458,7 @@ src/engine/Threads.cpp:
 build/MoveGenerator.o: src/engine/MoveGenerator.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'MoveGenerator'
-#  Last modified 2022-03-16 21:19:48
+#  Last modified 2022-03-17 21:09:12
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -496,7 +494,7 @@ build/Test.o:
 # Not a target:
 src/engine/Evaluation.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-16 21:14:11
+#  Last modified 2022-03-17 19:13:04
 #  File has been updated.
 #  Successfully updated.
 
@@ -509,7 +507,7 @@ src/engine/Evaluation.cpp:
 build/main.o: src/gui/main.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'main'
-#  Last modified 2022-03-16 21:19:55
+#  Last modified 2022-03-17 21:09:19
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 49):
@@ -535,8 +533,7 @@ build/ChessGUI: build/BitBoards.o build/ChessBoard.o build/Evaluation.o build/Mi
 # automatic
 # < := build/BitBoards.o
 # automatic
-# + := build/BitBoards.o build/ChessBoard.o build/Evaluation.o build/Misc.o build/MoveGenerator.o build/MovePick.o build/Search.o build/Threads.o build/TransposTable.o build/Tune.o build/Zobrist.o build/ChessGUI.o build/GameState.o  
-build/main.o
+# + := build/BitBoards.o build/ChessBoard.o build/Evaluation.o build/Misc.o build/MoveGenerator.o build/MovePick.o build/Search.o build/Threads.o build/TransposTable.o build/Tune.o build/Zobrist.o build/ChessGUI.o build/GameState.o build/main.o
 # automatic
 # % := 
 # automatic
@@ -553,7 +550,7 @@ build/main.o
 build/Evaluation.o: src/engine/Evaluation.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Evaluation'
-#  Last modified 2022-03-16 21:19:47
+#  Last modified 2022-03-17 21:09:11
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'makefile', line 45):
@@ -569,14 +566,14 @@ src/engine/ChessBoard.cpp:
 # Not a target:
 src/engine/Tune.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-16 21:18:30
+#  Last modified 2022-03-17 19:14:02
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 src/gui/GameState.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-11 21:55:46
+#  Last modified 2022-03-17 21:09:04
 #  File has been updated.
 #  Successfully updated.
 
@@ -594,6 +591,6 @@ src/gui/GameState.cpp:
 # strcache performance: lookups = 142 / hit rate = 31%
 # hash-table stats:
 # Load=97/8192=1%, Rehash=0, Collisions=0/142=0%
-# Finished Make data base on Wed Mar 16 21:21:41 2022
+# Finished Make data base on Thu Mar 17 22:05:54 2022
 
  
