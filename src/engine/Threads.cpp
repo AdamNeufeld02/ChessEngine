@@ -105,7 +105,7 @@ void ThreadPool::startSearching(ChessBoard& cb, int time) {
     waitForAllThreads();
     // Init main thread
     MainThread* mt = static_cast<MainThread*>(threads[0]);
-    mt->alloted = time * 1000;
+    mt->alloted = time;
     mt->start = std::chrono::steady_clock::now();
     for (int i = 0; i < size; i++) {
         threads[i]->bestMove = NOMOVE;
@@ -151,15 +151,6 @@ SearchInfo ThreadPool::getBestThread() {
     }
 
     for (int i = 0; i < size; i++) {
-        std::cout << "Depth: " << threads[i]->depthReached << std::endl;
-        std::cout << "Eval: "  << (double)threads[i]->bestScore/pieceVals[PAWN].mg << std::endl;
-        std::cout << "PV: ";
-        for (int k = 0; k < threads[i]->depthReached; k++) {
-            std::cout << " " << Misc::moveToString(threads[i]->bestPV[k]);
-        }
-        std::cout << std::endl;
-        std::cout << "Thread id: "<< threads[i]->id << std::endl;
-        std::cout << "--------------------" << std::endl;
 
         votes[threads[i]->bestMove] += std::max((threads[i]->bestScore - minScore), 1) + 5 * threads[i]->depthReached;
         

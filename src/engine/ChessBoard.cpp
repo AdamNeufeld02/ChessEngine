@@ -105,6 +105,7 @@ void ChessBoard::doMove(Move move, StateInfo& si) {
     st->key ^= Zobrist::castlingKeys[st->castlingRights];
 
     st->ply++;
+
     updateChecksAndPins(colToMove);
 
     st->repetitions = 0;
@@ -418,20 +419,18 @@ void ChessBoard::fenToBoard(std::string fenString, StateInfo& si) {
     // Parse Castling Rights
     stringIndex += 2;
     curr = fenString[stringIndex];
-    if (curr != *"-") {
-        while (curr != *" ") {
-            if (curr == *"K") {
-                st->castlingRights |= WHITE_OO;
-            } else if (curr == *"Q") {
-                st->castlingRights |= WHITE_OOO;
-            } else if (curr == *"k") {
-                st->castlingRights |= BLACK_OO;
-            } else if (curr == *"q") {
-                st->castlingRights |= BLACK_OOO;
-            }
-            stringIndex++;
-            curr = fenString[stringIndex];
+    while (curr != *" ") {
+        if (curr == *"K") {
+            st->castlingRights |= WHITE_OO;
+        } else if (curr == *"Q") {
+            st->castlingRights |= WHITE_OOO;
+        } else if (curr == *"k") {
+            st->castlingRights |= BLACK_OO;
+        } else if (curr == *"q") {
+            st->castlingRights |= BLACK_OOO;
         }
+        stringIndex++;
+        curr = fenString[stringIndex];
     }
     st->key ^= Zobrist::castlingKeys[st->castlingRights];
 
@@ -466,6 +465,69 @@ void ChessBoard::fenToBoard(std::string fenString, StateInfo& si) {
         st->epSquare = -1;
     }
     updateChecksAndPins(colToMove);
+}
+
+std::string ChessBoard::boardToFen() {
+    static std::string pieceMap[PIECENB] = {"\0", "P", "N", "B", "R", "Q", "K", "\0", "\0", "p", "n", "b", "r", "q", "k"};
+    static std::string numMap[9] = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
+    std::string ret;
+    std::string curr;
+    int empty = 0;
+    for (int rank = 7; rank >= 0; rank--) {
+        for (int file = 0; file < 8; file++) {
+            curr = pieceMap[pieceOn(rank * 8 + file)];
+            if (curr != "\0") {
+                if (empty) {
+                    ret.append(numMap[empty]);
+                    empty = 0;
+                }
+                ret.append(curr);
+            } else {
+                empty++;
+            }
+        }
+        if (empty) {
+            ret.append(numMap[empty]);
+            empty = 0;
+        }
+        if (rank > 0) {
+            ret.append("/");
+        } else {
+            ret.append(" ");
+        }
+    }
+
+    if (colToMove == WHITE) {
+        ret.append("w ");
+    } else {
+        ret.append("b ");
+    }
+
+    if (st->castlingRights) {
+        if (canCastle(WHITE_OO)) {
+            ret.append("K");
+        }
+        if (canCastle(WHITE_OOO)) {
+            ret.append("Q");
+        }
+        if (canCastle(BLACK_OO)) {
+            ret.append("k");
+        }
+        if (canCastle(BLACK_OOO)) {
+            ret.append("q");
+        }
+    } else {
+        ret.append("-");
+    }
+
+    ret.append(" ");
+
+    if (st->epSquare > 0) {
+        ret.append(Misc::indexToString(st->epSquare));
+    } else {
+        ret.append("-");
+    }
+    return ret;
 }
 
 // Initializes all bitboards to empty and all fields

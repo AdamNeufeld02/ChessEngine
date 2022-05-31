@@ -5,8 +5,9 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
+ 
 
-# Make data base, printed on Thu Mar 17 22:05:54 2022
+# Make data base, printed on Tue May 31 14:02:51 2022
 
 # Variables
 
@@ -17,11 +18,13 @@ LC_ALL = C
 # environment
 USERPROFILE = C:\Users\adamn
 # makefile (from 'makefile', line 16)
+SRCS_PLY := src/selfplay/Player.cpp src/selfplay/SPmain.cpp
+# makefile (from 'makefile', line 19)
 OBJS_TST :=  build/Test.o
 # environment
 LOCALAPPDATA = C:\Users\adamn\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-7a1b50d4-b1dc-41ee-952f-9920f90cc97e-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-dc28f286-dcbe-418b-80cd-c6a20829a7b0-sock
 # makefile (from 'makefile', line 5)
 GUI_DIR = src/gui
 # environment
@@ -39,7 +42,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_12784_DUQHLZDWQBVYRDZS
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_41600_NQGPLAKFAJXOYTJN
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -53,7 +56,7 @@ VSCODE_LOG_STACK = false
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\adamn\AppData\Roaming\Code\CachedData\c722ca6c7eed3d7987c0d5c3df5c45f6b15e77d1
+VSCODE_CODE_CACHE_PATH = C:\Users\adamn\AppData\Roaming\Code\CachedData\57fd6d0195bb9b9d1b49f6da5db789060795de47
 # environment
 LANG = C
 # default
@@ -92,17 +95,17 @@ MAKEFILE_LIST := makefile
 @F = $(notdir $@)
 # environment
 VSCODE_VERBOSE_LOGGING = true
-# makefile (from 'makefile', line 15)
+# makefile (from 'makefile', line 18)
 OBJS_ENG :=  build/BitBoards.o  build/ChessBoard.o  build/Evaluation.o  build/Misc.o  build/MoveGenerator.o  build/MovePick.o  build/Search.o  build/Threads.o  build/TransposTable.o  build/Tune.o  build/Zobrist.o
 # environment
-VSCODE_PID = 12784
+VSCODE_PID = 41600
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
-# makefile (from 'makefile', line 12)
+# makefile (from 'makefile', line 14)
 SRCS_TST := src/test/Test.cpp
 # automatic
 *F = $(notdir $*)
-# makefile (from 'makefile', line 28)
+# makefile (from 'makefile', line 32)
 LIBRARY_PATHS = -LC:\Users\adamn\SDL2\lib
 # automatic
 <D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
@@ -158,7 +161,7 @@ COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
 ?F = $(notdir $?)
 # environment
 PROGRAMW6432 = C:\Program Files
-# makefile (from 'makefile', line 17)
+# makefile (from 'makefile', line 20)
 OBJS_GUI :=  build/ChessGUI.o  build/GameState.o  build/main.o
 # environment
 PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
@@ -172,11 +175,11 @@ USERDOMAIN = LAPTOP-7FSGAFD8
 GNUMAKEFLAGS := 
 # environment
 OS = Windows_NT
-# makefile (from 'makefile', line 7)
+# makefile (from 'makefile', line 8)
 EXE = $(BUILD_DIR)/ChessGUI
 # makefile
 .DEFAULT_GOAL := all
-# makefile (from 'makefile', line 24)
+# makefile (from 'makefile', line 28)
 INCLUDE_ENGINE = -Isrc/engine
 # default
 MAKE_VERSION := 4.3
@@ -190,9 +193,11 @@ NUMBER_OF_PROCESSORS = 16
 PUBLIC = C:\Users\Public
 # makefile (from 'makefile', line 3)
 ENG_DIR = src/engine
-# makefile (from 'makefile', line 22)
-CXX_FLAGS = -c -g -Ofast -Wall -Wextra -pedantic
+# makefile (from 'makefile', line 10)
+EXEP = $(BUILD_DIR)/SelfPlay
 # makefile (from 'makefile', line 26)
+CXX_FLAGS = -c -g -Ofast -Wall -Wextra -pedantic
+# makefile (from 'makefile', line 30)
 INCLUDE_SDL = -IC:\msys64\mingw64\include\SDL2
 # environment
 APPDATA = C:\Users\adamn\AppData\Roaming
@@ -200,6 +205,8 @@ APPDATA = C:\Users\adamn\AppData\Roaming
 HOMEDRIVE = C:
 # environment
 AMDPROFILERPATH = C:\Program Files\AMD\AMDuProf\bin
+# makefile (from 'makefile', line 6)
+PLY_DIR = src/selfplay
 # environment
 PROCESSOR_ARCHITECTURE = x86
 # environment
@@ -210,16 +217,18 @@ BUILD_DIR = build
 COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
 # environment
 VS2019INSTALLDIR = C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
-# makefile (from 'makefile', line 11)
+# makefile (from 'makefile', line 21)
+OBJS_PLY :=  build/Player.o  build/SPmain.o
+# makefile (from 'makefile', line 13)
 SRCS_ENG := src/engine/BitBoards.cpp src/engine/ChessBoard.cpp src/engine/Evaluation.cpp src/engine/Misc.cpp src/engine/MoveGenerator.cpp src/engine/MovePick.cpp src/engine/Search.cpp src/engine/Threads.cpp src/engine/TransposTable.cpp src/engine/Tune.cpp src/engine/Zobrist.cpp
-# makefile (from 'makefile', line 8)
+# makefile (from 'makefile', line 9)
 EXET = $(BUILD_DIR)/ChessTest
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\adamn\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\d4a9e6f9a87c3367f01bb615cd195f42-1.65.2-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\d4a9e6f9a87c3367f01bb615cd195f42-1.67.0-main-sock
 # makefile (from 'makefile', line 4)
 TST_DIR = src/test
 # default
@@ -236,16 +245,16 @@ SESSIONNAME = Console
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync load
 # environment
 PROCESSOR_REVISION = 5000
-# makefile (from 'makefile', line 20)
+# makefile (from 'makefile', line 24)
 CXX = g++
-# makefile (from 'makefile', line 31)
+# makefile (from 'makefile', line 35)
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
-# makefile (from 'makefile', line 13)
+# makefile (from 'makefile', line 15)
 SRCS_GUI := src/gui/ChessGUI.cpp src/gui/GameState.cpp src/gui/main.cpp
 # environment
 PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # variable set hash-table stats:
-# Load=117/1024=11%, Rehash=0, Collisions=17/184=9%
+# Load=121/1024=12%, Rehash=0, Collisions=22/200=11%
 
 # Pattern-specific Variable Values
 
@@ -256,31 +265,36 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # src/gui (key c:/Users/adamn/Desktop/ChessEngine/src/gui, mtime 1647395907): 7 files, no impossibilities.
 # . (key c:/Users/adamn/Desktop/ChessEngine, mtime 1647397120): 8 files, no impossibilities.
 # src/engine (key c:/Users/adamn/Desktop/ChessEngine/src/engine, mtime 1647382648): 25 files, no impossibilities.
+# src/selfplay (key c:/Users/adamn/Desktop/ChessEngine/src/selfplay, mtime 1648093547): 5 files, no impossibilities.
 # src/test (key c:/Users/adamn/Desktop/ChessEngine/src/test, mtime 1647382685): 4 files, no impossibilities.
 
-# 44 files, no impossibilities in 4 directories.
+# 49 files, no impossibilities in 5 directories.
 
 # Implicit Rules
 
 build/%.o: src/engine/%.cpp
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 build/%.o: src/gui/%.cpp
-#  recipe to execute (from 'makefile', line 49):
+#  recipe to execute (from 'makefile', line 56):
 	$(CXX) $(INCLUDE_SDL) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(GUI_DIR)/$*.cpp -o $@
 
 build/%.o: src/test/%.cpp
-#  recipe to execute (from 'makefile', line 53):
+#  recipe to execute (from 'makefile', line 60):
 	$(CXX) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(TST_DIR)/$*.cpp -o $@
 
-# 3 implicit rules, 0 (0.0%) terminal.
+build/%.o: src/selfplay/%.cpp
+#  recipe to execute (from 'makefile', line 63):
+	$(CXX) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(PLY_DIR)/$*.cpp -o $@
+
+# 4 implicit rules, 0 (0.0%) terminal.
 # Files
 
 # Not a target:
 src/engine/Search.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-16 11:27:32
+#  Last modified 2022-03-16 13:27:32
 #  File has been updated.
 #  Successfully updated.
 
@@ -288,132 +302,139 @@ build/ChessTest: build/BitBoards.o build/ChessBoard.o build/Evaluation.o build/M
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 41):
+#  recipe to execute (from 'makefile', line 45):
 	$(CXX) $(OBJS_ENG) $(OBJS_TST) -o $(EXET)
 
 build/MovePick.o: src/engine/MovePick.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'MovePick'
-#  Last modified 2022-03-17 21:09:13
+#  Last modified 2022-05-06 15:32:49
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 build/ChessGUI.o: src/gui/ChessGUI.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'ChessGUI'
-#  Last modified 2022-03-17 21:09:17
+#  Last modified 2022-05-06 15:32:53
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 49):
+#  recipe to execute (from 'makefile', line 56):
 	$(CXX) $(INCLUDE_SDL) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(GUI_DIR)/$*.cpp -o $@
 
 build/Tune.o: src/engine/Tune.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Tune'
-#  Last modified 2022-03-17 21:09:16
+#  Last modified 2022-05-06 15:32:52
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 build/Zobrist.o: src/engine/Zobrist.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Zobrist'
-#  Last modified 2022-03-17 21:09:16
+#  Last modified 2022-05-06 15:32:52
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 # Not a target:
 src/gui/ChessGUI.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-01-24 21:12:25
+#  Last modified 2022-01-24 23:12:25
 #  File has been updated.
 #  Successfully updated.
 
 build/Threads.o: src/engine/Threads.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Threads'
-#  Last modified 2022-03-17 21:09:15
+#  Last modified 2022-05-06 15:32:51
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 56):
-	del $(BUILD_DIR)\*.o
+#  recipe to execute (from 'makefile', line 66):
+	 
+del $(BUILD_DIR)\*.o
 	del $(BUILD_DIR)\*.exe
 
 build/BitBoards.o: src/engine/BitBoards.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'BitBoards'
-#  Last modified 2022-03-17 21:09:09
+#  Last modified 2022-05-06 15:32:45
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 build/ChessBoard.o: src/engine/ChessBoard.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'ChessBoard'
-#  Last modified 2022-03-17 21:09:10
+#  Last modified 2022-05-06 15:32:46
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
+
+# Not a target:
+build/Player.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 src/gui/main.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-15 15:20:42
+#  Last modified 2022-03-21 21:47:44
 #  File has been updated.
 #  Successfully updated.
 
 build/TransposTable.o: src/engine/TransposTable.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'TransposTable'
-#  Last modified 2022-03-17 21:09:15
+#  Last modified 2022-05-06 15:32:51
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 build/Search.o: src/engine/Search.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Search'
-#  Last modified 2022-03-17 21:09:14
+#  Last modified 2022-05-06 15:32:50
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 # Not a target:
 src/engine/BitBoards.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-15 16:02:32
+#  Last modified 2022-03-15 18:02:32
 #  File has been updated.
 #  Successfully updated.
 
 build/Misc.o: src/engine/Misc.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Misc'
-#  Last modified 2022-03-17 21:09:12
+#  Last modified 2022-05-06 15:32:48
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 # Not a target:
 src/engine/Zobrist.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-02-01 18:09:28
+#  Last modified 2022-02-01 20:09:28
 #  File has been updated.
 #  Successfully updated.
 
@@ -423,7 +444,7 @@ src/engine/Zobrist.cpp:
 #  Modification time never checked.
 #  File has not been updated.
 
-all: build/ChessGUI build/ChessTest
+all: build/ChessGUI build/ChessTest build/SelfPlay
 #  Command line target.
 #  Implicit rule search has been done.
 #  File does not exist.
@@ -435,55 +456,68 @@ all: build/ChessGUI build/ChessTest
 build/GameState.o: src/gui/GameState.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'GameState'
-#  Last modified 2022-03-17 21:09:18
+#  Last modified 2022-05-06 15:32:54
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 49):
+#  recipe to execute (from 'makefile', line 56):
 	$(CXX) $(INCLUDE_SDL) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(GUI_DIR)/$*.cpp -o $@
 
 # Not a target:
 src/engine/MoveGenerator.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-15 15:14:08
+#  Last modified 2022-04-28 18:58:01
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 src/engine/Threads.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-11 21:56:37
+#  Last modified 2022-03-21 21:49:06
 #  File has been updated.
 #  Successfully updated.
 
 build/MoveGenerator.o: src/engine/MoveGenerator.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'MoveGenerator'
-#  Last modified 2022-03-17 21:09:12
+#  Last modified 2022-05-06 15:32:48
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 # Not a target:
 src/engine/TransposTable.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-01 21:23:03
+#  Last modified 2022-03-01 23:23:03
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 src/engine/Misc.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-15 15:12:20
+#  Last modified 2022-03-15 17:12:20
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-16 21:21:24
+#  Last modified 2022-03-23 22:54:19
 #  File has been updated.
 #  Successfully updated.
+
+build/SelfPlay: build/Player.o build/SPmain.o build/BitBoards.o build/ChessBoard.o build/Evaluation.o build/Misc.o build/MoveGenerator.o build/MovePick.o build/Search.o build/Threads.o build/TransposTable.o build/Tune.o build/Zobrist.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 48):
+	$(CXX) $(OBJS_PLY) $(OBJS_ENG) -o $(EXEP)
+
+# Not a target:
+build/SPmain.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 build/Test.o:
@@ -494,7 +528,7 @@ build/Test.o:
 # Not a target:
 src/engine/Evaluation.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-17 19:13:04
+#  Last modified 2022-05-05 22:39:16
 #  File has been updated.
 #  Successfully updated.
 
@@ -507,16 +541,16 @@ src/engine/Evaluation.cpp:
 build/main.o: src/gui/main.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'main'
-#  Last modified 2022-03-17 21:09:19
+#  Last modified 2022-05-06 15:32:55
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 49):
+#  recipe to execute (from 'makefile', line 56):
 	$(CXX) $(INCLUDE_SDL) $(INCLUDE_ENGINE) $(CXX_FLAGS) $(GUI_DIR)/$*.cpp -o $@
 
 # Not a target:
 src/engine/MovePick.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-11 21:56:16
+#  Last modified 2022-04-28 20:09:38
 #  File has been updated.
 #  Successfully updated.
 
@@ -544,53 +578,53 @@ build/ChessGUI: build/BitBoards.o build/ChessBoard.o build/Evaluation.o build/Mi
 # | := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=5/18=28%
-#  recipe to execute (from 'makefile', line 37):
+#  recipe to execute (from 'makefile', line 41):
 	$(CXX) $(OBJS_ENG) $(OBJS_GUI) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE)
 
 build/Evaluation.o: src/engine/Evaluation.cpp
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'Evaluation'
-#  Last modified 2022-03-17 21:09:11
+#  Last modified 2022-05-06 15:32:47
 #  File has been updated.
 #  Successfully updated.
-#  recipe to execute (from 'makefile', line 45):
+#  recipe to execute (from 'makefile', line 52):
 	$(CXX) $(CXX_FLAGS) $(ENG_DIR)/$*.cpp -o $@
 
 # Not a target:
 src/engine/ChessBoard.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-15 20:02:20
+#  Last modified 2022-03-21 23:10:56
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 src/engine/Tune.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-17 19:14:02
+#  Last modified 2022-05-05 22:40:18
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 src/gui/GameState.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-03-17 21:09:04
+#  Last modified 2022-05-06 15:32:39
 #  File has been updated.
 #  Successfully updated.
 
 # files hash-table stats:
-# Load=36/1024=4%, Rehash=0, Collisions=0/123=0%
+# Load=39/1024=4%, Rehash=0, Collisions=0/141=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 97 / storage = 1321 B / avg = 13 B
-# current buf: size = 8174 B / used = 1321 B / count = 97 / avg = 13 B
+# strcache buffers: 1 (0) / strings = 105 / storage = 1429 B / avg = 13 B
+# current buf: size = 8174 B / used = 1429 B / count = 105 / avg = 13 B
 
-# strcache performance: lookups = 142 / hit rate = 31%
+# strcache performance: lookups = 166 / hit rate = 36%
 # hash-table stats:
-# Load=97/8192=1%, Rehash=0, Collisions=0/142=0%
-# Finished Make data base on Thu Mar 17 22:05:54 2022
+# Load=105/8192=1%, Rehash=0, Collisions=0/166=0%
+# Finished Make data base on Tue May 31 14:02:51 2022
 
  

@@ -25,114 +25,6 @@ void testKey(ChessBoard& cb) {
     REQUIRE(key == cb.key());
 }
 
-void setParams(double params[NPARAMS][PHASENB]) {
-    int idx = 0;
-    if (TUNEMATERIAL) {
-        for (int i = PAWN; i < KING; i++) {
-            params[idx][mg] = pieceVals[i].mg;
-            params[idx][eg] = pieceVals[i].eg;
-            idx++;
-        }
-    }
-
-    if (TUNEPSQT) {
-        for (int i = PAWN; i <= KING; i++) {
-            for (int j = 0; j < 64; j++) {
-                params[idx][mg] = pieceSquareTables[makePiece(BLACK, PieceType(i))][j].mg;
-                params[idx][eg] = pieceSquareTables[makePiece(BLACK, PieceType(i))][j].eg;
-                idx++;
-            }
-        }
-    }
-
-    if (TUNEPAWNSTRUCT) {
-        for (int j = 0; j < 8; j++) {
-            params[idx][mg] = connectedBonus[j].mg;
-            params[idx][eg] = connectedBonus[j].eg;
-            idx++;
-        }
-        for (int j = 0; j < 8; j++) {
-            params[idx][mg] = passedBonus[j].mg;
-            params[idx][eg] = passedBonus[j].eg;
-            idx++;
-        }
-        params[idx][mg] = isolated.mg;
-        params[idx][eg] = isolated.eg;
-        idx++;
-
-        params[idx][mg] = doubled.mg;
-        params[idx][eg] = doubled.eg;
-        idx++;
-
-        params[idx][mg] = unsupported.mg;
-        params[idx][eg] = unsupported.eg;
-        idx++;
-
-        params[idx][mg] = supported.mg;
-        params[idx][eg] = supported.eg;
-        idx++;
-
-        for (int j = 0; j < 4; j++) {
-            for (int k = 0; k < 8; k++) {
-                params[idx][mg] = shelterBonus[j][k].mg;
-                params[idx][eg] = shelterBonus[j][k].eg;
-                idx++;
-            }
-        }
-
-        for (int k = 0; k < 8; k++) {
-            params[idx][mg] = blockedStorm[k].mg;
-            params[idx][eg] =blockedStorm[k].eg;
-            idx++;
-        }
-
-        for (int k = 0; k < 8; k++) {
-            params[idx][mg] = unblockedStorm[k].mg;
-            params[idx][eg] = unblockedStorm[k].eg;
-            idx++;
-        }
-
-        for (int j = 0; j < 2; j++) {
-            for (int k = 0; k < 2; k++) {
-                params[idx][mg] = openFileBonus[j][k].mg;
-                params[idx][eg] = openFileBonus[j][k].eg;
-                idx++;
-            }
-        }
-    }
-
-    if (TUNEKINGSAFETY) {
-        for (int i = 0; i < 100; i++) {
-            params[idx][mg] = safetyTable[i].mg;
-            params[idx][eg] = safetyTable[i].eg;
-            idx++;
-        }
-    }
-
-    if (TUNEMOBILITY) {
-        for (int i = 0; i < 9; i++) {
-            params[idx][mg] = knightMobility[i].mg;
-            params[idx][eg] = knightMobility[i].eg;
-            idx++;
-        }
-        for (int i = 0; i < 14; i++) {
-            params[idx][mg] = bishopMobility[i].mg;
-            params[idx][eg] = bishopMobility[i].eg;
-            idx++;
-        }
-        for (int i = 0; i < 15; i++) {
-            params[idx][mg] = rookMobility[i].mg;
-            params[idx][eg] = rookMobility[i].eg;
-            idx++;
-        }
-        for (int i = 0; i < 28; i++) {
-            params[idx][mg] = queenMobility[i].mg;
-            params[idx][eg] = queenMobility[i].eg;
-            idx++;
-        }
-    }
-}
-
 TEST_CASE("ChessBoard::FenString constructor", "[Weight=1][part=ChessBoard]") {
     BitBoards::precomputeAttackSets();
     Evaluation::init();
@@ -208,6 +100,10 @@ TEST_CASE("ChessBoard::Key", "[Weight=1][part=ChessBoard]") {
 }
 
 TEST_CASE("Tune::initCoeffs", "[Weight=1][part=Tune]") {
+    std::ifstream inFile(TUNINGFILE); 
+    int cnt = std::count(std::istreambuf_iterator<char>(inFile), std::istreambuf_iterator<char>(), '\n');
+    std::cout << "Num Positions: " << cnt << std::endl;
+    Tuner::runTuner();
     StateInfo si;
     std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     std::string altPos[6] ={"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ",
@@ -218,20 +114,26 @@ TEST_CASE("Tune::initCoeffs", "[Weight=1][part=Tune]") {
                             "8/1r6/4K3/p1B3b1/2kP4/8/1p6/1R6 w - - 0 56 [0.0]"};   
 
     ChessBoard cb = ChessBoard(startingFen, si);
-    Evaluation::doTrace = true;
+
+    std::cout << cb.boardToFen() << std::endl;
+    cb.fenToBoard(cb.boardToFen(), si);
     TuningEntry entry;
     Tuner::initSingleEntry(entry, cb);
     REQUIRE(entry.nTerms == 0);
 
     double params[NPARAMS][PHASENB] = {0};
-    setParams(params);
+    Tuner::setParams(params);
     for (int i = 0; i < 6; i++) {
         memset(&Evaluation::trace, 0, sizeof(EvalTrace));
         cb.fenToBoard(altPos[i], si);
+        cb.fenToBoard(cb.boardToFen(), si);
+        std::cout << cb.boardToFen() << std::endl;
         Tuner::initSingleEntry(entry, cb);
-        int sEval = entry.sEval;
-        entry.sEval = 0;
+        int sEval = entry.origEval;
+        entry.origEval = 0;
         int lEval = Tuner::linearEval(entry, params);
         REQUIRE(lEval == sEval);
     }
+    double old[NPARAMS][PHASENB] = {0};
+    Tuner::writeParams(params, old);
 }

@@ -4,6 +4,11 @@
 #include "Evaluation.h"
 #include "ChessBoard.h"
 
+// TODO: Change to use staged system instead. Generate moves only as we need them.
+// Gen captures first and only if no cuttoff occurs move on to quiet generation.
+
+// TODO: Score captures with a mix of SEE and capture history. Keep quiet scoring the same.
+
 
 enum Stage {
     TTMove, GoodCaptures, EvenCaptures, Refutations, AllQuiets, LosingCaptures

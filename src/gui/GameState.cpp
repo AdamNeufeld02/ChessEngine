@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-const static std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";;
+const static std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 GameState::GameState() {
     states = std::unique_ptr<std::deque<StateInfo>>(new std::deque<StateInfo>(1));
@@ -62,11 +62,15 @@ Move GameState::getMoveFromComp() {
         std::cout << "COMPUTER LOST";
         return NOMOVE;
     }
-    tp->startSearching(*chessBoard, 3);
+    tp->startSearching(*chessBoard, 3000);
     tp->waitForAllThreads();
     SearchInfo si = tp->getBestThread();
     std::cout << "Depth: " << si.depth << std::endl;
-    std::cout << "Eval: "  << (double)si.score/pieceVals[PAWN].mg << std::endl;
+    if (si.score >= MateInMax) {
+        std::cout << "Eval: M" << (Infinity - abs(si.score)) / 2 << std::endl;
+    } else {
+        std::cout << "Eval: "  << (double)si.score/pieceVals[PAWN].mg << std::endl;
+    }
     std::cout << "Nodes Searched: "<< si.nodesSearched << std::endl;
     std::cout << "--------------------" << std::endl;
     Move move = si.best;

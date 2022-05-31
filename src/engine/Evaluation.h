@@ -45,6 +45,8 @@ extern Score safetyTable[100];
 // The weight of each attack on the king zone by piece
 extern int attackerWeight[8];
 
+extern Score rookOnOpenFile;
+
 extern Score knightMobility[9];
 extern Score bishopMobility[14];
 extern Score rookMobility[15];
@@ -54,7 +56,7 @@ extern Score queenMobility[28];
 
 class ChessBoard;
 
-static const int draw = -1;
+static const int draw = 0;
 
 struct EvalTrace {
     // Pawn Eval Trace
@@ -76,6 +78,7 @@ struct EvalTrace {
     int bishopMob[COLOURNB][14];
     int rookMob[COLOURNB][15];
     int queenMob[COLOURNB][28];
+    int rookOnOpenFile[COLOURNB];
 };
 
 struct pawnEntry {
@@ -111,6 +114,9 @@ namespace Evaluation {
     int evaluate(ChessBoard& cb);
 
     template<Colour col>
+    void traceEval(ChessBoard& cb);
+
+    template<Colour col>
     Score evaluatePawnStructure(ChessBoard& cb);
 
     template<Colour col>
@@ -124,7 +130,6 @@ namespace Evaluation {
     void init();
 
     extern EvalTrace trace;
-    extern bool doTrace;
 }
 
 #endif

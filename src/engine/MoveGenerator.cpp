@@ -1,5 +1,7 @@
 #include "MoveGenerator.h"
 
+// Generates legal moves for a given chess position. If onlyCaptures is specified then only legal captures are generated
+// unless the player to move is in check, then all legal moves will be generated.
 ScoredMove* MoveGenerator::generateMoves(ChessBoard& chessBoard, ScoredMove* moves, bool onlyCaptures) {
     ScoredMove* curr = moves;
     Colour us = chessBoard.colourToMove();
@@ -108,6 +110,7 @@ ScoredMove* MoveGenerator::generateKingMoves(ChessBoard& chessBoard, ScoredMove*
     return moves;
 }
 
+// Generates all pawn moves including promotions double pushes and enpassents
 template<GenType t, Colour us>
 ScoredMove* MoveGenerator::generatePawnMoves(ChessBoard& chessBoard, ScoredMove* moves, bitBoard targets) {
     Colour them = ~us;

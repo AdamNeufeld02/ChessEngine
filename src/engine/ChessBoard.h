@@ -41,6 +41,7 @@ class ChessBoard {
     ChessBoard();
 
     void fenToBoard(std::string fenString, StateInfo& si);
+    std::string boardToFen();
     // copies the given board to this board
     void copy(ChessBoard& cb);
     // return piece code at specific index
@@ -58,6 +59,9 @@ class ChessBoard {
 
     // Returns true if the given capture is above the threshold and false otherwise
     bool seeGE(Move move, int threshold);
+
+    // Returns true if the given move is legal for the current board state
+    bool isLegal(Move move);
 
     bool isDraw();
 
@@ -199,7 +203,7 @@ inline int ChessBoard::ply() {
 }
 
 inline bool ChessBoard::isDraw() {
-    return st->repetitions >= 2;
+    return st->repetitions >= 2 || st->rule50 >= 50;
 }
 
 inline void ChessBoard::putPiece(Piece pc, int sq) {
